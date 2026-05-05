@@ -1,0 +1,13 @@
+{
+  "name": "Zygo Express",
+  "short_name": "Zygo",
+  "description": "Fast & reliable last-mile delivery.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fdfaf6",
+  "theme_color": "#F2541B",
+  "icons": [
+    { "src": "/zygo-icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

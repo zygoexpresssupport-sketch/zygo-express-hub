@@ -31,11 +31,11 @@ export const Footer = () => (
       </div>
       <div className="space-y-3">
         <div className="font-bold">Contact</div>
-        <a href="mailto:hello@zygoexpress.com" className="flex items-center gap-2 opacity-70 hover:opacity-100">
-          <Mail className="h-4 w-4" /> hello@zygoexpress.com
+        <a href="mailto:zygoexpresssupport@gmail.com" className="flex items-center gap-2 opacity-70 hover:opacity-100">
+          <Mail className="h-4 w-4" /> zygoexpresssupport@gmail.com
         </a>
-        <a href="tel:+254700000000" className="flex items-center gap-2 opacity-70 hover:opacity-100">
-          <Phone className="h-4 w-4" /> +254 700 000 000
+        <a href="tel:+233202858011" className="flex items-center gap-2 opacity-70 hover:opacity-100">
+          <Phone className="h-4 w-4" /> +233 20 285 8011
         </a>
       </div>
     </div>

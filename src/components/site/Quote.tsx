@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Name is required").max(80),
@@ -18,20 +19,26 @@ const schema = z.object({
 export const Quote = () => {
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const parsed = schema.safeParse(Object.fromEntries(fd));
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Quote request sent! We'll be in touch shortly.");
-      (e.target as HTMLFormElement).reset();
-    }, 700);
+    const { data, error } = await supabase.functions.invoke("submit-quote", {
+      body: parsed.data,
+    });
+    setLoading(false);
+    if (error || (data && (data as any).error)) {
+      toast.error("Couldn't send quote. Please try again.");
+      return;
+    }
+    toast.success("Quote request sent! We'll be in touch shortly.");
+    form.reset();
   };
 
   return (
@@ -58,7 +65,7 @@ export const Quote = () => {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" name="phone" placeholder="+254 7..." required maxLength={20} />
+              <Input id="phone" name="phone" placeholder="+233 20 285 8011" required maxLength={20} />
             </div>
           </div>
           <div className="space-y-1.5">

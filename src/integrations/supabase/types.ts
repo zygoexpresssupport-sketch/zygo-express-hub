@@ -16,31 +16,58 @@ export type Database = {
     Tables: {
       quote_requests: {
         Row: {
+          confirmed_at: string | null
           created_at: string
           details: string | null
           dropoff: string
+          dropoff_lat: number | null
+          dropoff_lng: number | null
           id: string
           name: string
+          notes: string | null
           phone: string
           pickup: string
+          pickup_lat: number | null
+          pickup_lng: number | null
+          source: string
+          status: string
+          tracking_code: string | null
         }
         Insert: {
+          confirmed_at?: string | null
           created_at?: string
           details?: string | null
           dropoff: string
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
           id?: string
           name: string
+          notes?: string | null
           phone: string
           pickup: string
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          source?: string
+          status?: string
+          tracking_code?: string | null
         }
         Update: {
+          confirmed_at?: string | null
           created_at?: string
           details?: string | null
           dropoff?: string
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
           id?: string
           name?: string
+          notes?: string | null
           phone?: string
           pickup?: string
+          pickup_lat?: number | null
+          pickup_lng?: number | null
+          source?: string
+          status?: string
+          tracking_code?: string | null
         }
         Relationships: []
       }
@@ -71,11 +98,43 @@ export type Database = {
     }
     Functions: {
       claim_first_admin: { Args: never; Returns: boolean }
+      confirm_quote: { Args: { _id: string }; Returns: string }
+      generate_tracking_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      log_manual_request: {
+        Args: {
+          _details: string
+          _dropoff: string
+          _name: string
+          _phone: string
+          _pickup: string
+          _source: string
+        }
+        Returns: string
+      }
+      lookup_tracking: {
+        Args: { _code: string }
+        Returns: {
+          confirmed_at: string
+          created_at: string
+          dropoff: string
+          dropoff_lat: number
+          dropoff_lng: number
+          pickup: string
+          pickup_lat: number
+          pickup_lng: number
+          status: string
+          tracking_code: string
+        }[]
+      }
+      update_quote_status: {
+        Args: { _id: string; _status: string }
         Returns: boolean
       }
     }

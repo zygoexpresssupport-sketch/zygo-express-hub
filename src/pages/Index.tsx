@@ -4,6 +4,7 @@ import { Services } from "@/components/site/Services";
 import { Tracking } from "@/components/site/Tracking";
 import { Quote } from "@/components/site/Quote";
 import { About } from "@/components/site/About";
+import { QrCode } from "@/components/site/QrCode";
 import { Footer } from "@/components/site/Footer";
 
 const Index = () => (
@@ -14,6 +15,7 @@ const Index = () => (
     <Tracking />
     <About />
     <Quote />
+    <QrCode />
     <Footer />
   </main>
 );

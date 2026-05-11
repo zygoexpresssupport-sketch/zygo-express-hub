@@ -2,8 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface QuoteBody {
@@ -21,18 +20,47 @@ function bad(message: string, status = 400) {
   });
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+// Free OSM geocoding — best-effort
+async function geocode(q: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+    const r = await fetch(url, { headers: { "User-Agent": "ZygoExpress/1.0" } });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!Array.isArray(j) || j.length === 0) return null;
+    return { lat: parseFloat(j[0].lat), lng: parseFloat(j[0].lon) };
+  } catch { return null; }
+}
+
+async function sendSms(to: string, body: string) {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
+  const FROM = Deno.env.get("TWILIO_FROM_NUMBER");
+  if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !FROM) {
+    console.warn("Twilio not fully configured, skipping SMS");
+    return;
   }
+  const res = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": TWILIO_API_KEY,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({ To: to, From: FROM, Body: body }),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    console.error(`Twilio SMS failed [${res.status}]: ${txt}`);
+  }
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return bad("Method not allowed", 405);
 
   let body: QuoteBody;
-  try {
-    body = await req.json();
-  } catch {
-    return bad("Invalid JSON");
-  }
+  try { body = await req.json(); } catch { return bad("Invalid JSON"); }
 
   const name = (body.name ?? "").toString().trim();
   const phone = (body.phone ?? "").toString().trim();
@@ -50,9 +78,20 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
+  // Best-effort geocoding (do both in parallel)
+  const [pickupGeo, dropoffGeo] = await Promise.all([geocode(pickup), geocode(dropoff)]);
+
   const { data, error } = await supabase
     .from("quote_requests")
-    .insert({ name, phone, pickup, dropoff, details: details || null })
+    .insert({
+      name, phone, pickup, dropoff,
+      details: details || null,
+      source: "website",
+      pickup_lat: pickupGeo?.lat ?? null,
+      pickup_lng: pickupGeo?.lng ?? null,
+      dropoff_lat: dropoffGeo?.lat ?? null,
+      dropoff_lng: dropoffGeo?.lng ?? null,
+    })
     .select("id")
     .single();
 
@@ -61,18 +100,11 @@ Deno.serve(async (req) => {
     return bad("Failed to save submission", 500);
   }
 
-  // Try to dispatch email notification (non-blocking failure)
-  try {
-    await supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "quote-request-notification",
-        recipientEmail: "zygoexpresssupport@gmail.com",
-        idempotencyKey: `quote-${data.id}`,
-        templateData: { name, phone, pickup, dropoff, details },
-      },
-    });
-  } catch (e) {
-    console.warn("Email dispatch skipped:", e);
+  // Notify admin via SMS
+  const ADMIN = Deno.env.get("TWILIO_ADMIN_NUMBER");
+  if (ADMIN) {
+    const msg = `🚀 New Zygo quote\n${name} (${phone})\nFrom: ${pickup}\nTo: ${dropoff}${details ? `\n${details.slice(0,80)}` : ""}`;
+    sendSms(ADMIN, msg).catch((e) => console.warn("SMS skipped:", e));
   }
 
   return new Response(JSON.stringify({ ok: true, id: data.id }), {

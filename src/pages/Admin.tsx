@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { LogOut, ShieldCheck, Plus, MapPin, CheckCircle2, Copy, BellRing } from "lucide-react";
 import { RouteMap } from "@/components/site/RouteMap";
+import { RidersDashboard } from "@/components/admin/RidersDashboard";
 
 type Quote = {
   id: string;
@@ -34,6 +35,8 @@ type Quote = {
   pickup_lng: number | null;
   dropoff_lat: number | null;
   dropoff_lng: number | null;
+  price: number | null;
+  assigned_rider_id: string | null;
 };
 
 const STATUS_OPTIONS = [
@@ -50,6 +53,8 @@ export default function Admin() {
   const [email, setEmail] = useState("");
   const [selected, setSelected] = useState<Quote | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
+  const [history, setHistory] = useState<any | null>(null);
+  const [priceDraft, setPriceDraft] = useState<string>("");
   const seenIds = useRef<Set<string>>(new Set());
 
   const loadQuotes = async () => {
@@ -129,6 +134,24 @@ export default function Admin() {
     toast.success(`Status → ${status}`);
   };
 
+  const savePrice = async (q: Quote) => {
+    const n = Number(priceDraft);
+    if (isNaN(n) || n < 0) return toast.error("Invalid price");
+    const { error } = await supabase.rpc("set_quote_price", { _id: q.id, _price: n });
+    if (error) return toast.error(error.message);
+    toast.success("Price saved");
+    loadQuotes();
+  };
+
+  // load customer history when a quote is opened
+  useEffect(() => {
+    if (!selected) { setHistory(null); return; }
+    setPriceDraft(selected.price != null ? String(selected.price) : "");
+    supabase.rpc("customer_history", { _phone: selected.phone }).then(({ data }) => {
+      setHistory((data as any)?.[0] ?? null);
+    });
+  }, [selected]);
+
   const copy = (text: string) => { navigator.clipboard.writeText(text); toast.success("Copied"); };
 
   if (loading) return <main className="min-h-screen flex items-center justify-center">Loading…</main>;
@@ -156,6 +179,7 @@ export default function Admin() {
           </div>
         ) : (
           <>
+            <RidersDashboard />
             <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
               <h1 className="text-3xl font-extrabold flex items-center gap-2">
                 <BellRing className="text-primary" /> Requests
@@ -236,6 +260,22 @@ export default function Admin() {
                     <div className="font-mono font-bold">{selected.tracking_code}</div>
                   </div>
                   <Button size="sm" variant="outline" onClick={() => copy(selected.tracking_code!)}><Copy className="h-4 w-4" /> Copy</Button>
+                </div>
+              )}
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <Label className="text-xs">Price (GHS)</Label>
+                  <Input type="number" step="0.01" min="0" value={priceDraft} onChange={(e)=>setPriceDraft(e.target.value)} />
+                </div>
+                <Button variant="hero" onClick={() => savePrice(selected)}>Save price</Button>
+              </div>
+              {history && Number(history.total_requests) > 1 && (
+                <div className="flex items-center justify-between bg-primary/10 rounded-lg p-3 text-xs">
+                  <div>
+                    <span className="font-bold uppercase mr-2">{history.tier}</span>
+                    Repeat customer · {history.delivered} delivered of {history.total_requests} requests
+                  </div>
+                  <div className="text-muted-foreground">Spent GHS {Number(history.total_spent||0).toFixed(2)}</div>
                 </div>
               )}
               {selected.details && (

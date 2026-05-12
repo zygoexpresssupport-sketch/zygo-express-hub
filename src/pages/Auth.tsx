@@ -23,15 +23,20 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: `${window.location.origin}/admin` },
       });
       setLoading(false);
       if (error) return toast.error(error.message);
-      toast.success("Account created. You're signed in.");
-      navigate("/admin", { replace: true });
+      if (data.session) {
+        toast.success("Account created. You're signed in.");
+        navigate("/admin", { replace: true });
+      } else {
+        toast.success("Account created. Check your email to confirm, then sign in.");
+        setMode("signin");
+      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);

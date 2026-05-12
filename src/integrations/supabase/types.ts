@@ -16,8 +16,10 @@ export type Database = {
     Tables: {
       quote_requests: {
         Row: {
+          assigned_rider_id: string | null
           confirmed_at: string | null
           created_at: string
+          delivered_at: string | null
           details: string | null
           dropoff: string
           dropoff_lat: number | null
@@ -29,13 +31,16 @@ export type Database = {
           pickup: string
           pickup_lat: number | null
           pickup_lng: number | null
+          price: number | null
           source: string
           status: string
           tracking_code: string | null
         }
         Insert: {
+          assigned_rider_id?: string | null
           confirmed_at?: string | null
           created_at?: string
+          delivered_at?: string | null
           details?: string | null
           dropoff: string
           dropoff_lat?: number | null
@@ -47,13 +52,16 @@ export type Database = {
           pickup: string
           pickup_lat?: number | null
           pickup_lng?: number | null
+          price?: number | null
           source?: string
           status?: string
           tracking_code?: string | null
         }
         Update: {
+          assigned_rider_id?: string | null
           confirmed_at?: string | null
           created_at?: string
+          delivered_at?: string | null
           details?: string | null
           dropoff?: string
           dropoff_lat?: number | null
@@ -65,9 +73,48 @@ export type Database = {
           pickup?: string
           pickup_lat?: number | null
           pickup_lng?: number | null
+          price?: number | null
           source?: string
           status?: string
           tracking_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_requests_assigned_rider_id_fkey"
+            columns: ["assigned_rider_id"]
+            isOneToOne: false
+            referencedRelation: "riders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      riders: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          phone: string
+          signed_in_at: string | null
+          slot: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string
+          signed_in_at?: string | null
+          slot: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          phone?: string
+          signed_in_at?: string | null
+          slot?: number
         }
         Relationships: []
       }
@@ -97,8 +144,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_next_rider: { Args: { _quote_id: string }; Returns: string }
       claim_first_admin: { Args: never; Returns: boolean }
       confirm_quote: { Args: { _id: string }; Returns: string }
+      customer_history: {
+        Args: { _phone: string }
+        Returns: {
+          delivered: number
+          first_seen: string
+          last_seen: string
+          tier: string
+          total_requests: number
+          total_spent: number
+        }[]
+      }
       generate_tracking_code: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -133,8 +192,31 @@ export type Database = {
           tracking_code: string
         }[]
       }
+      rider_daily_stats: {
+        Args: { _day: string }
+        Returns: {
+          deliveries: number
+          in_progress: number
+          is_active: boolean
+          name: string
+          revenue: number
+          rider_id: string
+          signed_in_at: string
+          slot: number
+        }[]
+      }
+      rider_sign_in: { Args: { _id: string }; Returns: boolean }
+      rider_sign_out: { Args: { _id: string }; Returns: boolean }
+      set_quote_price: {
+        Args: { _id: string; _price: number }
+        Returns: boolean
+      }
       update_quote_status: {
         Args: { _id: string; _status: string }
+        Returns: boolean
+      }
+      update_rider: {
+        Args: { _id: string; _name: string; _phone: string }
         Returns: boolean
       }
     }

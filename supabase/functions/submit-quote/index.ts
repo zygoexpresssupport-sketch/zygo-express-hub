@@ -32,13 +32,38 @@ async function geocode(q: string): Promise<{ lat: number; lng: number } | null> 
   } catch { return null; }
 }
 
+async function sendTelegram(text: string) {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const TELEGRAM_API_KEY = Deno.env.get("TELEGRAM_API_KEY");
+  const CHAT_ID = Deno.env.get("TELEGRAM_ADMIN_CHAT_ID");
+  if (!LOVABLE_API_KEY || !TELEGRAM_API_KEY || !CHAT_ID) {
+    console.warn("Telegram not configured, skipping");
+    return { ok: false, reason: "not_configured" };
+  }
+  const res = await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+      "X-Connection-Api-Key": TELEGRAM_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: "HTML" }),
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    console.error(`Telegram send failed [${res.status}]: ${txt}`);
+    return { ok: false, reason: `${res.status}: ${txt.slice(0,200)}` };
+  }
+  return { ok: true };
+}
+
 async function sendSms(to: string, body: string) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
   const FROM = Deno.env.get("TWILIO_FROM_NUMBER");
   if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !FROM) {
     console.warn("Twilio not fully configured, skipping SMS");
-    return;
+    return { ok: false, reason: "not_configured" };
   }
   const res = await fetch("https://connector-gateway.lovable.dev/twilio/Messages.json", {
     method: "POST",
@@ -52,7 +77,9 @@ async function sendSms(to: string, body: string) {
   if (!res.ok) {
     const txt = await res.text();
     console.error(`Twilio SMS failed [${res.status}]: ${txt}`);
+    return { ok: false, reason: `${res.status}: ${txt.slice(0,200)}` };
   }
+  return { ok: true };
 }
 
 Deno.serve(async (req) => {
@@ -100,11 +127,18 @@ Deno.serve(async (req) => {
     return bad("Failed to save submission", 500);
   }
 
-  // Notify admin via SMS
+  // Notify admin — Telegram primary, SMS backup
+  const plain = `🚀 New Zygo quote\n${name} (${phone})\nFrom: ${pickup}\nTo: ${dropoff}${details ? `\n${details.slice(0,120)}` : ""}`;
+  const html = `🚀 <b>New Zygo quote</b>\n<b>${name}</b> (${phone})\n<b>From:</b> ${pickup}\n<b>To:</b> ${dropoff}${details ? `\n${details.slice(0,160)}` : ""}`;
+
+  const tg = await sendTelegram(html);
+  if (!tg.ok) console.warn("Telegram alert failed:", tg.reason);
+
   const ADMIN = Deno.env.get("TWILIO_ADMIN_NUMBER");
   if (ADMIN) {
-    const msg = `🚀 New Zygo quote\n${name} (${phone})\nFrom: ${pickup}\nTo: ${dropoff}${details ? `\n${details.slice(0,80)}` : ""}`;
-    sendSms(ADMIN, msg).catch((e) => console.warn("SMS skipped:", e));
+    sendSms(ADMIN, plain).then((r) => {
+      if (!r.ok) console.warn("SMS alert failed:", r.reason);
+    }).catch((e) => console.warn("SMS error:", e));
   }
 
   return new Response(JSON.stringify({ ok: true, id: data.id }), {

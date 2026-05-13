@@ -2,7 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Truck, CheckCircle2, Package, Clock } from "lucide-react";
+import { Search, MapPin, Truck, CheckCircle2, Package, Clock, Smartphone, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { RouteMap } from "./RouteMap";
@@ -29,12 +29,16 @@ type TrackResult = {
   pickup_lng: number | null;
   dropoff_lat: number | null;
   dropoff_lng: number | null;
+  price: number | null;
+  paid_at: string | null;
 };
 
 export const Tracking = () => {
   const [id, setId] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TrackResult | null>(null);
+  const [email, setEmail] = useState("");
+  const [paying, setPaying] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +54,24 @@ export const Tracking = () => {
       return toast.error("No shipment found for that code");
     }
     setResult(row);
+  };
+
+  const onPay = async () => {
+    if (!result) return;
+    setPaying(true);
+    const { data, error } = await supabase.functions.invoke("paystack-init", {
+      body: {
+        tracking_code: result.tracking_code,
+        email: email || undefined,
+        callback_url: window.location.href,
+      },
+    });
+    setPaying(false);
+    if (error || (data as any)?.error) {
+      toast.error((data as any)?.error || "Couldn't start payment");
+      return;
+    }
+    window.location.href = (data as any).authorization_url;
   };
 
   const activeIdx = result ? Math.max(0, STATUS_FLOW.indexOf(result.status as any)) : 0;
@@ -111,6 +133,41 @@ export const Tracking = () => {
               <div><div className="text-xs text-muted-foreground">Pickup</div><div className="font-medium">{result.pickup}</div></div>
               <div><div className="text-xs text-muted-foreground">Drop-off</div><div className="font-medium">{result.dropoff}</div></div>
             </div>
+
+            {result.price && Number(result.price) > 0 && (
+              <div className="rounded-2xl border border-border bg-muted/30 p-4 sm:p-5 space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Amount due</div>
+                    <div className="text-2xl font-extrabold">GHS {Number(result.price).toFixed(2)}</div>
+                  </div>
+                  {result.paid_at ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 text-xs font-bold uppercase">
+                      <BadgeCheck className="h-4 w-4" /> Paid
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase">
+                      <Smartphone className="h-4 w-4" /> Mobile money
+                    </span>
+                  )}
+                </div>
+                {!result.paid_at && (
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email for receipt (optional)"
+                      className="h-12"
+                    />
+                    <Button onClick={onPay} variant="hero" size="lg" disabled={paying}>
+                      <Smartphone /> {paying ? "Starting…" : "Pay now"}
+                    </Button>
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground">Pay with MTN MoMo, Vodafone Cash, AirtelTigo or card via Paystack.</p>
+              </div>
+            )}
 
             {(result.pickup_lat || result.dropoff_lat) && (
               <RouteMap

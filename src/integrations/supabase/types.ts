@@ -27,11 +27,16 @@ export type Database = {
           id: string
           name: string
           notes: string | null
+          paid_at: string | null
+          payment_provider: string | null
+          payment_reference: string | null
           phone: string
           pickup: string
           pickup_lat: number | null
           pickup_lng: number | null
           price: number | null
+          route_distance_m: number | null
+          route_duration_s: number | null
           source: string
           status: string
           tracking_code: string | null
@@ -48,11 +53,16 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
+          paid_at?: string | null
+          payment_provider?: string | null
+          payment_reference?: string | null
           phone: string
           pickup: string
           pickup_lat?: number | null
           pickup_lng?: number | null
           price?: number | null
+          route_distance_m?: number | null
+          route_duration_s?: number | null
           source?: string
           status?: string
           tracking_code?: string | null
@@ -69,11 +79,16 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
+          paid_at?: string | null
+          payment_provider?: string | null
+          payment_reference?: string | null
           phone?: string
           pickup?: string
           pickup_lat?: number | null
           pickup_lng?: number | null
           price?: number | null
+          route_distance_m?: number | null
+          route_duration_s?: number | null
           source?: string
           status?: string
           tracking_code?: string | null
@@ -185,12 +200,18 @@ export type Database = {
           dropoff: string
           dropoff_lat: number
           dropoff_lng: number
+          paid_at: string
           pickup: string
           pickup_lat: number
           pickup_lng: number
+          price: number
           status: string
           tracking_code: string
         }[]
+      }
+      mark_quote_paid: {
+        Args: { _provider: string; _reference: string; _tracking_code: string }
+        Returns: boolean
       }
       rider_daily_stats: {
         Args: { _day: string }

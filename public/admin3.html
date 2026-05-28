@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+⁸<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -398,8 +398,8 @@ function renderRequests() {
   }
   document.getElementById('requests-tbody').innerHTML=allOrders.map(o=>{
     const date=new Date(o.created_at);
-    const dateStr=date.toLocaleDateString('en-GH',{month:'short',day:'numeric'});
-    const timeStr=date.toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+const dateStr = date.toLocaleDateString('en-GH',{year:'numeric',month:'short',day:'numeric'});
+const timeStr = date.toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',hour12:false});
     const source=o.source??'Website';
     const sourceClass=source.toLowerCase().includes('whatsapp')?'whatsapp':'';
     const phone=o.phone??o.customer_phone??'';
@@ -410,7 +410,7 @@ function renderRequests() {
     const phoneDisplay=phone?`<a href="tel:${phone}" class="phone-link">${phone}</a>`:'—';
     return `
       <tr>
-        <td style="white-space:nowrap;color:#6b7280;font-size:12px">${dateStr}<br>${timeStr}</td>
+        <td style="color:#6b7280;font-size:11px;min-width:80px">${dateStr}<br>${timeStr}</td>
         <td><span class="source-badge ${sourceClass}">${source}</span></td>
         <td style="font-weight:500">${name}</td>
         <td>${phoneDisplay}</td>

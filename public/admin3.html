@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Zygo Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    :root {
+      --orange: #f97316;
+      --bg: #f8f8f8;
+      --white: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #6b7280;
+      --green: #16a34a;
+      --red: #dc2626;
+      --radius: 12px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; }
+    .screen { display:none; min-height:100vh; flex-direction:column; }
+    .screen.active { display:flex; }
+
+    /* LOGIN */
+    #screen-login { background:var(--white); align-items:center; justify-content:center; padding:32px 24px; }
+    .login-box { width:100%; max-width:360px; }
+    .login-header { display:flex; align-items:center; gap:10px; margin-bottom:32px; }
+    .login-shield { width:40px; height:40px; background:var(--orange); border-radius:10px; display:grid; place-items:center; color:white; font-size:20px; }
+    .login-title-text { font-weight:700; font-size:18px; }
+    .login-email-text { font-size:13px; color:var(--muted); }
+    .login-h1 { font-size:28px; font-weight:700; margin-bottom:6px; }
+    .login-sub { color:var(--muted); font-size:14px; margin-bottom:28px; }
+    .field { margin-bottom:14px; }
+    .field label { display:block; font-size:13px; font-weight:500; margin-bottom:6px; }
+    .field input { width:100%; background:var(--white); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:15px; color:var(--text); font-family:'Inter',sans-serif; outline:none; transition:border-color 0.2s; }
+    .field input:focus { border-color:var(--orange); }
+    .btn-login { width:100%; padding:14px; border:none; background:var(--orange); border-radius:8px; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; color:white; cursor:pointer; }
+    .btn-login:active { opacity:0.85; }
+    .err { background:#fef2f2; border:1px solid #fecaca; color:var(--red); padding:10px 14px; border-radius:8px; font-size:13px; margin-top:10px; display:none; }
+    .err.show { display:block; }
+
+    /* TOPBAR */
+    .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:14px 16px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+    .topbar-left { display:flex; align-items:center; gap:8px; }
+    .topbar-shield { width:32px; height:32px; background:var(--orange); border-radius:8px; display:grid; place-items:center; color:white; font-size:16px; }
+    .topbar-title { font-weight:700; font-size:15px; }
+    .topbar-right { display:flex; align-items:center; gap:12px; }
+    .topbar-email { font-size:12px; color:var(--muted); }
+    .signout-btn { display:flex; align-items:center; gap:6px; background:none; border:1px solid var(--border); padding:7px 12px; border-radius:8px; font-size:13px; cursor:pointer; color:var(--text); font-family:'Inter',sans-serif; }
+    .signout-btn:active { background:var(--bg); }
+
+    /* MAIN */
+    .main-content { flex:1; overflow-y:auto; padding:16px; max-width:900px; margin:0 auto; width:100%; }
+
+    /* SECTION CARD */
+    .section-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:20px; }
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+    .section-title { display:flex; align-items:center; gap:8px; font-size:16px; font-weight:700; }
+    .active-count { font-size:13px; color:var(--muted); font-weight:400; }
+    .section-controls { display:flex; align-items:center; gap:8px; }
+    .date-select { border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:13px; font-family:'Inter',sans-serif; outline:none; background:var(--white); color:var(--text); cursor:pointer; }
+    .refresh-btn { border:1px solid var(--border); border-radius:8px; padding:7px 14px; font-size:13px; font-family:'Inter',sans-serif; background:var(--white); cursor:pointer; font-weight:500; }
+    .refresh-btn:active { background:var(--bg); }
+
+    /* STATS */
+    .stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
+    .stat-box { background:var(--bg); border-radius:10px; padding:12px; text-align:center; }
+    .stat-box-label { font-size:11px; color:var(--muted); margin-bottom:4px; }
+    .stat-box-value { font-size:20px; font-weight:700; }
+
+    /* RIDER ROWS */
+    .rider-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .rider-row:last-child { border-bottom:none; }
+    .rider-num { width:32px; height:32px; border-radius:50%; background:var(--bg); display:grid; place-items:center; font-size:13px; font-weight:600; color:var(--muted); flex-shrink:0; }
+    .rider-info { flex:1; }
+    .rider-name { font-size:14px; font-weight:600; }
+    .rider-duty { font-size:12px; color:var(--muted); }
+    .rider-stats { text-align:right; font-size:12px; color:var(--muted); margin-right:8px; }
+    .rider-stats strong { color:var(--text); }
+    .rider-edit-btn { background:none; border:none; color:var(--muted); cursor:pointer; padding:6px; font-size:16px; }
+    .signin-btn { background:var(--orange); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+    .signin-btn:active { opacity:0.85; }
+    .signin-btn.on-duty { background:#dcfce7; color:var(--green); }
+    .auto-assign-note { font-size:11px; color:var(--muted); margin-top:12px; padding-top:12px; border-top:1px solid var(--border); line-height:1.5; }
+
+    /* REQUESTS */
+    .requests-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+    .requests-title { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:700; }
+    .count-badge { background:#fff7ed; color:var(--orange); border-radius:20px; padding:2px 10px; font-size:14px; font-weight:600; }
+    .requests-actions { display:flex; gap:8px; }
+    .log-dm-btn { background:var(--orange); color:white; border:none; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; display:flex; align-items:center; gap:6px; }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; border-radius:var(--radius); border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; min-width:700px; }
+    thead th { background:var(--bg); padding:10px 12px; text-align:left; font-size:12px; font-weight:600; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
+    tbody tr { border-bottom:1px solid var(--border); }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:#fffbf7; }
+    tbody td { padding:12px; font-size:13px; vertical-align:middle; }
+    .source-badge { display:inline-block; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:500; background:var(--bg); color:var(--muted); border:1px solid var(--border); }
+    .source-badge.whatsapp { background:#dcfce7; color:#15803d; border-color:#bbf7d0; }
+    .phone-link { color:var(--orange); text-decoration:none; font-weight:500; }
+    .status-text { font-weight:600; font-size:13px; }
+    .status-text.confirmed { color:#ea580c; }
+    .status-text.in_transit { color:#2563eb; }
+    .status-text.out_for_delivery { color:#9333ea; }
+    .status-text.delivered { color:var(--green); }
+    .status-text.pending { color:var(--muted); }
+    .status-text.picked_up { color:#0891b2; }
+    .status-text.cancelled { color:var(--red); }
+    .code-text { font-family:monospace; font-size:12px; font-weight:600; }
+    .status-select { border:1px solid var(--border); border-radius:8px; padding:7px 10px; font-size:12px; font-family:'Inter',sans-serif; outline:none; background:var(--white); cursor:pointer; min-width:130px; color:var(--text); }
+    .status-select:focus { border-color:var(--orange); }
+    .empty-row td { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+
+    /* MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:flex-end; justify-content:center; z-index:200; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--white); border-radius:20px 20px 0 0; padding:24px 20px 40px; width:100%; max-width:480px; animation:slideUp 0.3s ease; }
+    @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+    .modal-title { font-size:17px; font-weight:700; margin-bottom:4px; }
+    .modal-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+    .modal-close { float:right; background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted); margin-top:-4px; }
+    .modal-btn { width:100%; padding:14px; border:none; border-radius:8px; background:var(--orange); color:white; font-size:15px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif; margin-top:8px; }
+
+    /* TOAST */
+    .toast { position:fixed; top:16px; left:50%; transform:translateX(-50%) translateY(-80px); background:var(--text); color:white; border-radius:10px; padding:10px 20px; font-size:14px; font-weight:500; z-index:9999; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; max-width:90vw; }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+    .toast.success { background:#15803d; }
+    .toast.error { background:var(--red); }
+
+    /* LOADING */
+    #screen-loading { align-items:center; justify-content:center; background:var(--white); }
+    .loading-brand { font-size:22px; font-weight:700; margin-bottom:24px; color:var(--text); }
+    .loading-brand span { color:var(--orange); }
+    .spinner-bar { width:80px; height:3px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .spinner-fill { height:100%; background:var(--orange); border-radius:3px; animation:load 1.5s ease-in-out infinite; }
+    @keyframes load { 0%{width:0%;margin-left:0} 50%{width:70%;margin-left:15%} 100%{width:0%;margin-left:100%} }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="screen-loading" class="screen active">
+  <div class="loading-brand">ZYGO <span>EXPRESS</span></div>
+  <div class="spinner-bar"><div class="spinner-fill"></div></div>
+</div>
+
+<!-- Login -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="login-shield">🛡️</div>
+      <div>
+        <div class="login-title-text">Admin Dashboard</div>
+        <div class="login-email-text">zygoexpresssupport@gmail.com</div>
+      </div>
+    </div>
+    <div class="login-h1">Welcome back</div>
+    <div class="login-sub">Sign in to manage your deliveries</div>
+    <div class="field"><label>Username</label><input type="text" id="admin-user" placeholder="admin" autocomplete="off"/></div>
+    <div class="field"><label>Password</label><input type="password" id="admin-pass" placeholder="••••••••"/></div>
+    <button class="btn-login" onclick="doLogin()">Sign in</button>
+    <div class="err" id="login-err">Incorrect credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="screen-main" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-shield">🛡️</div>
+      <div class="topbar-title">Admin Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-email">zygoexpresssupport@gmail.com</span>
+      <button class="signout-btn" onclick="doLogout()">⏻ Sign out</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- Riders Section -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">
+          🚴 <span>Riders</span>
+          <span class="active-count" id="active-count">0/10 active</span>
+        </div>
+        <div class="section-controls">
+          <select class="date-select" id="date-select">
+            <option>Today</option>
+            <option>This week</option>
+            <option>All time</option>
+          </select>
+          <button class="refresh-btn" onclick="loadAll()">Refresh</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-box-label">Active</div>
+          <div class="stat-box-value" id="riders-active">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Deliveries</div>
+          <div class="stat-box-value" id="riders-deliveries">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Revenue</div>
+          <div class="stat-box-value" id="riders-revenue">GHS 0.00</div>
+        </div>
+      </div>
+
+      <div id="riders-list"></div>
+
+      <div class="auto-assign-note">
+        New confirmed requests are auto-assigned to the active rider with the fewest deliveries today (ties: earliest sign-in).
+      </div>
+    </div>
+
+    <!-- Requests Section -->
+    <div class="section-card">
+      <div class="requests-header">
+        <div class="requests-title">
+          🔔 <span>Requests</span>
+          <span class="count-badge" id="requests-count">0</span>
+        </div>
+        <div class="requests-actions">
+          <button class="refresh-btn" onclick="loadAll()">Refresh</button>
+          <button class="log-dm-btn">+ Log social DM</button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Source</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Route</th>
+              <th>Status</th>
+              <th>Code</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="requests-tbody">
+            <tr><td colspan="8" style="text-align:center;padding:40px;color:#9ca3af">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Edit Rider Modal -->
+<div class="modal-overlay" id="modal-rider">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRiderModal()">✕</button>
+    <div class="modal-title">Edit Rider</div>
+    <div class="modal-sub" id="modal-rider-sub">Update rider name</div>
+    <div class="field"><label>Rider Name</label><input type="text" id="modal-rider-name" placeholder="Enter name"/></div>
+    <button class="modal-btn" onclick="saveRiderName()">Save</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+const TABLE = "quote_requests";
+const ADMINS = [
+  { user:"emmanuel", pass:"zygo2024" },
+  { user:"admin",    pass:"admin123"  },
+];
+const STATUSES = ["pending","confirmed","picked_up","in_transit","out_for_delivery","delivered","cancelled"];
+const STATUS_LABELS = { pending:"Pending", confirmed:"Confirmed", picked_up:"Picked Up", in_transit:"In Transit", out_for_delivery:"Out For Delivery", delivered:"Delivered", cancelled:"Cancelled" };
+
+function getRiders() {
+  const saved = localStorage.getItem('zygo_riders_v2');
+  if (saved) return JSON.parse(saved);
+  const r = [];
+  for (let i=1;i<=10;i++) r.push({id:i,name:`Rider ${i}`,active:false,signedInAt:null});
+  return r;
+}
+function saveRiders(r) { localStorage.setItem('zygo_riders_v2', JSON.stringify(r)); }
+
+let sb, allOrders=[], editingRiderId=null;
+
+window.addEventListener('load', async () => {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  await new Promise(r=>setTimeout(r,900));
+  if (localStorage.getItem('zygo_admin_v2')) showMain();
+  else showScreen('login');
+});
+
+function showScreen(n) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+}
+
+function doLogin() {
+  const u=document.getElementById('admin-user').value.trim().toLowerCase();
+  const p=document.getElementById('admin-pass').value.trim();
+  if (!ADMINS.find(a=>a.user===u&&a.pass===p)) { document.getElementById('login-err').classList.add('show'); return; }
+  localStorage.setItem('zygo_admin_v2','1');
+  showMain();
+}
+
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active')) doLogin(); });
+
+function doLogout() { localStorage.removeItem('zygo_admin_v2'); showScreen('login'); }
+
+async function showMain() {
+  showScreen('main');
+  await loadAll();
+  sb.channel('admin-rt').on('postgres_changes',{event:'*',schema:'public',table:TABLE},()=>loadAll()).subscribe();
+}
+
+async function loadAll() {
+  const {data,error} = await sb.from(TABLE).select('*').order('created_at',{ascending:false});
+  if (!error&&data) allOrders=data;
+  renderRiders();
+  renderRequests();
+}
+
+function renderRiders() {
+  const riders=getRiders();
+  const active=riders.filter(r=>r.active).length;
+  const delivered=allOrders.filter(o=>o.status==='delivered').length;
+  const revenue=allOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+  document.getElementById('active-count').textContent=`${active}/10 active`;
+  document.getElementById('riders-active').textContent=active;
+  document.getElementById('riders-deliveries').textContent=delivered;
+  document.getElementById('riders-revenue').textContent=`GHS ${revenue.toFixed(2)}`;
+  document.getElementById('riders-list').innerHTML=riders.map(r=>`
+    <div class="rider-row">
+      <div class="rider-num">${r.id}</div>
+      <div class="rider-info">
+        <div class="rider-name">${r.name}</div>
+        <div class="rider-duty">${r.active?'🟢 On duty':'Off duty'}</div>
+      </div>
+      <div class="rider-stats"><strong>0</strong> delivered<br>0 active · GHS 0.00</div>
+      <button class="rider-edit-btn" onclick="editRider(${r.id})">✏️</button>
+      <button class="signin-btn ${r.active?'on-duty':''}" onclick="toggleRider(${r.id})">
+        ⏻ ${r.active?'Sign out':'Sign in'}
+      </button>
+    </div>`).join('');
+}
+
+function toggleRider(id) {
+  const riders=getRiders();
+  const r=riders.find(x=>x.id===id);
+  r.active=!r.active;
+  r.signedInAt=r.active?new Date().toISOString():null;
+  saveRiders(riders);
+  renderRiders();
+  showToast(r.active?`${r.name} signed in`:`${r.name} signed out`,'success');
+}
+
+function editRider(id) {
+  const riders=getRiders();
+  const r=riders.find(x=>x.id===id);
+  editingRiderId=id;
+  document.getElementById('modal-rider-sub').textContent=`Rider ${id}`;
+  document.getElementById('modal-rider-name').value=r.name;
+  document.getElementById('modal-rider').classList.add('show');
+}
+
+function saveRiderName() {
+  const name=document.getElementById('modal-rider-name').value.trim();
+  if(!name) return;
+  const riders=getRiders();
+  riders.find(x=>x.id===editingRiderId).name=name;
+  saveRiders(riders);
+  closeRiderModal();
+  renderRiders();
+  showToast('Rider name updated','success');
+}
+
+function closeRiderModal() { document.getElementById('modal-rider').classList.remove('show'); }
+
+document.getElementById('modal-rider').addEventListener('click',e=>{ if(e.target===document.getElementById('modal-rider')) closeRiderModal(); });
+
+function renderRequests() {
+  document.getElementById('requests-count').textContent=allOrders.length;
+  if(!allOrders.length) {
+    document.getElementById('requests-tbody').innerHTML='<tr class="empty-row"><td colspan="8">No requests yet. Orders will appear here once customers book.</td></tr>';
+    return;
+  }
+  document.getElementById('requests-tbody').innerHTML=allOrders.map(o=>{
+    const date=new Date(o.created_at);
+    const dateStr=date.toLocaleDateString('en-GH',{month:'short',day:'numeric'});
+    const timeStr=date.toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    const source=o.source??'Website';
+    const sourceClass=source.toLowerCase().includes('whatsapp')?'whatsapp':'';
+    const phone=o.phone??o.customer_phone??'';
+    const name=o.customer_name??o.name??'—';
+    const route=o.pickup&&o.dropoff?`${o.pickup} → ${o.dropoff}`:(o.pickup??o.dropoff??'—');
+    const statusClass=(o.status??'').replace(/ /g,'_').toLowerCase();
+    const statusLabel=STATUS_LABELS[o.status]??o.status??'—';
+    const phoneDisplay=phone?`<a href="tel:${phone}" class="phone-link">${phone}</a>`:'—';
+    return `
+      <tr>
+        <td style="white-space:nowrap;color:#6b7280;font-size:12px">${dateStr}<br>${timeStr}</td>
+        <td><span class="source-badge ${sourceClass}">${source}</span></td>
+        <td style="font-weight:500">${name}</td>
+        <td>${phoneDisplay}</td>
+        <td style="max-width:140px;font-size:12px">${route}</td>
+        <td><span class="status-text ${statusClass}">${statusLabel}</span></td>
+        <td><span class="code-text">${o.tracking_code??'—'}</span></td>
+        <td>
+          <select class="status-select" onchange="updateStatus('${o.tracking_code}',this.value,this)">
+            ${STATUSES.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+async function updateStatus(code,newStatus,el) {
+  el.disabled=true;
+  const update={status:newStatus};
+  if(newStatus==='confirmed') update.confirmed_at=new Date().toISOString();
+  const {error}=await sb.from(TABLE).update(update).eq('tracking_code',code);
+  el.disabled=false;
+  if(error){showToast('Update failed','error');return;}
+  showToast(`${code} → ${STATUS_LABELS[newStatus]}`,'success');
+  await loadAll();
+}
+
+function showToast(msg,type='success') {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

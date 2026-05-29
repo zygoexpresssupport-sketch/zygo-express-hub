@@ -309,7 +309,7 @@ function doLogout(){localStorage.removeItem('zygo_admin_v4');showScreen('login')
 async function showMain(){
   showScreen('main');
   await loadAll();
-  // Real-time orders
+  await loadRiderStatuses();
   sb.channel('admin-orders').on('postgres_changes',{event:'*',schema:'public',table:TABLE},()=>loadAll()).subscribe();
   // ✅ Real-time rider sign in/out
   sb.channel('admin-riders').on('postgres_changes',{event:'*',schema:'public',table:RIDERS_TABLE},payload=>{

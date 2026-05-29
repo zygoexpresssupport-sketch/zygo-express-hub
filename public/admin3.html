@@ -107,6 +107,8 @@
     .status-select:focus{border-color:var(--orange);}
     .track-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;white-space:nowrap;margin-top:4px;}
     .cost-badge{display:inline-block;background:#fff7ed;color:var(--orange);border:1px solid #fed7aa;border-radius:6px;padding:2px 6px;font-size:11px;font-weight:600;}
+    .wa-btn{background:#25d366;color:white;border:none;border-radius:6px;padding:5px 8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;margin-top:4px;display:flex;align-items:center;gap:4px;}
+    .wa-btn:active{opacity:0.85;}
 
     /* TRACK MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-end;justify-content:center;z-index:200;}
@@ -309,7 +311,7 @@ function doLogout(){localStorage.removeItem('zygo_admin_v4');showScreen('login')
 async function showMain(){
   showScreen('main');
   await loadAll();
-  await loadRiderStatuses();
+  // Real-time orders
   sb.channel('admin-orders').on('postgres_changes',{event:'*',schema:'public',table:TABLE},()=>loadAll()).subscribe();
   // ✅ Real-time rider sign in/out
   sb.channel('admin-riders').on('postgres_changes',{event:'*',schema:'public',table:RIDERS_TABLE},payload=>{
@@ -468,10 +470,29 @@ function renderRequests(){
           <select class="status-select" onchange="updateStatus('${o.tracking_code}',this.value,this)">
             ${STATUSES.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
           </select>
-          <br><button class="track-btn" onclick="openTrack('${o.tracking_code}')">📍 Track</button>
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <button class="track-btn" onclick="openTrack('${o.tracking_code}')">📍 Track</button>
+            ${phone?`<button class="wa-btn" onclick="sendWhatsApp('${o.tracking_code}','${phone}','${(name).replace(/'/g,'')}','${(o.pickup??'').replace(/'/g,'')}','${(o.dropoff??'').replace(/'/g,'')}','${o.status??''}')">💬 WA</button>`:''}
+          </div>
         </td>
       </tr>`;
   }).join('');
+}
+
+function sendWhatsApp(code,phone,name,pickup,dropoff,status){
+  const trackingUrl='https://zygo-express-hub.lovable.app/#track';
+  const STATUS_MSGS={
+    confirmed:'Hello '+name+'! Your Zygo Express delivery has been *confirmed*! 🛵\n\n📦 *Tracking ID:* '+code+'\n📍 *Pickup:* '+pickup+'\n🏁 *Drop-off:* '+dropoff+'\n\nTrack your parcel: '+trackingUrl+'\n\nThank you for choosing Zygo Express! 🙏',
+    picked_up:'Hello '+name+'! Your parcel has been *picked up* by our rider! 📦\n\n*Tracking ID:* '+code+'\n📍 '+pickup+' → '+dropoff+'\n\nTrack live: '+trackingUrl,
+    in_transit:'Hello '+name+'! Your parcel is *on the way*! 🛵\n\n*Tracking ID:* '+code+'\n🏁 Heading to: '+dropoff+'\n\nTrack live: '+trackingUrl,
+    out_for_delivery:'Hello '+name+'! Your parcel is *out for delivery* and will arrive very soon! 📍\n\n*Tracking ID:* '+code+'\n\nPlease be available to receive it.\nTrack live: '+trackingUrl,
+    delivered:'Hello '+name+'! Your Zygo Express delivery is *complete*! ✅\n\n*Tracking ID:* '+code+'\n\nThank you for choosing Zygo Express! We hope to serve you again. 🙏'
+  };
+  const msg=STATUS_MSGS[status]||('Hello '+name+'! Update on your Zygo Express delivery.\n\n*Tracking ID:* '+code+'\n📍 '+pickup+' → '+dropoff+'\n\nTrack: '+trackingUrl);
+  let p=phone.replace(/\s+/g,'').replace(/^0/,'233');
+  if(!p.startsWith('233'))p='233'+p;
+  window.open('https://wa.me/'+p+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('WhatsApp opened','success');
 }
 
 async function updateStatus(code,newStatus,el){

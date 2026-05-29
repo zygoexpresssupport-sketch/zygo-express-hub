@@ -230,7 +230,7 @@
           <span class="count-badge" id="requests-count">0</span>
         </div>
         <div class="requests-actions">
-          <button class="refresh-btn" onclick="loadAll()">Refresh</button>
+         <button class="refresh-btn" onclick="loadAll(); this.textContent='↻ Loading...'; setTimeout(()=>this.textContent='Refresh',1500)">Refresh</button>
           <button class="log-dm-btn">+ Log social DM</button>
         </div>
       </div>

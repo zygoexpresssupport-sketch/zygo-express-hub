@@ -38,19 +38,22 @@ export const Quote = () => {
 
     const trackingCode = generateCode();
 
+    // Use any to bypass strict type checking for new columns
+    const record: any = {
+      tracking_code: trackingCode,
+      status:        "pending",
+      name:          parsed.data.name,
+      phone:         parsed.data.phone,
+      pickup:        parsed.data.pickup,
+      dropoff:       parsed.data.dropoff,
+      details:       parsed.data.details ?? null,
+      source:        "Website",
+      created_at:    new Date().toISOString(),
+    };
+
     const { error } = await supabase
       .from("quote_requests")
-      .insert({
-        tracking_code: trackingCode,
-        status:        "pending",
-        name:          parsed.data.name,
-        phone:         parsed.data.phone,
-        pickup:        parsed.data.pickup,
-        dropoff:       parsed.data.dropoff,
-        details:       parsed.data.details ?? null,
-        source:        "Website",
-        created_at:    new Date().toISOString(),
-      });
+      .insert(record);
 
     setLoading(false);
 

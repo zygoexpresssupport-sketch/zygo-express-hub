@@ -211,7 +211,7 @@
         <div class="requests-title">🔔 <span>Requests</span> <span class="count-badge" id="requests-count">0</span></div>
         <div class="requests-actions">
           <button class="refresh-btn" onclick="refreshSection(this,'requests')">Refresh</button>
-          <button class="log-dm-btn">+ Log social DM</button>
+          <button class="log-dm-btn" onclick="openLogDM()">+ Log social DM</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -226,6 +226,35 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- Log Social DM Modal -->
+<div class="modal-overlay" id="modal-log-dm">
+  <div class="modal" style="max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeLogDM()">✕</button>
+    <div class="modal-title">Log Social DM Order</div>
+    <div class="modal-sub">Enter details from WhatsApp, Instagram or Facebook</div>
+
+    <div class="field">
+      <label>Source</label>
+      <select id="dm-source" style="width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;font-size:15px;font-family:Inter,sans-serif;outline:none;background:#fff;color:#111827;">
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Instagram">Instagram</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Phone call">Phone call</option>
+        <option value="Walk-in">Walk-in</option>
+      </select>
+    </div>
+    <div class="field"><label>Customer Name</label><input type="text" id="dm-name" placeholder="e.g. Kofi Mensah"/></div>
+    <div class="field"><label>Phone Number</label><input type="tel" id="dm-phone" placeholder="e.g. 0244123456"/></div>
+    <div class="field"><label>Pickup Location</label><input type="text" id="dm-pickup" placeholder="e.g. Osu, Accra"/></div>
+    <div class="field"><label>Drop-off Location</label><input type="text" id="dm-dropoff" placeholder="e.g. East Legon, Accra"/></div>
+    <div class="field"><label>Price (GHS) — optional</label><input type="number" id="dm-price" placeholder="Leave blank to auto-calculate"/></div>
+    <div class="field"><label>Notes — optional</label><input type="text" id="dm-notes" placeholder="Any special instructions"/></div>
+
+    <button class="modal-btn" id="dm-submit-btn" onclick="submitLogDM()">📝 Log Order</button>
+    <div id="dm-error" style="color:#dc2626;font-size:13px;margin-top:8px;display:none"></div>
   </div>
 </div>
 
@@ -553,6 +582,81 @@ async function refreshSection(btn,section){
   btn.textContent=orig;
   showToast(`${section==='riders'?'Riders':'Requests'} refreshed`,'success');
 }
+
+// ── Log Social DM ────────────────────────────────────────────────────────────────
+function openLogDM(){
+  // Clear form
+  ['dm-name','dm-phone','dm-pickup','dm-dropoff','dm-price','dm-notes'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('dm-error').style.display='none';
+  document.getElementById('modal-log-dm').classList.add('show');
+}
+
+function closeLogDM(){
+  document.getElementById('modal-log-dm').classList.remove('show');
+}
+
+async function submitLogDM(){
+  const name   = document.getElementById('dm-name').value.trim();
+  const phone  = document.getElementById('dm-phone').value.trim();
+  const pickup = document.getElementById('dm-pickup').value.trim();
+  const dropoff= document.getElementById('dm-dropoff').value.trim();
+  const price  = document.getElementById('dm-price').value.trim();
+  const source = document.getElementById('dm-source').value;
+  const notes  = document.getElementById('dm-notes').value.trim();
+  const errEl  = document.getElementById('dm-error');
+
+  if(!name||!phone||!pickup||!dropoff){
+    errEl.textContent='Please fill in name, phone, pickup and drop-off.';
+    errEl.style.display='block';
+    return;
+  }
+
+  const btn=document.getElementById('dm-submit-btn');
+  btn.textContent='Saving…';
+  btn.disabled=true;
+  errEl.style.display='none';
+
+  // Generate tracking code
+  const code='ZGX-'+Math.random().toString(36).substring(2,8).toUpperCase();
+
+  const record={
+    tracking_code: code,
+    status: 'confirmed',
+    customer_name: name,
+    phone: phone,
+    pickup: pickup,
+    dropoff: dropoff,
+    source: source,
+    price: price?Number(price):null,
+    confirmed_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    currency: 'GHS',
+  };
+
+  if(notes) record.notes=notes;
+
+  const {error}=await sb.from(TABLE).insert(record);
+
+  btn.textContent='📝 Log Order';
+  btn.disabled=false;
+
+  if(error){
+    errEl.textContent='Failed to save order. Please try again.';
+    errEl.style.display='block';
+    return;
+  }
+
+  closeLogDM();
+  showToast(`Order logged for ${name} · ${code}`,'success');
+  await loadAll();
+}
+
+document.getElementById('modal-log-dm').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-log-dm')) closeLogDM();
+});
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg,type='success'){

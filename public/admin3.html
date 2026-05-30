@@ -189,7 +189,7 @@
         <div class="section-title">🚴 <span>Riders</span> <span class="active-count" id="active-count">0/10 active</span></div>
         <div class="section-controls">
           <select class="date-select" id="date-select" onchange="loadAll()">
-            <option value="today">Today</option>
+            <option value="today" id="today-option">Today</option>
             <option value="week">This week</option>
             <option value="all">All time</option>
           </select>
@@ -320,6 +320,10 @@ let sb, allOrders=[], liveRiders={}, editingRiderId=null;
 
 window.addEventListener('load',async()=>{
   sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  // Show actual date in filter dropdown
+  const _now=new Date();
+  const _fmt=String(_now.getDate()).padStart(2,'0')+'/'+String(_now.getMonth()+1).padStart(2,'0')+'/'+_now.getFullYear();
+  document.getElementById('today-option').textContent=_fmt;
   await new Promise(r=>setTimeout(r,900));
   if(localStorage.getItem('zygo_admin_v4')) showMain();
   else showScreen('login');

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#f97316"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <title>Zygo Express — Book a Delivery</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+    :root{--orange:#f97316;--orange2:#fbbf24;--bg:#0d0d0d;--surface:#1a1a1a;--border:#2a2a2a;--text:#f5f5f5;--muted:#888;--green:#22c55e;--red:#ef4444;--radius:16px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+    /* HERO */
+    .hero{
+      background: linear-gradient(135deg, #1a0a00 0%, #0d0d0d 60%);
+      padding:40px 20px 32px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:'';position:absolute;width:500px;height:500px;
+      background:radial-gradient(circle,rgba(249,115,22,0.15) 0%,transparent 70%);
+      top:-200px;right:-100px;pointer-events:none;
+    }
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:10px;display:grid;place-items:center;font-size:18px;}
+    .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+    .brand-name span{color:var(--orange);}
+    .hero-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1.15;margin-bottom:10px;}
+    .hero-title span{color:var(--orange);}
+    .hero-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:360px;}
+
+    /* FORM CARD */
+    .form-wrap{padding:0 16px 40px;}
+    .form-card{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:20px;padding:24px;margin-top:-20px;
+      position:relative;z-index:10;
+      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    }
+    .form-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:20px;color:var(--text);}
+
+    .field{margin-bottom:16px;}
+    .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px;letter-spacing:0.5px;text-transform:uppercase;}
+    .field input,.field textarea,.field select{
+      width:100%;background:#111;border:1.5px solid var(--border);
+      border-radius:12px;padding:14px 16px;font-size:15px;
+      color:var(--text);font-family:'DM Sans',sans-serif;outline:none;
+      transition:border-color 0.2s;
+    }
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--orange);}
+    .field textarea{min-height:80px;resize:none;}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    /* Route visual */
+    .route-visual{position:relative;margin-bottom:8px;}
+    .route-connector{position:absolute;left:20px;top:56px;width:2px;height:20px;background:linear-gradient(to bottom,var(--orange2),var(--orange));z-index:1;}
+
+    .submit-btn{
+      width:100%;padding:17px;border:none;
+      background:linear-gradient(135deg,var(--orange),var(--orange2));
+      border-radius:var(--radius);font-family:'Syne',sans-serif;
+      font-size:16px;font-weight:700;color:#000;cursor:pointer;
+      transition:transform 0.15s,opacity 0.15s;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      margin-top:8px;
+    }
+    .submit-btn:active{transform:scale(0.97);opacity:0.9;}
+    .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+
+    /* Success screen */
+    #screen-success{display:none;padding:40px 20px;text-align:center;}
+    .success-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--green),#16a34a);border-radius:50%;display:grid;place-items:center;margin:0 auto 24px;font-size:36px;}
+    .success-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;}
+    .success-sub{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:24px;}
+    .tracking-display{
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);padding:20px;margin-bottom:24px;
+    }
+    .tracking-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+    .tracking-code{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--orange);letter-spacing:2px;}
+    .track-now-btn{
+      display:block;width:100%;padding:16px;
+      background:linear-gradient(135deg,var(--orange),var(--orange2));
+      border-radius:var(--radius);font-family:'Syne',sans-serif;
+      font-size:15px;font-weight:700;color:#000;text-decoration:none;
+      text-align:center;margin-bottom:12px;
+    }
+    .book-another-btn{
+      display:block;width:100%;padding:14px;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:var(--radius);font-family:'Syne',sans-serif;
+      font-size:14px;font-weight:600;color:var(--text);text-decoration:none;
+      text-align:center;cursor:pointer;
+    }
+
+    /* Price estimate */
+    .price-estimate{
+      background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);
+      border-radius:12px;padding:14px 16px;margin-bottom:16px;
+      display:none;
+    }
+    .price-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
+    .price-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--orange);}
+    .price-note{font-size:11px;color:var(--muted);margin-top:4px;}
+
+    /* Error */
+    .error-box{
+      background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
+      color:var(--red);padding:12px 16px;border-radius:10px;
+      font-size:13px;margin-bottom:16px;display:none;
+    }
+    .error-box.show{display:block;}
+
+    /* Features strip */
+    .features{display:flex;gap:16px;overflow-x:auto;padding:20px 16px 0;scrollbar-width:none;}
+    .features::-webkit-scrollbar{display:none;}
+    .feature{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:130px;flex-shrink:0;}
+    .feature-icon{font-size:22px;margin-bottom:8px;}
+    .feature-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
+    .feature-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+    .spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+
+<!-- Booking Form -->
+<div id="screen-form">
+  <div class="hero">
+    <div class="brand">
+      <div class="brand-icon">🚀</div>
+      <div class="brand-name">Zygo<span>Express</span></div>
+    </div>
+    <div class="hero-title">Fast delivery,<br><span>anywhere in Ghana.</span></div>
+    <div class="hero-sub">Fill in the details below and we'll get your parcel moving within minutes.</div>
+  </div>
+
+  <div class="features">
+    <div class="feature"><div class="feature-icon">⚡</div><div class="feature-title">Same Day</div><div class="feature-sub">Fast pickups</div></div>
+    <div class="feature"><div class="feature-icon">📍</div><div class="feature-title">Live Tracking</div><div class="feature-sub">Track in real time</div></div>
+    <div class="feature"><div class="feature-icon">💰</div><div class="feature-title">GHS 3.20/km</div><div class="feature-sub">Fair pricing</div></div>
+    <div class="feature"><div class="feature-icon">🛡️</div><div class="feature-title">Safe & Secure</div><div class="feature-sub">Insured parcels</div></div>
+  </div>
+
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-title">📦 Book your delivery</div>
+
+      <div class="error-box" id="error-box"></div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Your Name</label>
+          <input type="text" id="f-name" placeholder="Full name" required/>
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="f-phone" placeholder="0244123456" required/>
+        </div>
+      </div>
+
+      <div class="route-visual">
+        <div class="field">
+          <label>📍 Pickup Location</label>
+          <input type="text" id="f-pickup" placeholder="Where to pick up from" required onblur="estimatePrice()"/>
+        </div>
+        <div class="route-connector"></div>
+        <div class="field" style="margin-top:8px">
+          <label>🏁 Drop-off Location</label>
+          <input type="text" id="f-dropoff" placeholder="Where to deliver to" required onblur="estimatePrice()"/>
+        </div>
+      </div>
+
+      <div class="price-estimate" id="price-estimate">
+        <div class="price-label">Estimated delivery cost</div>
+        <div class="price-value" id="price-value">Calculating…</div>
+        <div class="price-note">Final price confirmed after pickup · GHS 3.20/km</div>
+      </div>
+
+      <div class="field">
+        <label>Parcel Details (optional)</label>
+        <textarea id="f-details" placeholder="Size, weight, fragile items, special instructions…"></textarea>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
+        🚀 Book Delivery
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Screen -->
+<div id="screen-success">
+  <div class="brand" style="padding:24px 20px 0">
+    <div class="brand-icon">🚀</div>
+    <div class="brand-name">Zygo<span>Express</span></div>
+  </div>
+  <div style="padding:40px 20px">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Booking Confirmed!</div>
+    <div class="success-sub">Your delivery request has been received. We'll contact you shortly to confirm pickup.</div>
+
+    <div class="tracking-display">
+      <div class="tracking-label">Your Tracking ID</div>
+      <div class="tracking-code" id="success-code">ZGX-XXXXXX</div>
+      <div style="font-size:12px;color:#888;margin-top:8px">Save this code to track your parcel</div>
+    </div>
+
+    <div id="success-details" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:#888;line-height:1.8"></div>
+
+    <a href="https://zygo-express-hub.lovable.app/#track" class="track-now-btn">📍 Track My Parcel</a>
+    <div class="book-another-btn" onclick="bookAnother()">+ Book Another Delivery</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+let sb;
+
+window.addEventListener('load', () => {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+});
+
+function generateCode(){
+  return 'ZGX-' + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+// Price estimator using straight-line distance as fallback
+async function estimatePrice(){
+  const pickup  = document.getElementById('f-pickup').value.trim();
+  const dropoff = document.getElementById('f-dropoff').value.trim();
+  if(!pickup || !dropoff) return;
+
+  const box = document.getElementById('price-estimate');
+  const val = document.getElementById('price-value');
+  box.style.display = 'block';
+  val.textContent = 'Calculating…';
+
+  try {
+    // Geocode both with Nominatim
+    const [p, d] = await Promise.all([
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Ghana')}&format=json&limit=1`, {headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Ghana')}&format=json&limit=1`, {headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json())
+    ]);
+
+    if(p.length && d.length){
+      // Get road distance from OSRM
+      const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${p[0].lon},${p[0].lat};${d[0].lon},${d[0].lat}?overview=false`).then(r=>r.json());
+      if(route.code === 'Ok'){
+        const km = route.routes[0].distance / 1000;
+        const price = Math.max(5, Math.ceil(km * 3.20 * 100) / 100);
+        val.textContent = `GHS ${price.toFixed(2)}`;
+        return;
+      }
+    }
+    val.textContent = 'GHS 5.00+';
+  } catch {
+    val.textContent = 'GHS 5.00+';
+  }
+}
+
+async function submitBooking(){
+  const name    = document.getElementById('f-name').value.trim();
+  const phone   = document.getElementById('f-phone').value.trim();
+  const pickup  = document.getElementById('f-pickup').value.trim();
+  const dropoff = document.getElementById('f-dropoff').value.trim();
+  const details = document.getElementById('f-details').value.trim();
+  const errBox  = document.getElementById('error-box');
+  const btn     = document.getElementById('submit-btn');
+
+  errBox.classList.remove('show');
+
+  if(!name || name.length < 2){ showError('Please enter your full name.'); return; }
+  if(!phone || phone.length < 7){ showError('Please enter a valid phone number.'); return; }
+  if(!pickup || pickup.length < 2){ showError('Please enter a pickup location.'); return; }
+  if(!dropoff || dropoff.length < 2){ showError('Please enter a drop-off location.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Booking…';
+
+  const code = generateCode();
+
+  try {
+    const { error } = await sb.from('quote_requests').insert({
+      tracking_code: code,
+      status:        'pending',
+      name:          name,
+      phone:         phone,
+      pickup:        pickup,
+      dropoff:       dropoff,
+      details:       details || null,
+      source:        'Website',
+      created_at:    new Date().toISOString(),
+      currency:      'GHS',
+    });
+
+    if(error){
+      console.error('Booking error:', error);
+      showError('Booking failed: ' + (error.message || 'Please try again.'));
+      btn.disabled = false;
+      btn.innerHTML = '🚀 Book Delivery';
+      return;
+    }
+
+    // Show success
+    document.getElementById('screen-form').style.display = 'none';
+    document.getElementById('screen-success').style.display = 'block';
+    document.getElementById('success-code').textContent = code;
+    document.getElementById('success-details').innerHTML =
+      `👤 <strong style="color:#f5f5f5">${name}</strong><br>` +
+      `📞 ${phone}<br>` +
+      `📍 Pickup: <strong style="color:#f5f5f5">${pickup}</strong><br>` +
+      `🏁 Drop-off: <strong style="color:#f5f5f5">${dropoff}</strong>`;
+
+    window.scrollTo(0, 0);
+
+  } catch(err) {
+    showError('Something went wrong. Please try again.');
+    btn.disabled = false;
+    btn.innerHTML = '🚀 Book Delivery';
+  }
+}
+
+function showError(msg){
+  const b = document.getElementById('error-box');
+  b.textContent = msg;
+  b.classList.add('show');
+  b.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function bookAnother(){
+  document.getElementById('screen-form').style.display = 'block';
+  document.getElementById('screen-success').style.display = 'none';
+  ['f-name','f-phone','f-pickup','f-dropoff','f-details'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('price-estimate').style.display='none';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

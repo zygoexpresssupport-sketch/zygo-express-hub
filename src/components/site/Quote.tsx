@@ -16,7 +16,6 @@ const schema = z.object({
   details: z.string().trim().max(500).optional(),
 });
 
-// Generate a tracking code
 function generateCode(): string {
   return "ZGX-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
@@ -42,25 +41,26 @@ export const Quote = () => {
     const { error } = await supabase
       .from("quote_requests")
       .insert({
-        tracking_code:  trackingCode,
-        status:         "pending",
-        customer_name:  parsed.data.name,
-        phone:          parsed.data.phone,
-        pickup:         parsed.data.pickup,
-        dropoff:        parsed.data.dropoff,
-        source:         "Website",
-        currency:       "GHS",
-        created_at:     new Date().toISOString(),
+        tracking_code: trackingCode,
+        status:        "pending",
+        name:          parsed.data.name,
+        phone:         parsed.data.phone,
+        pickup:        parsed.data.pickup,
+        dropoff:       parsed.data.dropoff,
+        details:       parsed.data.details ?? null,
+        source:        "Website",
+        created_at:    new Date().toISOString(),
       });
 
     setLoading(false);
 
     if (error) {
+      console.error("Quote error:", error);
       toast.error("Couldn't send quote. Please try again.");
       return;
     }
 
-    toast.success(`Quote sent! Your tracking ID is ${trackingCode}`);
+    toast.success(`Quote sent! Your tracking ID: ${trackingCode}`);
     form.reset();
   };
 

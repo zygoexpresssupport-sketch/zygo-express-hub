@@ -3,220 +3,745 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <meta name="theme-color" content="#f97316"/>
+  <meta name="theme-color" content="#0f0f0f"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <title>Zygo Express — Book a Delivery</title>
+  <title>Zygo Express — Book Delivery</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
-    :root{--orange:#f97316;--orange2:#fbbf24;--bg:#0d0d0d;--surface:#1a1a1a;--border:#2a2a2a;--text:#f5f5f5;--muted:#888;--green:#22c55e;--red:#ef4444;--radius:16px;}
-    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+    :root {
+      --ink:     #0f0f0f;
+      --paper:   #fafaf8;
+      --orange:  #f97316;
+      --amber:   #f59e0b;
+      --cream:   #fff9f0;
+      --stone:   #e8e4dc;
+      --muted:   #9c9589;
+      --green:   #16a34a;
+      --red:     #dc2626;
+      --r:       12px;
+    }
 
-    /* HERO */
-    .hero{
-      background: linear-gradient(135deg, #1a0a00 0%, #0d0d0d 60%);
-      padding:40px 20px 32px;
-      position:relative;
-      overflow:hidden;
-    }
-    .hero::before{
-      content:'';position:absolute;width:500px;height:500px;
-      background:radial-gradient(circle,rgba(249,115,22,0.15) 0%,transparent 70%);
-      top:-200px;right:-100px;pointer-events:none;
-    }
-    .brand{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
-    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:10px;display:grid;place-items:center;font-size:18px;}
-    .brand-name{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
-    .brand-name span{color:var(--orange);}
-    .hero-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1.15;margin-bottom:10px;}
-    .hero-title span{color:var(--orange);}
-    .hero-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:360px;}
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-    /* FORM CARD */
-    .form-wrap{padding:0 16px 40px;}
-    .form-card{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:20px;padding:24px;margin-top:-20px;
-      position:relative;z-index:10;
-      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Satoshi', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    .form-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:20px;color:var(--text);}
 
-    .field{margin-bottom:16px;}
-    .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px;letter-spacing:0.5px;text-transform:uppercase;}
-    .field input,.field textarea,.field select{
-      width:100%;background:#111;border:1.5px solid var(--border);
-      border-radius:12px;padding:14px 16px;font-size:15px;
-      color:var(--text);font-family:'DM Sans',sans-serif;outline:none;
-      transition:border-color 0.2s;
+    /* ── TOPBAR ── */
+    .topbar {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--ink);
     }
-    .field input:focus,.field textarea:focus,.field select:focus{border-color:var(--orange);}
-    .field textarea{min-height:80px;resize:none;}
-    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      background: var(--orange);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      color: white;
+      letter-spacing: -1px;
+    }
+
+    .logo-name {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      color: white;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-name em { color: var(--orange); font-style: normal; }
+
+    .topbar-pill {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* ── HERO STRIP ── */
+    .hero {
+      background: var(--ink);
+      padding: 28px 20px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-text {
+      position: absolute;
+      right: -10px;
+      top: -10px;
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 110px;
+      color: rgba(255,255,255,0.03);
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      color: white;
+      line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+
+    .hero-title span {
+      color: var(--orange);
+    }
+
+    .hero-sub {
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 320px;
+    }
+
+    /* ── ZONE CARDS ── */
+    .zone-section {
+      padding: 20px 20px 0;
+      background: var(--ink);
+    }
+
+    .zone-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .zone-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .zone-card.active {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+
+    .zone-card.active .zone-price,
+    .zone-card.active .zone-km,
+    .zone-card.active .zone-name { color: white; }
+
+    .zone-price {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--orange);
+    }
+
+    .zone-card.active .zone-price { color: white; }
+
+    .zone-km {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .zone-name {
+      font-size: 9px;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 3px;
+    }
+
+    /* ── FORM ── */
+    .form-container {
+      background: var(--ink);
+      padding: 0 16px 0;
+    }
+
+    .form-card {
+      background: var(--paper);
+      border-radius: 20px 20px 0 0;
+      padding: 28px 20px;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 4px;
+      background: var(--stone);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .group-label {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-wrap {
+      margin-bottom: 10px;
+    }
+
+    .input-wrap:last-child { margin-bottom: 0; }
+
+    .input-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 5px;
+      display: block;
+    }
+
+    .input-field {
+      width: 100%;
+      background: white;
+      border: 1.5px solid var(--stone);
+      border-radius: var(--r);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-family: 'Satoshi', sans-serif;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    .input-field:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+    }
+
+    .input-field::placeholder { color: #bbb; }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
 
     /* Route visual */
-    .route-visual{position:relative;margin-bottom:8px;}
-    .route-connector{position:absolute;left:20px;top:56px;width:2px;height:20px;background:linear-gradient(to bottom,var(--orange2),var(--orange));z-index:1;}
+    .route-group {
+      position: relative;
+    }
 
-    .submit-btn{
-      width:100%;padding:17px;border:none;
-      background:linear-gradient(135deg,var(--orange),var(--orange2));
-      border-radius:var(--radius);font-family:'Syne',sans-serif;
-      font-size:16px;font-weight:700;color:#000;cursor:pointer;
-      transition:transform 0.15s,opacity 0.15s;
-      display:flex;align-items:center;justify-content:center;gap:8px;
-      margin-top:8px;
+    .route-track {
+      position: absolute;
+      left: 22px;
+      top: 54px;
+      bottom: 54px;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--amber), var(--orange));
+      border-radius: 1px;
     }
-    .submit-btn:active{transform:scale(0.97);opacity:0.9;}
-    .submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 
-    /* Success screen */
-    #screen-success{display:none;padding:40px 20px;text-align:center;}
-    .success-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--green),#16a34a);border-radius:50%;display:grid;place-items:center;margin:0 auto 24px;font-size:36px;}
-    .success-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:8px;}
-    .success-sub{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:24px;}
-    .tracking-display{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);padding:20px;margin-bottom:24px;
+    .route-dot {
+      position: absolute;
+      left: 16px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      z-index: 2;
     }
-    .tracking-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-    .tracking-code{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--orange);letter-spacing:2px;}
-    .track-now-btn{
-      display:block;width:100%;padding:16px;
-      background:linear-gradient(135deg,var(--orange),var(--orange2));
-      border-radius:var(--radius);font-family:'Syne',sans-serif;
-      font-size:15px;font-weight:700;color:#000;text-decoration:none;
-      text-align:center;margin-bottom:12px;
+
+    .route-dot-top {
+      top: 20px;
+      background: var(--amber);
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
     }
-    .book-another-btn{
-      display:block;width:100%;padding:14px;
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);font-family:'Syne',sans-serif;
-      font-size:14px;font-weight:600;color:var(--text);text-decoration:none;
-      text-align:center;cursor:pointer;
+
+    .route-dot-bottom {
+      bottom: 20px;
+      background: var(--orange);
+      box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
+    }
+
+    .route-group .input-field { padding-left: 38px; }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--stone);
+      margin: 20px 0;
     }
 
     /* Price estimate */
-    .price-estimate{
-      background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);
-      border-radius:12px;padding:14px 16px;margin-bottom:16px;
-      display:none;
+    .price-reveal {
+      background: var(--cream);
+      border: 1.5px solid rgba(249,115,22,0.2);
+      border-radius: var(--r);
+      padding: 16px;
+      display: none;
+      margin-bottom: 10px;
     }
-    .price-label{font-size:12px;color:var(--muted);margin-bottom:4px;}
-    .price-value{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--orange);}
-    .price-note{font-size:11px;color:var(--muted);margin-top:4px;}
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .price-left { }
+    .price-tag { font-size: 11px; font-weight: 700; color: #c2410c; text-transform: uppercase; letter-spacing: 0.5px; }
+    .price-zone-name { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .price-dist { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+    .price-amount {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--orange);
+      letter-spacing: -1px;
+    }
+
+    /* Notes */
+    .notes-field {
+      resize: none;
+      min-height: 80px;
+    }
+
+    /* Submit */
+    .submit-section {
+      padding: 0 16px 40px;
+      background: var(--paper);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: var(--r);
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: -0.3px;
+    }
+
+    .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .submit-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    /* Trust row */
+    .trust-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 16px 20px 0;
+      background: var(--paper);
+    }
+
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .trust-item span { font-size: 18px; }
 
     /* Error */
-    .error-box{
-      background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);
-      color:var(--red);padding:12px 16px;border-radius:10px;
-      font-size:13px;margin-bottom:16px;display:none;
+    .error-msg {
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+      color: var(--red);
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
     }
-    .error-box.show{display:block;}
+    .error-msg.show { display: block; }
 
-    /* Features strip */
-    .features{display:flex;gap:16px;overflow-x:auto;padding:20px 16px 0;scrollbar-width:none;}
-    .features::-webkit-scrollbar{display:none;}
-    .feature{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;min-width:130px;flex-shrink:0;}
-    .feature-icon{font-size:22px;margin-bottom:8px;}
-    .feature-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;}
-    .feature-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+    /* ── SUCCESS ── */
+    #screen-success { display: none; }
 
-    .spinner{width:18px;height:18px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;}
-    @keyframes spin{to{transform:rotate(360deg)}}
+    .success-top {
+      background: var(--ink);
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .success-ring {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: var(--orange);
+      display: grid;
+      place-items: center;
+      font-size: 38px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 1;
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-title {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 30px;
+      color: white;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .success-sub {
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      line-height: 1.65;
+      position: relative;
+      z-index: 1;
+    }
+
+    .success-body { padding: 0 16px 40px; background: var(--paper); }
+
+    .code-block {
+      background: var(--ink);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      margin-top: -20px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .code-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .code-value {
+      font-family: 'Cabinet Grotesk', sans-serif;
+      font-weight: 900;
+      font-size: 34px;
+      color: var(--orange);
+      letter-spacing: 3px;
+    }
+
+    .code-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 6px;
+    }
+
+    .summary-card {
+      background: white;
+      border: 1px solid var(--stone);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--stone);
+      font-size: 13px;
+    }
+
+    .summary-row:last-child { border-bottom: none; }
+    .summary-key { color: var(--muted); }
+    .summary-val { font-weight: 600; text-align: right; max-width: 55%; }
+    .summary-val.price { color: var(--orange); font-family: 'Cabinet Grotesk', sans-serif; font-size: 16px; font-weight: 800; }
+
+    .btn-primary {
+      display: block; width: 100%; padding: 17px;
+      background: var(--orange); color: white; border: none;
+      border-radius: var(--r); font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 16px; font-weight: 800; text-align: center;
+      text-decoration: none; cursor: pointer; margin-bottom: 10px;
+      letter-spacing: -0.3px; transition: opacity 0.2s;
+    }
+    .btn-primary:active { opacity: 0.88; }
+
+    .btn-ghost {
+      display: block; width: 100%; padding: 15px;
+      background: white; border: 1.5px solid var(--stone); color: var(--ink);
+      border-radius: var(--r); font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700; text-align: center;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-ghost:active { background: var(--stone); }
+
+    .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .badge-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
 
-<!-- Booking Form -->
+<!-- ═══════════════ BOOKING FORM ═══════════════ -->
 <div id="screen-form">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">ZE</div>
+      <div class="logo-name">Zygo<em>Express</em></div>
+    </div>
+    <div class="topbar-pill">🇬🇭 Ghana Delivery</div>
+  </div>
+
+  <!-- Hero -->
   <div class="hero">
-    <div class="brand">
-      <div class="brand-icon">🚀</div>
-      <div class="brand-name">Zygo<span>Express</span></div>
+    <div class="hero-bg-text">ZE</div>
+    <div class="hero-eyebrow">⚡ Book in 60 seconds</div>
+    <div class="hero-title">Your parcel.<br><span>Delivered fast.</span></div>
+    <div class="hero-sub">Same-day pickups. Real-time rider tracking. Transparent pricing. No surprises.</div>
+    <div class="badge-row">
+      <div class="badge">✓ Instant confirmation</div>
+      <div class="badge">✓ Live GPS tracking</div>
+      <div class="badge">✓ All Ghana networks</div>
     </div>
-    <div class="hero-title">Fast delivery,<br><span>anywhere in Ghana.</span></div>
-    <div class="hero-sub">Fill in the details below and we'll get your parcel moving within minutes.</div>
   </div>
 
-  <div class="features">
-    <div class="feature"><div class="feature-icon">⚡</div><div class="feature-title">Same Day</div><div class="feature-sub">Fast pickups</div></div>
-    <div class="feature"><div class="feature-icon">📍</div><div class="feature-title">Live Tracking</div><div class="feature-sub">Track in real time</div></div>
-    <div class="feature"><div class="feature-icon">💰</div><div class="feature-title">GHS 3.20/km</div><div class="feature-sub">Fair pricing</div></div>
-    <div class="feature"><div class="feature-icon">🛡️</div><div class="feature-title">Safe & Secure</div><div class="feature-sub">Insured parcels</div></div>
+  <!-- Zone pricing -->
+  <div class="zone-section">
+    <div style="padding:16px 0 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px">Delivery Pricing Zones</div>
+    <div class="zone-row">
+      <div class="zone-card" id="zone-1">
+        <div class="zone-price">GHS 13</div>
+        <div class="zone-km">0–2 km</div>
+        <div class="zone-name">Zone 1</div>
+      </div>
+      <div class="zone-card" id="zone-2">
+        <div class="zone-price">GHS 16</div>
+        <div class="zone-km">2–4 km</div>
+        <div class="zone-name">Zone 2</div>
+      </div>
+      <div class="zone-card" id="zone-3">
+        <div class="zone-price">GHS 20</div>
+        <div class="zone-km">4–6 km</div>
+        <div class="zone-name">Zone 3</div>
+      </div>
+      <div class="zone-card" id="zone-4">
+        <div class="zone-price">GHS 30</div>
+        <div class="zone-km">6+ km</div>
+        <div class="zone-name">Zone 4</div>
+      </div>
+    </div>
   </div>
 
-  <div class="form-wrap">
+  <!-- Form -->
+  <div class="form-container">
     <div class="form-card">
-      <div class="form-title">📦 Book your delivery</div>
 
-      <div class="error-box" id="error-box"></div>
+      <div class="error-msg" id="error-box"></div>
 
-      <div class="field-row">
-        <div class="field">
-          <label>Your Name</label>
-          <input type="text" id="f-name" placeholder="Full name" required/>
-        </div>
-        <div class="field">
-          <label>Phone</label>
-          <input type="tel" id="f-phone" placeholder="0244123456" required/>
-        </div>
-      </div>
-
-      <div class="route-visual">
-        <div class="field">
-          <label>📍 Pickup Location</label>
-          <input type="text" id="f-pickup" placeholder="Where to pick up from" required onblur="estimatePrice()"/>
-        </div>
-        <div class="route-connector"></div>
-        <div class="field" style="margin-top:8px">
-          <label>🏁 Drop-off Location</label>
-          <input type="text" id="f-dropoff" placeholder="Where to deliver to" required onblur="estimatePrice()"/>
+      <!-- Contact -->
+      <div class="form-group">
+        <div class="group-label">👤 Your Details</div>
+        <div class="input-row">
+          <div class="input-wrap">
+            <div class="input-label">Full Name</div>
+            <input class="input-field" type="text" id="f-name" placeholder="Jane Mensah" required/>
+          </div>
+          <div class="input-wrap">
+            <div class="input-label">Phone Number</div>
+            <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456" required/>
+          </div>
         </div>
       </div>
 
-      <div class="price-estimate" id="price-estimate">
-        <div class="price-label">Estimated delivery cost</div>
-        <div class="price-value" id="price-value">Calculating…</div>
-        <div class="price-note">Final price confirmed after pickup · GHS 3.20/km</div>
+      <div class="divider"></div>
+
+      <!-- Route -->
+      <div class="form-group route-group">
+        <div class="group-label">📍 Delivery Route</div>
+        <div class="route-dot route-dot-top"></div>
+        <div class="route-track"></div>
+        <div class="route-dot route-dot-bottom"></div>
+        <div class="input-wrap">
+          <div class="input-label">Pickup Location</div>
+          <input class="input-field" type="text" id="f-pickup" placeholder="Where to pick up from" required onblur="estimatePrice()"/>
+        </div>
+        <div class="input-wrap" style="margin-top:10px">
+          <div class="input-label">Drop-off Location</div>
+          <input class="input-field" type="text" id="f-dropoff" placeholder="Where to deliver to" required onblur="estimatePrice()"/>
+        </div>
       </div>
 
-      <div class="field">
-        <label>Parcel Details (optional)</label>
-        <textarea id="f-details" placeholder="Size, weight, fragile items, special instructions…"></textarea>
+      <!-- Price estimate -->
+      <div class="price-reveal" id="price-reveal">
+        <div class="price-row">
+          <div class="price-left">
+            <div class="price-tag">Estimated Cost</div>
+            <div class="price-zone-name" id="p-zone">Calculating…</div>
+            <div class="price-dist" id="p-dist"></div>
+          </div>
+          <div class="price-amount" id="p-amount">—</div>
+        </div>
       </div>
 
-      <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
-        🚀 Book Delivery
-      </button>
+      <div class="divider"></div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <div class="group-label">📦 Parcel Details <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.6">(optional)</span></div>
+        <div class="input-wrap">
+          <textarea class="input-field notes-field" id="f-details" placeholder="Size, weight, fragile, special handling…"></textarea>
+        </div>
+      </div>
+
     </div>
   </div>
+
+  <!-- Trust + Submit -->
+  <div class="submit-section">
+    <div class="trust-row" style="margin-bottom:16px;padding:0">
+      <div class="trust-item"><span>⚡</span>Same Day</div>
+      <div class="trust-item"><span>📍</span>Live Track</div>
+      <div class="trust-item"><span>💰</span>Fair Price</div>
+      <div class="trust-item"><span>🛡️</span>Insured</div>
+    </div>
+    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
+      Confirm Booking →
+    </button>
+    <div class="submit-note">No payment needed now · We'll contact you to confirm</div>
+  </div>
+
 </div>
 
-<!-- Success Screen -->
+
+<!-- ═══════════════ SUCCESS ═══════════════ -->
 <div id="screen-success">
-  <div class="brand" style="padding:24px 20px 0">
-    <div class="brand-icon">🚀</div>
-    <div class="brand-name">Zygo<span>Express</span></div>
-  </div>
-  <div style="padding:40px 20px">
-    <div class="success-icon">✅</div>
-    <div class="success-title">Booking Confirmed!</div>
-    <div class="success-sub">Your delivery request has been received. We'll contact you shortly to confirm pickup.</div>
 
-    <div class="tracking-display">
-      <div class="tracking-label">Your Tracking ID</div>
-      <div class="tracking-code" id="success-code">ZGX-XXXXXX</div>
-      <div style="font-size:12px;color:#888;margin-top:8px">Save this code to track your parcel</div>
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-mark">ZE</div>
+      <div class="logo-name">Zygo<em>Express</em></div>
+    </div>
+  </div>
+
+  <div class="success-top">
+    <div class="success-ring">✓</div>
+    <div class="success-title">You're booked.</div>
+    <div class="success-sub">Your delivery request is confirmed.<br>We'll call you shortly to arrange pickup.</div>
+  </div>
+
+  <div class="success-body">
+    <div class="code-block">
+      <div class="code-label">Your Tracking ID</div>
+      <div class="code-value" id="s-code">ZGX-XXXXXX</div>
+      <div class="code-hint">Use this to track your parcel anytime</div>
     </div>
 
-    <div id="success-details" style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:16px;margin-bottom:20px;font-size:13px;color:#888;line-height:1.8"></div>
+    <div class="summary-card" id="s-summary"></div>
 
-    <a href="https://zygo-express-hub.lovable.app/#track" class="track-now-btn">📍 Track My Parcel</a>
-    <div class="book-another-btn" onclick="bookAnother()">+ Book Another Delivery</div>
+    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary">📍 Track My Parcel</a>
+    <div class="btn-ghost" onclick="bookAnother()">+ Book Another Delivery</div>
   </div>
+
 </div>
+
 
 <script>
 const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
@@ -227,45 +752,64 @@ window.addEventListener('load', () => {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 });
 
-function generateCode(){
-  return 'ZGX-' + Math.random().toString(36).substring(2,8).toUpperCase();
+function generateCode() {
+  return 'ZGX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-// Price estimator using straight-line distance as fallback
-async function estimatePrice(){
+function getZone(km) {
+  if (km <= 2) return { price: 13, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
+  if (km <= 4) return { price: 16, name: 'Zone 2 · 2–4 km',  id: 'zone-2' };
+  if (km <= 6) return { price: 20, name: 'Zone 3 · 4–6 km',  id: 'zone-3' };
+  return       { price: 30, name: 'Zone 4 · 6+ km',          id: 'zone-4' };
+}
+
+function setActiveZone(id) {
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+async function estimatePrice() {
   const pickup  = document.getElementById('f-pickup').value.trim();
   const dropoff = document.getElementById('f-dropoff').value.trim();
-  if(!pickup || !dropoff) return;
+  if (!pickup || !dropoff) return;
 
-  const box = document.getElementById('price-estimate');
-  const val = document.getElementById('price-value');
-  box.style.display = 'block';
-  val.textContent = 'Calculating…';
+  const reveal = document.getElementById('price-reveal');
+  const pZone  = document.getElementById('p-zone');
+  const pDist  = document.getElementById('p-dist');
+  const pAmt   = document.getElementById('p-amount');
+
+  reveal.style.display = 'block';
+  pZone.textContent = 'Calculating route…';
+  pAmt.textContent  = '…';
+  pDist.textContent = '';
 
   try {
-    // Geocode both with Nominatim
     const [p, d] = await Promise.all([
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Ghana')}&format=json&limit=1`, {headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Ghana')}&format=json&limit=1`, {headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json())
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Ghana')}&format=json&limit=1`,  { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Ghana')}&format=json&limit=1`, { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
     ]);
 
-    if(p.length && d.length){
-      // Get road distance from OSRM
-      const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${p[0].lon},${p[0].lat};${d[0].lon},${d[0].lat}?overview=false`).then(r=>r.json());
-      if(route.code === 'Ok'){
-        const km = route.routes[0].distance / 1000;
-        const price = Math.max(5, Math.ceil(km * 3.20 * 100) / 100);
-        val.textContent = `GHS ${price.toFixed(2)}`;
+    if (p.length && d.length) {
+      const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${p[0].lon},${p[0].lat};${d[0].lon},${d[0].lat}?overview=false`).then(r => r.json());
+      if (route.code === 'Ok') {
+        const km   = route.routes[0].distance / 1000;
+        const zone = getZone(km);
+        pAmt.textContent  = `GHS ${zone.price}`;
+        pZone.textContent = zone.name;
+        pDist.textContent = `Road distance: ${km.toFixed(1)} km`;
+        setActiveZone(zone.id);
         return;
       }
     }
-    val.textContent = 'GHS 5.00+';
-  } catch {
-    val.textContent = 'GHS 5.00+';
-  }
+  } catch {}
+
+  pAmt.textContent  = 'GHS 13';
+  pZone.textContent = 'Zone 1 (minimum charge)';
+  pDist.textContent = 'Could not calculate exact distance';
+  setActiveZone('zone-1');
 }
 
-async function submitBooking(){
+async function submitBooking() {
   const name    = document.getElementById('f-name').value.trim();
   const phone   = document.getElementById('f-phone').value.trim();
   const pickup  = document.getElementById('f-pickup').value.trim();
@@ -276,15 +820,17 @@ async function submitBooking(){
 
   errBox.classList.remove('show');
 
-  if(!name || name.length < 2){ showError('Please enter your full name.'); return; }
-  if(!phone || phone.length < 7){ showError('Please enter a valid phone number.'); return; }
-  if(!pickup || pickup.length < 2){ showError('Please enter a pickup location.'); return; }
-  if(!dropoff || dropoff.length < 2){ showError('Please enter a drop-off location.'); return; }
+  if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
+  if (!phone || phone.length < 7) { showErr('Please enter a valid phone number.'); return; }
+  if (!pickup)                    { showErr('Please enter a pickup location.'); return; }
+  if (!dropoff)                   { showErr('Please enter a drop-off location.'); return; }
 
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div> Booking…';
+  btn.innerHTML = '<div class="spinner"></div>&nbsp; Booking…';
 
-  const code = generateCode();
+  const code      = generateCode();
+  const priceText = document.getElementById('p-amount').textContent;
+  const priceNum  = parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]);
 
   try {
     const { error } = await sb.from('quote_requests').insert({
@@ -296,52 +842,52 @@ async function submitBooking(){
       dropoff:       dropoff,
       details:       details || null,
       source:        'Website',
-      created_at:    new Date().toISOString(),
+      price:         priceNum || 13,
       currency:      'GHS',
+      created_at:    new Date().toISOString(),
     });
 
-    if(error){
-      console.error('Booking error:', error);
-      showError('Booking failed: ' + (error.message || 'Please try again.'));
+    if (error) {
+      showErr('Booking failed: ' + (error.message || 'Please try again.'));
       btn.disabled = false;
-      btn.innerHTML = '🚀 Book Delivery';
+      btn.innerHTML = 'Confirm Booking →';
       return;
     }
 
     // Show success
-    document.getElementById('screen-form').style.display = 'none';
+    document.getElementById('screen-form').style.display   = 'none';
     document.getElementById('screen-success').style.display = 'block';
-    document.getElementById('success-code').textContent = code;
-    document.getElementById('success-details').innerHTML =
-      `👤 <strong style="color:#f5f5f5">${name}</strong><br>` +
-      `📞 ${phone}<br>` +
-      `📍 Pickup: <strong style="color:#f5f5f5">${pickup}</strong><br>` +
-      `🏁 Drop-off: <strong style="color:#f5f5f5">${dropoff}</strong>`;
-
+    document.getElementById('s-code').textContent = code;
+    document.getElementById('s-summary').innerHTML = `
+      <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${name}</span></div>
+      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${phone}</span></div>
+      <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${pickup}</span></div>
+      <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${dropoff}</span></div>
+      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${priceNum || 13}</span></div>
+    `;
     window.scrollTo(0, 0);
 
-  } catch(err) {
-    showError('Something went wrong. Please try again.');
+  } catch {
+    showErr('Something went wrong. Please check your connection and try again.');
     btn.disabled = false;
-    btn.innerHTML = '🚀 Book Delivery';
+    btn.innerHTML = 'Confirm Booking →';
   }
 }
 
-function showError(msg){
+function showErr(msg) {
   const b = document.getElementById('error-box');
   b.textContent = msg;
   b.classList.add('show');
-  b.scrollIntoView({behavior:'smooth', block:'center'});
+  b.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function bookAnother(){
-  document.getElementById('screen-form').style.display = 'block';
+function bookAnother() {
+  document.getElementById('screen-form').style.display   = 'block';
   document.getElementById('screen-success').style.display = 'none';
-  ['f-name','f-phone','f-pickup','f-dropoff','f-details'].forEach(id=>{
-    document.getElementById(id).value='';
-  });
-  document.getElementById('price-estimate').style.display='none';
-  window.scrollTo(0,0);
+  ['f-name','f-phone','f-pickup','f-dropoff','f-details'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('price-reveal').style.display = 'none';
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
+  window.scrollTo(0, 0);
 }
 </script>
 </body>

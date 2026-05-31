@@ -635,7 +635,7 @@
     <div class="hero-bg-text">ZE</div>
     <div class="hero-eyebrow">⚡ Book in 60 seconds</div>
     <div class="hero-title">Your parcel.<br><span>Delivered fast.</span></div>
-    <div class="hero-sub">Same-day pickups. Real-time rider tracking. Transparent pricing. No surprises.</div>
+    <div class="hero-sub">Same-day pickups across Wa & Upper West. Real-time rider tracking. Transparent pricing.</div>
     <div class="badge-row">
       <div class="badge">✓ Instant confirmation</div>
       <div class="badge">✓ Live GPS tracking</div>
@@ -701,11 +701,11 @@
         <div class="route-dot route-dot-bottom"></div>
         <div class="input-wrap">
           <div class="input-label">Pickup Location</div>
-          <input class="input-field" type="text" id="f-pickup" placeholder="Where to pick up from" required onblur="estimatePrice()"/>
+          <input class="input-field" type="text" id="f-pickup" placeholder="e.g. Kpaguri, Wa Polytechnic, Nakori" required onblur="estimatePrice()"/>
         </div>
         <div class="input-wrap" style="margin-top:10px">
           <div class="input-label">Drop-off Location</div>
-          <input class="input-field" type="text" id="f-dropoff" placeholder="Where to deliver to" required onblur="estimatePrice()"/>
+          <input class="input-field" type="text" id="f-dropoff" placeholder="e.g. Jahan, Ssnit, Dobile" required onblur="estimatePrice()"/>
         </div>
       </div>
 
@@ -847,8 +847,8 @@ async function estimatePrice() {
 
   try {
     const [p, d] = await Promise.all([
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Ghana')}&format=json&limit=1`,  { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Ghana')}&format=json&limit=1`, { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Wa, Upper West, Ghana')}&format=json&limit=1`,  { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
+      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Wa, Upper West, Ghana')}&format=json&limit=1`, { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
     ]);
 
     if (p.length && d.length) {

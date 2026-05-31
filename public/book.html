@@ -559,6 +559,46 @@
     .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
+    /* MoMo Payment */
+    .momo-card {
+      background: white;
+      border: 1.5px solid #fcd34d;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .momo-header {
+      background: #fffbeb;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #fde68a;
+    }
+    .momo-icon { font-size: 28px; }
+    .momo-title { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 15px; color: #92400e; }
+    .momo-sub { font-size: 12px; color: #b45309; margin-top: 2px; }
+    .momo-number-wrap { padding: 16px; text-align: center; border-bottom: 1px solid #fde68a; }
+    .momo-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .momo-number { font-family: 'Cabinet Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: var(--ink); letter-spacing: 2px; }
+    .momo-name { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .momo-copy-btn {
+      margin-top: 10px; padding: 8px 20px;
+      background: #f59e0b; color: white; border: none;
+      border-radius: 8px; font-family: 'Cabinet Grotesk', sans-serif;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .momo-copy-btn:active { opacity: 0.85; }
+    .momo-steps { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #fde68a; }
+    .momo-step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: #f59e0b; color: white;
+      display: grid; place-items: center;
+      font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+    .momo-note { padding: 12px 16px; font-size: 12px; color: #b45309; background: #fffbeb; }
+
     .badge-row {
       display: flex;
       gap: 6px;
@@ -736,6 +776,28 @@
 
     <div class="summary-card" id="s-summary"></div>
 
+    <div class="momo-card" id="momo-card" style="display:none">
+      <div class="momo-header">
+        <div class="momo-icon">📱</div>
+        <div>
+          <div class="momo-title">Pay via MTN MoMo</div>
+          <div class="momo-sub">Send payment to confirm your delivery</div>
+        </div>
+      </div>
+      <div class="momo-number-wrap">
+        <div class="momo-label">Send to this number</div>
+        <div class="momo-number" id="momo-display">0240393582</div>
+        <div class="momo-name">Zygo Express</div>
+        <button class="momo-copy-btn" onclick="copyMomo()">Copy Number</button>
+      </div>
+      <div class="momo-steps">
+        <div class="momo-step"><span class="step-num">1</span> Dial <strong>*170#</strong> on your MTN phone</div>
+        <div class="momo-step"><span class="step-num">2</span> Select <strong>Transfer Money → MoMo User</strong></div>
+        <div class="momo-step"><span class="step-num">3</span> Send <strong id="momo-amount-display">the delivery amount</strong> to <strong>0240393582</strong></div>
+        <div class="momo-step"><span class="step-num">4</span> Use your <strong>Tracking ID</strong> as reference</div>
+      </div>
+      <div class="momo-note">💡 Payment confirms your booking. We'll call you once verified.</div>
+    </div>
     <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary">📍 Track My Parcel</a>
     <div class="btn-ghost" onclick="bookAnother()">+ Book Another Delivery</div>
   </div>
@@ -821,7 +883,13 @@ async function submitBooking() {
   errBox.classList.remove('show');
 
   if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
-  if (!phone || phone.length < 7) { showErr('Please enter a valid phone number.'); return; }
+  // Ghana phone validation
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  const ghanaValid = /^(0[23456789]\d{8}|\+233[23456789]\d{8}|233[23456789]\d{8})$/.test(cleanPhone);
+  if (!phone || !ghanaValid) {
+    showErr('Please enter a valid Ghana phone number (e.g. 0244 123 456).');
+    return;
+  }
   if (!pickup)                    { showErr('Please enter a pickup location.'); return; }
   if (!dropoff)                   { showErr('Please enter a drop-off location.'); return; }
 
@@ -865,6 +933,10 @@ async function submitBooking() {
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${dropoff}</span></div>
       <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${priceNum || 13}</span></div>
     `;
+    // Show MoMo card with correct amount
+    const momoCard = document.getElementById('momo-card');
+    momoCard.style.display = 'block';
+    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 13);
     window.scrollTo(0, 0);
 
   } catch {
@@ -872,6 +944,25 @@ async function submitBooking() {
     btn.disabled = false;
     btn.innerHTML = 'Confirm Booking →';
   }
+}
+
+function copyMomo() {
+  navigator.clipboard.writeText('0240393582').then(() => {
+    const btn = document.querySelector('.momo-copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy Number', 2000);
+  }).catch(() => {
+    // Fallback for older browsers
+    const el = document.createElement('input');
+    el.value = '0240393582';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.querySelector('.momo-copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy Number', 2000);
+  });
 }
 
 function showErr(msg) {

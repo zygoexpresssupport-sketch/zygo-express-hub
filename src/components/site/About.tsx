@@ -1,4 +1,4 @@
-import { TrendingUp, Users, Award } from "lucide-react";
+import { MapPin, Rocket, ShieldCheck } from "lucide-react";
 
 export const About = () => (
   <section id="about" className="py-24">
@@ -13,13 +13,13 @@ export const About = () => (
         </p>
         <div className="grid grid-cols-3 gap-6 pt-4">
           {[
-            { icon: TrendingUp, v: "5x", l: "Faster pickups" },
-            { icon: Users, v: "500+", l: "Happy clients" },
-            { icon: Award, v: "#1", l: "Local rated" },
+            { icon: MapPin, v: "Now Live in Wa", l: "Upper West Region" },
+            { icon: ShieldCheck, v: "Built for Trust", l: "Pharmacies & Bus Stations" },
+            { icon: Rocket, v: "Expanding Soon", l: "Tamale · Bolgatanga" },
           ].map((s) => (
-            <div key={s.l} className="space-y-2">
+            <div key={s.v} className="space-y-2">
               <s.icon className="h-6 w-6 text-primary" />
-              <div className="text-2xl font-extrabold">{s.v}</div>
+              <div className="text-base font-extrabold leading-tight">{s.v}</div>
               <div className="text-xs text-muted-foreground">{s.l}</div>
             </div>
           ))}

@@ -1,9 +1,9 @@
-import { Bike, Building2, Globe2, PackageCheck, Timer, ShieldCheck } from "lucide-react";
+import { Bike, Building2, MapPin, PackageCheck, Timer, ShieldCheck } from "lucide-react";
 
 const services = [
   { icon: Bike, title: "On-Demand Delivery", desc: "Same-day pickup and drop within the city — perfect for urgent parcels." },
   { icon: Building2, title: "Business & E-commerce", desc: "Scheduled routes and bulk handling for online stores and SMEs." },
-  { icon: Globe2, title: "Nationwide Coverage", desc: "Reliable inter-city delivery across the country with full visibility." },
+  { icon: MapPin, title: "Proudly Serving Wa, Upper West Region", desc: "Coming Soon: Tamale | Bolgatanga" },
   { icon: Timer, title: "Express Same-Day", desc: "Need it now? Our express tier prioritises your shipment end-to-end." },
   { icon: ShieldCheck, title: "Secure Handling", desc: "Insured shipments with proof of delivery and signature capture." },
   { icon: PackageCheck, title: "Returns Management", desc: "Hassle-free reverse logistics for your customers." },

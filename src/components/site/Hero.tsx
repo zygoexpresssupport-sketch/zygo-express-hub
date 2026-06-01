@@ -30,16 +30,19 @@ export const Hero = () => (
             </a>
           </Button>
         </div>
-        <div className="flex gap-8 pt-4">
+        <div className="flex flex-wrap gap-2 pt-4">
           {[
-            { v: "10k+", l: "Parcels delivered" },
-            { v: "99.4%", l: "On-time rate" },
-            { v: "24/7", l: "Support" },
-          ].map((s) => (
-            <div key={s.l}>
-              <div className="text-2xl md:text-3xl font-extrabold text-gradient">{s.v}</div>
-              <div className="text-xs md:text-sm text-muted-foreground">{s.l}</div>
-            </div>
+            "Now Live in Wa",
+            "Serving Pharmacies & Bus Stations",
+            "Built for Speed & Trust",
+            "Launching Across Upper West",
+          ].map((t) => (
+            <span
+              key={t}
+              className="text-xs md:text-sm font-semibold px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary"
+            >
+              {t}
+            </span>
           ))}
         </div>
       </div>

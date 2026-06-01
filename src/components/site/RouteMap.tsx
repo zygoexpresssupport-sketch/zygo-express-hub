@@ -6,6 +6,7 @@ type RouteMapProps = {
   pickup: LatLng | null;
   dropoff: LatLng | null;
   rider?: LatLng | null;
+  height?: number;
 };
 
 const buildMapUrl = (pickup: LatLng | null, dropoff: LatLng | null): string => {
@@ -29,7 +30,7 @@ const buildMapUrl = (pickup: LatLng | null, dropoff: LatLng | null): string => {
   return "";
 };
 
-export const RouteMap = ({ pickup, dropoff, rider }: RouteMapProps) => {
+export const RouteMap = ({ pickup, dropoff, rider, height = 340 }: RouteMapProps) => {
   const mapUrl = buildMapUrl(pickup, dropoff);
 
   return (
@@ -39,14 +40,14 @@ export const RouteMap = ({ pickup, dropoff, rider }: RouteMapProps) => {
           title="Delivery route map"
           src={mapUrl}
           width="100%"
-          height="340"
+          height={height}
           style={{ border: 0, display: "block" }}
           allowFullScreen
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         />
       ) : (
-        <div className="h-[340px] bg-muted flex items-center justify-center text-muted-foreground text-sm">
+        <div style={{ height }} className="bg-muted flex items-center justify-center text-muted-foreground text-sm">
           Map unavailable — coordinates missing
         </div>
       )}

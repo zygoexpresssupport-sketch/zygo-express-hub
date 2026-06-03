@@ -66,6 +66,29 @@ CREATE TABLE IF NOT EXISTS public.riders (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- If the table already existed from an older version, make sure required columns exist
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS slot          INT;
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS name          TEXT NOT NULL DEFAULT '';
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS phone         TEXT;
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS is_active     BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS signed_in_at  TIMESTAMPTZ;
+ALTER TABLE public.riders ADD COLUMN IF NOT EXISTS created_at    TIMESTAMPTZ NOT NULL DEFAULT now();
+
+-- Backfill slot for any existing rows that lack it, then add constraints
+WITH numbered AS (
+  SELECT id, ROW_NUMBER() OVER (ORDER BY created_at, id) AS rn
+  FROM public.riders WHERE slot IS NULL
+)
+UPDATE public.riders r SET slot = n.rn FROM numbered n WHERE r.id = n.id;
+
+ALTER TABLE public.riders ALTER COLUMN slot SET NOT NULL;
+DO $$ BEGIN
+  ALTER TABLE public.riders ADD CONSTRAINT riders_slot_key UNIQUE (slot);
+EXCEPTION WHEN duplicate_table OR duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  ALTER TABLE public.riders ADD CONSTRAINT riders_slot_check CHECK (slot BETWEEN 1 AND 50);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
 GRANT SELECT ON public.riders TO anon, authenticated;
 GRANT ALL    ON public.riders TO service_role;
 

@@ -27,7 +27,7 @@ export const Footer = () => (
         <a href="#services" className="block opacity-70 hover:opacity-100">Services</a>
         <a href="#about" className="block opacity-70 hover:opacity-100">About</a>
         <a href="#track" className="block opacity-70 hover:opacity-100">Track parcel</a>
-        <a href="#quote" className="block opacity-70 hover:opacity-100">Get a quote</a>
+        <a href="https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html" target="_blank" rel="noopener noreferrer" className="block opacity-70 hover:opacity-100">Get a quote</a>
       </div>
       <div className="space-y-3">
         <div className="font-bold">Contact</div>

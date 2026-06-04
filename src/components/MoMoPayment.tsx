@@ -43,19 +43,18 @@ export const MoMoPayment = ({
 
     setSubmitting(true);
 
-    // Save reference to Supabase for manual verification
-    const { error } = await supabase
-      .from("quote_requests")
-      .update({
-        payment_reference: reference.trim(),
-        payment_provider: "mtn_momo_manual",
-      })
-      .eq("tracking_code", trackingCode.toUpperCase());
+    // Submit via edge function (service role) — RLS blocks direct client writes by design
+    const { data, error } = await supabase.functions.invoke("submit-momo-reference", {
+      body: {
+        tracking_code: trackingCode.toUpperCase(),
+        reference: reference.trim(),
+      },
+    });
 
     setSubmitting(false);
 
-    if (error) {
-      toast.error("Could not save reference. Please try again.");
+    if (error || (data && (data as any).error)) {
+      toast.error((data as any)?.error ?? "Could not save reference. Please try again.");
       return;
     }
 

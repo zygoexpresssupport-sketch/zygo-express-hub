@@ -77,12 +77,23 @@ Deno.serve(async (req) => {
     return new Response("ok", {
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+        "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-internal-secret",
       },
     });
   }
 
   try {
+    // Require shared secret — function should only be invoked from trusted server contexts
+    // (DB webhook or admin server code), never directly by browser clients.
+    const INTERNAL_SECRET = Deno.env.get("INTERNAL_FUNCTION_SECRET");
+    const provided = req.headers.get("x-internal-secret");
+    if (!INTERNAL_SECRET || provided !== INTERNAL_SECRET) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } }
+      );
+    }
+
     const body = await req.json();
 
     // Support both direct API calls and Supabase webhook triggers
@@ -171,12 +182,13 @@ Deno.serve(async (req) => {
         dropoff_lat: destCoords.lat,
         dropoff_lng: destCoords.lng,
       })
-      .eq("tracking_code", trackingCode);
+      .eq("tracking_code", trackingCode)
+      .is("price", null);
 
     if (error) {
       console.error("[Zygo] DB update error:", error);
       return new Response(
-        JSON.stringify({ error: "Database update failed", details: error }),
+        JSON.stringify({ error: "Internal server error" }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }

@@ -6,7 +6,7 @@ import logo from "/zygo-icon.png";
 const links = [
   { href: "#services", label: "Services" },
   { href: "#track", label: "Track" },
-  { href: "#quote", label: "Get Quote" },
+  { href: "/book.html", label: "Get Quote" },
   { href: "#about", label: "About" },
   { href: "#contact", label: "Contact" },
 ];
@@ -27,7 +27,7 @@ export const Navbar = () => {
             </a>
           ))}
           <Button variant="hero" size="sm" asChild>
-            <a href="#quote">Ship Now</a>
+            <a href="/book.html">Ship Now</a>
           </Button>
         </div>
         <button
@@ -47,7 +47,7 @@ export const Navbar = () => {
               </a>
             ))}
             <Button variant="hero" asChild onClick={() => setOpen(false)}>
-              <a href="#quote">Ship Now</a>
+              <a href="/book.html">Ship Now</a>
             </Button>
           </div>
         </div>

@@ -27,7 +27,7 @@ export const Navbar = () => {
             </a>
           ))}
           <Button variant="hero" size="sm" asChild>
-            <a href="/admin3.html">Admin Panel</a>
+            <a href="#quote">Ship Now</a>
           </Button>
         </div>
         <button
@@ -47,7 +47,7 @@ export const Navbar = () => {
               </a>
             ))}
             <Button variant="hero" asChild onClick={() => setOpen(false)}>
-              <a href="/admin3.html">Admin Panel</a>
+              <a href="#quote">Ship Now</a>
             </Button>
           </div>
         </div>

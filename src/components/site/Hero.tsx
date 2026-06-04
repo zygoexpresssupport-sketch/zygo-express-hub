@@ -20,8 +20,8 @@ export const Hero = () => (
         </p>
         <div className="flex flex-wrap gap-4">
           <Button variant="hero" size="xl" asChild>
-            <a href="/admin3.html">
-              Admin Dashboard <ArrowRight />
+            <a href="https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html">
+              Get a Quote <ArrowRight />
             </a>
           </Button>
           <Button variant="outlineHero" size="xl" asChild>

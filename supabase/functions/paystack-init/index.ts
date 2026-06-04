@@ -31,6 +31,29 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Validate callback_url against an allowlist to prevent open-redirect phishing
+  const ALLOWED_ORIGINS = [
+    "https://zygo-express-hub.lovable.app",
+    "https://id-preview--9bc7707c-92d3-4256-be82-000890a9a3bb.lovable.app",
+  ];
+  let safeCallback: string | undefined = undefined;
+  if (body.callback_url) {
+    try {
+      const parsed = new URL(body.callback_url);
+      if (ALLOWED_ORIGINS.includes(parsed.origin)) {
+        safeCallback = parsed.toString();
+      } else {
+        return new Response(JSON.stringify({ error: "Invalid callback_url" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid callback_url" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
+
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -67,7 +90,7 @@ Deno.serve(async (req) => {
       amount: Math.round(Number(row.price) * 100), // pesewas
       currency: "GHS",
       reference,
-      callback_url: body.callback_url || undefined,
+      callback_url: safeCallback,
       channels: ["mobile_money", "card", "bank"],
       metadata: { tracking_code: code, customer_phone: row.phone, customer_name: row.name },
     }),

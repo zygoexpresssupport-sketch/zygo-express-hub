@@ -57,6 +57,11 @@ async function sendTelegram(text: string) {
   return { ok: true };
 }
 
+// Escape user-supplied strings for Telegram HTML parse mode
+function escHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 async function sendSms(to: string, body: string) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
@@ -129,7 +134,7 @@ Deno.serve(async (req) => {
 
   // Notify admin — Telegram primary, SMS backup
   const plain = `🚀 New Zygo quote\n${name} (${phone})\nFrom: ${pickup}\nTo: ${dropoff}${details ? `\n${details.slice(0,120)}` : ""}`;
-  const html = `🚀 <b>New Zygo quote</b>\n<b>${name}</b> (${phone})\n<b>From:</b> ${pickup}\n<b>To:</b> ${dropoff}${details ? `\n${details.slice(0,160)}` : ""}`;
+  const html = `🚀 <b>New Zygo quote</b>\n<b>${escHtml(name)}</b> (${escHtml(phone)})\n<b>From:</b> ${escHtml(pickup)}\n<b>To:</b> ${escHtml(dropoff)}${details ? `\n${escHtml(details.slice(0,160))}` : ""}`;
 
   const tg = await sendTelegram(html);
   if (!tg.ok) console.warn("Telegram alert failed:", tg.reason);

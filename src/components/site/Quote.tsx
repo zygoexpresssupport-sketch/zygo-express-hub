@@ -16,10 +16,6 @@ const schema = z.object({
   details: z.string().trim().max(500).optional(),
 });
 
-function generateCode(): string {
-  return "ZGX-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
 export const Quote = () => {
   const [loading, setLoading] = useState(false);
 
@@ -36,24 +32,9 @@ export const Quote = () => {
 
     setLoading(true);
 
-    const trackingCode = generateCode();
-
-    // Use any to bypass strict type checking for new columns
-    const record: any = {
-      tracking_code: trackingCode,
-      status:        "pending",
-      name:          parsed.data.name,
-      phone:         parsed.data.phone,
-      pickup:        parsed.data.pickup,
-      dropoff:       parsed.data.dropoff,
-      details:       parsed.data.details ?? null,
-      source:        "Website",
-      created_at:    new Date().toISOString(),
-    };
-
-    const { error } = await supabase
-      .from("quote_requests")
-      .insert(record);
+    const { error } = await supabase.functions.invoke("submit-quote", {
+      body: parsed.data,
+    });
 
     setLoading(false);
 
@@ -63,7 +44,7 @@ export const Quote = () => {
       return;
     }
 
-    toast.success(`Quote sent! Your tracking ID: ${trackingCode}`);
+    toast.success("Quote sent! We'll be in touch shortly.");
     form.reset();
   };
 

@@ -5,8 +5,8 @@ import { useRef } from "react";
 
 export const QrCode = () => {
   const url = typeof window !== "undefined"
-    ? `${window.location.origin}/#quote`
-    : "https://zygo-express-hub.lovable.app/#quote";
+    ? `${window.location.origin}/book.html`
+    : "https://zygo-express-hub.lovable.app/book.html";
   const ref = useRef<HTMLDivElement>(null);
 
   const download = () => {

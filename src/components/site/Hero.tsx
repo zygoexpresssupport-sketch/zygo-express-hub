@@ -53,6 +53,8 @@ export const Hero = () => (
           alt="Zygo Express courier delivering a parcel at speed"
           width={1600}
           height={1024}
+          fetchPriority="high"
+          decoding="async"
           className="relative rounded-3xl shadow-elegant w-full object-cover aspect-[4/3]"
         />
         <div className="absolute -bottom-6 -left-6 bg-card shadow-card rounded-2xl p-4 flex items-center gap-3">

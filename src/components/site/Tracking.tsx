@@ -74,7 +74,7 @@ export const Tracking = () => {
 
       setLoading(false);
       if(error || !data){ toast.error("No shipment found for that code."); return; }
-      setResult(data as TrackResult);
+      setResult(data as unknown as TrackResult);
     } catch {
       setLoading(false);
       toast.error("Lookup failed. Please try again.");

@@ -11,14 +11,14 @@ export const Footer = () => (
         </div>
         <p className="opacity-70 max-w-sm">Last-mile delivery for businesses and people who can't afford to slow down.</p>
         <div className="flex gap-3 pt-2">
-          <a href="https://www.tiktok.com/@zygo.express" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="h-10 w-10 rounded-full bg-background/10 hover:bg-gradient-hero grid place-items-center transition-smooth">
-            <Music2 className="h-4 w-4" />
+          <a href="https://www.tiktok.com/@zygo.express" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="h-12 w-12 rounded-full bg-black text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
+            <Music2 className="h-5 w-5" />
           </a>
-          <a href="https://x.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" className="h-10 w-10 rounded-full bg-background/10 hover:bg-gradient-hero grid place-items-center transition-smooth">
-            <Twitter className="h-4 w-4" />
+          <a href="https://x.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" className="h-12 w-12 rounded-full bg-[#000000] text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
+            <Twitter className="h-5 w-5" />
           </a>
-          <a href="https://www.facebook.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="h-10 w-10 rounded-full bg-background/10 hover:bg-gradient-hero grid place-items-center transition-smooth">
-            <Facebook className="h-4 w-4" />
+          <a href="https://www.facebook.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="h-12 w-12 rounded-full bg-[#1877F2] text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
+            <Facebook className="h-5 w-5" />
           </a>
         </div>
       </div>

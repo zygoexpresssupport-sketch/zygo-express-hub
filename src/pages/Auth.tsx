@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,14 @@ export default function Auth() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-dark p-4">
+      <Helmet>
+        <title>Sign in — Zygo Express</title>
+        <meta name="description" content="Zygo Express staff sign in." />
+        <meta name="robots" content="noindex,nofollow" />
+        <link rel="canonical" href="https://zygo-express-hub.lovable.app/auth" />
+        <meta property="og:title" content="Sign in — Zygo Express" />
+        <meta property="og:url" content="https://zygo-express-hub.lovable.app/auth" />
+      </Helmet>
       <form onSubmit={onSubmit} className="w-full max-w-md bg-card text-card-foreground p-8 rounded-3xl shadow-elegant space-y-5">
         <div>
           <h1 className="text-3xl font-extrabold">Admin {mode === "signin" ? "Sign in" : "Sign up"}</h1>

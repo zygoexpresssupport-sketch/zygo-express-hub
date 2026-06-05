@@ -1,0 +1,13 @@
+# Zygo Express
+
+> Same-day parcel delivery service in Wa and the Upper West Region of Ghana. Book online, pay via MTN MoMo, track your rider live.
+
+Zygo Express is a registered last-mile delivery business in Wa, Ghana. We pick up and deliver parcels, documents, food, medication, and groceries across Wa Municipal and surrounding communities within 1–3 hours. Customers book on the website, receive a tracking code, pay via MTN Mobile Money, and follow their rider in real time.
+
+## Pages
+
+- [Home](/): Service overview, booking, live tracking, pricing zones, FAQ, and partnership signup.
+
+## Optional
+
+- [Book a delivery](https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html): External booking form.

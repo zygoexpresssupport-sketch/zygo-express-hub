@@ -1,126 +1,673 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { Bike, Power, PowerOff, Pencil, Check, X } from "lucide-react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Zygo Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    :root{--orange:#f97316;--bg:#f8f8f8;--white:#ffffff;--border:#e5e7eb;--text:#111827;--muted:#6b7280;--green:#16a34a;--red:#dc2626;--radius:12px;}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+    .screen{display:none;min-height:100vh;flex-direction:column;}
+    .screen.active{display:flex;}
 
-type RiderStat = {
-  rider_id: string;
-  slot: number;
-  name: string;
-  is_active: boolean;
-  signed_in_at: string | null;
-  deliveries: number;
-  revenue: number;
-  in_progress: number;
-};
+    /* LOGIN */
+    #screen-login{background:var(--white);align-items:center;justify-content:center;padding:32px 24px;}
+    .login-box{width:100%;max-width:360px;}
+    .login-header{display:flex;align-items:center;gap:10px;margin-bottom:32px;}
+    .login-shield{width:40px;height:40px;background:var(--orange);border-radius:10px;display:grid;place-items:center;color:white;font-size:20px;}
+    .login-title-text{font-weight:700;font-size:18px;}
+    .login-email-text{font-size:13px;color:var(--muted);}
+    .login-h1{font-size:28px;font-weight:700;margin-bottom:6px;}
+    .login-sub{color:var(--muted);font-size:14px;margin-bottom:28px;}
+    .field{margin-bottom:14px;}
+    .field label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;}
+    .field input{width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:15px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+    .field input:focus{border-color:var(--orange);}
+    .btn-login{width:100%;padding:14px;border:none;background:var(--orange);border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:white;cursor:pointer;}
+    .btn-login:active{opacity:0.85;}
+    .err{background:#fef2f2;border:1px solid #fecaca;color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-top:10px;display:none;}
+    .err.show{display:block;}
 
-export const RidersDashboard = () => {
-  const today = new Date().toISOString().slice(0, 10);
-  const [day, setDay] = useState(today);
-  const [rows, setRows] = useState<RiderStat[]>([]);
-  const [editing, setEditing] = useState<string | null>(null);
-  const [draft, setDraft] = useState<{ name: string; phone: string }>({ name: "", phone: "" });
+    /* TOPBAR */
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .topbar-left{display:flex;align-items:center;gap:8px;}
+    .topbar-shield{width:32px;height:32px;background:var(--orange);border-radius:8px;display:grid;place-items:center;color:white;font-size:16px;}
+    .topbar-title{font-weight:700;font-size:15px;}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+    .topbar-email{font-size:12px;color:var(--muted);}
+    .signout-btn{background:none;border:1px solid var(--border);padding:7px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;}
 
-  const load = async () => {
-    const { data, error } = await supabase.rpc("rider_daily_stats", { _day: day });
-    if (error) return toast.error("Couldn't load riders");
-    setRows((data as any) || []);
-  };
+    /* MAIN */
+    .main-content{flex:1;overflow-y:auto;padding:16px;max-width:900px;margin:0 auto;width:100%;}
+    .section-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px;}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+    .section-title{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:700;}
+    .active-count{font-size:13px;color:var(--muted);font-weight:400;}
+    .section-controls{display:flex;align-items:center;gap:8px;}
+    .date-select{border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:13px;font-family:'Inter',sans-serif;outline:none;background:var(--white);color:var(--text);cursor:pointer;}
+    .refresh-btn{border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;font-family:'Inter',sans-serif;background:var(--white);cursor:pointer;font-weight:500;}
+    .refresh-btn:active{background:var(--bg);}
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [day]);
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+    .stat-box{background:var(--bg);border-radius:10px;padding:12px;text-align:center;}
+    .stat-box-label{font-size:11px;color:var(--muted);margin-bottom:4px;}
+    .stat-box-value{font-size:20px;font-weight:700;}
 
-  const toggle = async (r: RiderStat) => {
-    const fn = r.is_active ? "rider_sign_out" : "rider_sign_in";
-    const { error } = await supabase.rpc(fn as any, { _id: r.rider_id });
-    if (error) return toast.error(error.message);
-    toast.success(r.is_active ? `Rider ${r.slot} signed out` : `Rider ${r.slot} signed in`);
-    load();
-  };
+    /* RIDER ROWS */
+    .rider-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+    .rider-row:last-child{border-bottom:none;}
+    .rider-num{width:32px;height:32px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted);flex-shrink:0;}
+    .rider-info{flex:1;min-width:80px;}
+    .rider-name{font-size:14px;font-weight:600;}
+    .rider-duty{font-size:12px;color:var(--muted);}
+    .rider-duty.online{color:var(--green);}
+    .rider-metrics{font-size:11px;color:var(--muted);text-align:center;padding:4px 8px;background:var(--bg);border-radius:8px;}
+    .rider-metrics strong{color:var(--text);display:block;font-size:13px;}
+    .rider-rating{font-size:12px;color:#d97706;font-weight:600;}
+    .rider-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:6px;font-size:16px;}
+    .signin-btn{background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;}
+    .signin-btn:active{opacity:0.85;}
+    .signin-btn.on-duty{background:#dcfce7;color:var(--green);}
+    .auto-assign-note{font-size:11px;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);line-height:1.5;}
+    .online-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px;animation:pulse 1.5s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-  const startEdit = (r: RiderStat) => { setEditing(r.rider_id); setDraft({ name: r.name, phone: "" }); };
-  const saveEdit = async (id: string) => {
-    const { error } = await supabase.rpc("update_rider", { _id: id, _name: draft.name, _phone: draft.phone });
-    if (error) return toast.error(error.message);
-    setEditing(null);
-    load();
-  };
+    /* REQUESTS */
+    .requests-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+    .requests-title{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700;}
+    .count-badge{background:#fff7ed;color:var(--orange);border-radius:20px;padding:2px 10px;font-size:14px;font-weight:600;}
+    .requests-actions{display:flex;gap:8px;}
+    .log-dm-btn{background:var(--orange);color:white;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
 
-  const totalDeliveries = rows.reduce((a, r) => a + Number(r.deliveries || 0), 0);
-  const totalRevenue = rows.reduce((a, r) => a + Number(r.revenue || 0), 0);
-  const activeCount = rows.filter((r) => r.is_active).length;
+    /* TABLE */
+    .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+    table{width:100%;border-collapse:collapse;min-width:750px;}
+    thead th{background:var(--bg);padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+    tbody tr{border-bottom:1px solid var(--border);}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:#fffbf7;}
+    tbody td{padding:10px 12px;font-size:13px;vertical-align:middle;}
+    .source-badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+    .source-badge.whatsapp{background:#dcfce7;color:#15803d;border-color:#bbf7d0;}
+    .phone-link{color:var(--orange);text-decoration:none;font-weight:500;}
+    .status-text{font-weight:600;font-size:13px;}
+    .status-text.confirmed{color:#ea580c;}
+    .status-text.in_transit{color:#2563eb;}
+    .status-text.out_for_delivery{color:#9333ea;}
+    .status-text.delivered{color:var(--green);}
+    .status-text.pending{color:var(--muted);}
+    .status-text.picked_up{color:#0891b2;}
+    .status-text.cancelled{color:var(--red);}
+    .code-text{font-family:monospace;font-size:12px;font-weight:600;}
+    .status-select{border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:12px;font-family:'Inter',sans-serif;outline:none;background:var(--white);cursor:pointer;min-width:120px;color:var(--text);}
+    .status-select:focus{border-color:var(--orange);}
+    .track-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:5px 8px;font-size:11px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;white-space:nowrap;margin-top:4px;}
+    .cost-badge{display:inline-block;background:#fff7ed;color:var(--orange);border:1px solid #fed7aa;border-radius:6px;padding:2px 6px;font-size:11px;font-weight:600;}
+    .wa-btn{background:#25d366;color:white;border:none;border-radius:6px;padding:5px 8px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;margin-top:4px;display:flex;align-items:center;gap:4px;}
+    .wa-btn:active{opacity:0.85;}
 
-  return (
-    <section className="bg-card rounded-2xl shadow-elegant p-5 mb-8">
-      <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-        <h2 className="text-xl font-extrabold flex items-center gap-2">
-          <Bike className="text-primary" /> Riders
-          <span className="text-xs text-muted-foreground font-medium">{activeCount}/10 active</span>
-        </h2>
-        <div className="flex items-center gap-2">
-          <Input type="date" value={day} onChange={(e) => setDay(e.target.value)} className="h-9 w-auto" />
-          <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
+    /* TRACK MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-end;justify-content:center;z-index:200;}
+    .modal-overlay.show{display:flex;}
+    .modal{background:var(--white);border-radius:20px 20px 0 0;padding:24px 20px 40px;width:100%;max-width:500px;animation:slideUp 0.3s ease;max-height:85vh;overflow-y:auto;}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .modal-title{font-size:17px;font-weight:700;margin-bottom:4px;}
+    .modal-sub{font-size:13px;color:var(--muted);margin-bottom:16px;}
+    .modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);margin-top:-4px;}
+    .info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+    .info-row:last-child{border-bottom:none;}
+    .info-label{color:var(--muted);}
+    .info-value{font-weight:600;text-align:right;}
+    .map-frame{width:100%;height:200px;border-radius:12px;border:1px solid var(--border);margin-top:14px;}
+    .rider-live{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--green);font-weight:500;}
+    .pulse-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0;}
+
+    /* TOAST */
+    .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:white;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;max-width:90vw;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.success{background:#15803d;}
+    .toast.error{background:var(--red);}
+
+    /* LOADING */
+    #screen-loading{align-items:center;justify-content:center;background:var(--white);}
+    .loading-brand{font-size:22px;font-weight:700;margin-bottom:24px;color:var(--text);}
+    .loading-brand span{color:var(--orange);}
+    .spinner-bar{width:80px;height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
+    .spinner-fill{height:100%;background:var(--orange);border-radius:3px;animation:load 1.5s ease-in-out infinite;}
+    @keyframes load{0%{width:0%;margin-left:0}50%{width:70%;margin-left:15%}100%{width:0%;margin-left:100%}}
+
+    /* EDIT RIDER MODAL */
+    .modal-btn{width:100%;padding:14px;border:none;border-radius:8px;background:var(--orange);color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;margin-top:8px;}
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="screen-loading" class="screen active">
+  <div class="loading-brand">ZYGO <span>EXPRESS</span></div>
+  <div class="spinner-bar"><div class="spinner-fill"></div></div>
+</div>
+
+<!-- Login -->
+<div id="screen-login" class="screen">
+  <div class="login-box">
+    <div class="login-header">
+      <div class="login-shield">🛡️</div>
+      <div><div class="login-title-text">Admin Dashboard</div><div class="login-email-text">zygoexpresssupport@gmail.com</div></div>
+    </div>
+    <div class="login-h1">Welcome back</div>
+    <div class="login-sub">Sign in to manage your deliveries</div>
+    <div class="field"><label>Username</label><input type="text" id="admin-user" placeholder="admin" autocomplete="off"/></div>
+    <div class="field"><label>Password</label><input type="password" id="admin-pass" placeholder="••••••••"/></div>
+    <button class="btn-login" onclick="doLogin()">Sign in</button>
+    <div class="err" id="login-err">Incorrect credentials. Please try again.</div>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="screen-main" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-shield">🛡️</div>
+      <div class="topbar-title">Admin Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-email">zygoexpresssupport@gmail.com</span>
+      <button class="signout-btn" onclick="doLogout()">⏻ Sign out</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- Riders -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">🚴 <span>Riders</span> <span class="active-count" id="active-count">0/10 active</span></div>
+        <div class="section-controls">
+          <select class="date-select" id="date-select" onchange="loadAll()">
+            <option value="today" id="today-option">Today</option>
+            <option value="week">This week</option>
+            <option value="all">All time</option>
+          </select>
+          <button class="refresh-btn" onclick="refreshSection(this,'riders')">Refresh</button>
         </div>
       </div>
-
-      <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-        <Stat label="Active" value={`${activeCount}`} />
-        <Stat label="Deliveries" value={`${totalDeliveries}`} />
-        <Stat label="Revenue" value={`GHS ${totalRevenue.toFixed(2)}`} />
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-box-label">Active</div><div class="stat-box-value" id="riders-active">0</div></div>
+        <div class="stat-box"><div class="stat-box-label">Deliveries</div><div class="stat-box-value" id="riders-deliveries">0</div></div>
+        <div class="stat-box"><div class="stat-box-label">Revenue</div><div class="stat-box-value" id="riders-revenue">GHS 0.00</div></div>
       </div>
+      <div id="riders-list"></div>
+      <div class="auto-assign-note">New confirmed requests are auto-assigned to the active rider with the fewest deliveries today (ties: earliest sign-in).</div>
+    </div>
 
-      <div className="grid gap-2">
-        {rows.map((r) => (
-          <div key={r.rider_id} className={`flex items-center gap-3 p-3 rounded-xl border ${r.is_active ? "border-primary/40 bg-primary/5" : "border-border"}`}>
-            <div className={`h-10 w-10 rounded-full grid place-items-center font-bold text-sm shrink-0 ${r.is_active ? "bg-gradient-hero text-primary-foreground shadow-glow" : "bg-muted text-muted-foreground"}`}>
-              {r.slot}
-            </div>
-            <div className="flex-1 min-w-0">
-              {editing === r.rider_id ? (
-                <div className="flex gap-2">
-                  <Input value={draft.name} onChange={(e)=>setDraft({...draft,name:e.target.value})} placeholder="Name" className="h-8 text-sm" />
-                  <Input value={draft.phone} onChange={(e)=>setDraft({...draft,phone:e.target.value})} placeholder="Phone" className="h-8 text-sm" />
-                </div>
-              ) : (
-                <>
-                  <div className="font-semibold truncate">{r.name || `Rider ${r.slot}`}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {r.is_active && r.signed_in_at ? `Since ${new Date(r.signed_in_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : "Off duty"}
-                  </div>
-                </>
-              )}
-            </div>
-            <div className="hidden sm:flex flex-col items-end text-xs gap-0.5 mr-2">
-              <span><b>{r.deliveries}</b> delivered</span>
-              <span className="text-muted-foreground">{r.in_progress} active · GHS {Number(r.revenue||0).toFixed(2)}</span>
-            </div>
-            {editing === r.rider_id ? (
-              <div className="flex gap-1">
-                <Button size="sm" variant="hero" onClick={() => saveEdit(r.rider_id)}><Check className="h-4 w-4" /></Button>
-                <Button size="sm" variant="outline" onClick={() => setEditing(null)}><X className="h-4 w-4" /></Button>
-              </div>
-            ) : (
-              <div className="flex gap-1">
-                <Button size="sm" variant="ghost" onClick={() => startEdit(r)}><Pencil className="h-4 w-4" /></Button>
-                <Button size="sm" variant={r.is_active ? "outline" : "hero"} onClick={() => toggle(r)}>
-                  {r.is_active ? <><PowerOff className="h-4 w-4" /> Sign out</> : <><Power className="h-4 w-4" /> Sign in</>}
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
+    <!-- Requests -->
+    <div class="section-card">
+      <div class="requests-header">
+        <div class="requests-title">🔔 <span>Requests</span> <span class="count-badge" id="requests-count">0</span></div>
+        <div class="requests-actions">
+          <button class="refresh-btn" onclick="refreshSection(this,'requests')">Refresh</button>
+          <button class="log-dm-btn" onclick="openLogDM()">+ Log social DM</button>
+        </div>
       </div>
-      <p className="text-xs text-muted-foreground mt-3">
-        New confirmed requests are auto-assigned to the active rider with the fewest deliveries today (ties: earliest sign-in).
-      </p>
-    </section>
-  );
-};
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date & Time</th><th>Source</th><th>Name</th><th>Phone</th><th>Route</th><th>Cost</th><th>Status</th><th>Code</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="requests-tbody">
+            <tr><td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-const Stat = ({ label, value }: { label: string; value: string }) => (
-  <div className="bg-muted rounded-xl p-3">
-    <div className="text-xs text-muted-foreground">{label}</div>
-    <div className="font-extrabold text-lg">{value}</div>
   </div>
-);
+</div>
+
+<!-- Log Social DM Modal -->
+<div class="modal-overlay" id="modal-log-dm">
+  <div class="modal" style="max-height:90vh;overflow-y:auto">
+    <button class="modal-close" onclick="closeLogDM()">✕</button>
+    <div class="modal-title">Log Social DM Order</div>
+    <div class="modal-sub">Enter details from WhatsApp, Instagram or Facebook</div>
+
+    <div class="field">
+      <label>Source</label>
+      <select id="dm-source" style="width:100%;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;font-size:15px;font-family:Inter,sans-serif;outline:none;background:#fff;color:#111827;">
+        <option value="WhatsApp">WhatsApp</option>
+        <option value="Instagram">Instagram</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Phone call">Phone call</option>
+        <option value="Walk-in">Walk-in</option>
+      </select>
+    </div>
+    <div class="field"><label>Customer Name</label><input type="text" id="dm-name" placeholder="e.g. Kofi Mensah"/></div>
+    <div class="field"><label>Phone Number</label><input type="tel" id="dm-phone" placeholder="e.g. 0244123456"/></div>
+    <div class="field"><label>Pickup Location</label><input type="text" id="dm-pickup" placeholder="e.g. Osu, Accra"/></div>
+    <div class="field"><label>Drop-off Location</label><input type="text" id="dm-dropoff" placeholder="e.g. East Legon, Accra"/></div>
+    <div class="field"><label>Price (GHS) — optional</label><input type="number" id="dm-price" placeholder="Leave blank to auto-calculate"/></div>
+    <div class="field"><label>Notes — optional</label><input type="text" id="dm-notes" placeholder="Any special instructions"/></div>
+
+    <button class="modal-btn" id="dm-submit-btn" onclick="submitLogDM()">📝 Log Order</button>
+    <div id="dm-error" style="color:#dc2626;font-size:13px;margin-top:8px;display:none"></div>
+  </div>
+</div>
+
+<!-- Track Modal -->
+<div class="modal-overlay" id="modal-track">
+  <div class="modal">
+    <button class="modal-close" onclick="closeTrackModal()">✕</button>
+    <div class="modal-title" id="track-title">Track Order</div>
+    <div class="modal-sub" id="track-sub">Live delivery tracking</div>
+    <div id="track-info"></div>
+    <div id="rider-live-box" style="display:none" class="rider-live">
+      <div class="pulse-dot"></div>
+      <div><div>Rider location live</div><div id="rider-coords" style="font-size:11px;opacity:0.8;margin-top:2px"></div></div>
+    </div>
+    <iframe id="track-map" class="map-frame" style="display:none" frameborder="0" allowfullscreen loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- Edit Rider Modal -->
+<div class="modal-overlay" id="modal-rider">
+  <div class="modal">
+    <button class="modal-close" onclick="closeRiderModal()">✕</button>
+    <div class="modal-title">Edit Rider</div>
+    <div class="modal-sub" id="modal-rider-sub">Update rider name</div>
+    <div class="field"><label>Rider Name</label><input type="text" id="modal-rider-name" placeholder="Enter name"/></div>
+    <button class="modal-btn" onclick="saveRiderName()">Save</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+const TABLE = "quote_requests";
+const RIDERS_TABLE = "riders";
+const RATE_PER_KM = 3.20;
+const ADMINS = [{user:"emmanuel",pass:"zygo2024"},{user:"admin",pass:"admin123"}];
+const STATUSES = ["pending","confirmed","picked_up","in_transit","out_for_delivery","delivered","cancelled"];
+const STATUS_LABELS = {pending:"Pending",confirmed:"Confirmed",picked_up:"Picked Up",in_transit:"In Transit",out_for_delivery:"Out For Delivery",delivered:"Delivered",cancelled:"Cancelled"};
+
+// Local rider config (names + IDs)
+const RIDER_CONFIG = [
+  {id:"RIDER-001",name:"Kofi"},
+  {id:"RIDER-002",name:"Ama"},
+  {id:"RIDER-003",name:"Kwame"},
+];
+
+function getLocalRiders(){
+  const s=localStorage.getItem('zygo_riders_admin_v2');
+  if(s) return JSON.parse(s);
+  // Build from config + extras up to 10
+  const r=[];
+  for(let i=1;i<=10;i++){
+    const cfg=RIDER_CONFIG[i-1];
+    r.push({id:i,riderId:cfg?.id??`RIDER-00${i}`,name:cfg?.name??`Rider ${i}`,active:false});
+  }
+  return r;
+}
+function saveLocalRiders(r){localStorage.setItem('zygo_riders_admin_v2',JSON.stringify(r));}
+
+let sb, allOrders=[], liveRiders={}, editingRiderId=null;
+
+window.addEventListener('load',async()=>{
+  sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+  // Show actual date in filter dropdown
+  const _now=new Date();
+  const _fmt=String(_now.getDate()).padStart(2,'0')+'/'+String(_now.getMonth()+1).padStart(2,'0')+'/'+_now.getFullYear();
+  document.getElementById('today-option').textContent=_fmt;
+  await new Promise(r=>setTimeout(r,900));
+  if(localStorage.getItem('zygo_admin_v4')) showMain();
+  else showScreen('login');
+});
+
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
+
+function doLogin(){
+  const u=document.getElementById('admin-user').value.trim().toLowerCase();
+  const p=document.getElementById('admin-pass').value.trim();
+  if(!ADMINS.find(a=>a.user===u&&a.pass===p)){document.getElementById('login-err').classList.add('show');return;}
+  localStorage.setItem('zygo_admin_v4','1');
+  showMain();
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
+function doLogout(){localStorage.removeItem('zygo_admin_v4');showScreen('login');}
+
+async function showMain(){
+  showScreen('main');
+  await loadAll();
+  // Real-time orders
+  sb.channel('admin-orders').on('postgres_changes',{event:'*',schema:'public',table:TABLE},()=>loadAll()).subscribe();
+  // ✅ Real-time rider sign in/out
+  sb.channel('admin-riders').on('postgres_changes',{event:'*',schema:'public',table:RIDERS_TABLE},payload=>{
+    const r=payload.new;
+    liveRiders[r.rider_id]={name:r.name,is_online:r.is_online,last_seen:r.last_seen};
+    renderRiders();
+    showToast(`${r.name} ${r.is_online?'signed in 🟢':'signed out'}`,r.is_online?'success':'');
+  }).subscribe();
+  // Load current rider statuses
+  loadRiderStatuses();
+}
+
+async function loadRiderStatuses(){
+  const {data}=await sb.from(RIDERS_TABLE).select('*');
+  if(data) data.forEach(r=>{liveRiders[r.rider_id]={name:r.name,is_online:r.is_online,last_seen:r.last_seen};});
+  renderRiders();
+}
+
+async function loadAll(){
+  const {data,error}=await sb.from(TABLE).select('*').order('created_at',{ascending:false});
+  if(!error&&data) allOrders=data;
+  renderRiders();
+  renderRequests();
+}
+
+// ── Format date ──────────────────────────────────────────────────────────────
+function formatDate(iso){
+  if(!iso) return '—';
+  const d=new Date(iso);
+  const day=String(d.getDate()).padStart(2,'0');
+  const mon=String(d.getMonth()+1).padStart(2,'0');
+  const yr=d.getFullYear();
+  const hr=String(d.getHours()).padStart(2,'0');
+  const mn=String(d.getMinutes()).padStart(2,'0');
+  return `${day}/${mon}/${yr} ${hr}:${mn}`;
+}
+
+// ── Auto cost ────────────────────────────────────────────────────────────────
+function calcCost(distM){if(!distM)return null;return Math.ceil((distM/1000)*RATE_PER_KM*100)/100;}
+
+// ── Riders ────────────────────────────────────────────────────────────────────
+function renderRiders(){
+  const localRiders=getLocalRiders();
+  // Count online from liveRiders
+  const onlineCount=Object.values(liveRiders).filter(r=>r.is_online).length;
+  const delivered=allOrders.filter(o=>o.status==='delivered').length;
+  const revenue=allOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+
+  document.getElementById('active-count').textContent=`${onlineCount}/10 active`;
+  document.getElementById('riders-active').textContent=onlineCount;
+  document.getElementById('riders-deliveries').textContent=delivered;
+  document.getElementById('riders-revenue').textContent=`GHS ${revenue.toFixed(2)}`;
+
+  document.getElementById('riders-list').innerHTML=localRiders.map(r=>{
+    const live=liveRiders[r.riderId];
+    const isOnline=live?.is_online??false;
+    const lastSeen=live?.last_seen?formatDate(live.last_seen):'Never';
+
+    // Per-rider metrics
+    const rOrders=allOrders.filter(o=>o.assigned_rider===r.riderId);
+    const rDelivered=rOrders.filter(o=>o.status==='delivered').length;
+    const rActive=rOrders.filter(o=>!['delivered','cancelled'].includes(o.status)).length;
+    const rRevenue=rOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+    const rRatings=rOrders.filter(o=>o.rider_rating).map(o=>Number(o.rider_rating));
+    const rAvgRating=rRatings.length?(rRatings.reduce((a,b)=>a+b,0)/rRatings.length).toFixed(1):null;
+
+    return `
+      <div class="rider-row">
+        <div class="rider-num">${r.id}</div>
+        <div class="rider-info">
+          <div class="rider-name">${r.name}</div>
+          <div class="rider-duty ${isOnline?'online':''}">
+            ${isOnline?'<span class="online-dot"></span>On duty':'Off duty'}
+            ${!isOnline&&live?` · Last seen ${lastSeen}`:''}
+          </div>
+        </div>
+        <div class="rider-metrics"><strong>${rDelivered}</strong>delivered</div>
+        <div class="rider-metrics"><strong>${rActive}</strong>active</div>
+        <div class="rider-metrics"><strong>GHS ${rRevenue.toFixed(0)}</strong>revenue</div>
+        ${rAvgRating?`<div class="rider-rating">⭐${rAvgRating}</div>`:''}
+        <button class="rider-edit-btn" onclick="editRider(${r.id})">✏️</button>
+        <button class="signin-btn ${isOnline?'on-duty':''}" onclick="toggleRider(${r.id})">
+          ⏻ ${isOnline?'Sign out':'Sign in'}
+        </button>
+      </div>`;
+  }).join('');
+}
+
+function toggleRider(id){
+  const localRiders=getLocalRiders();
+  const r=localRiders.find(x=>x.id===id);
+  // Toggle in liveRiders manually for admin override
+  const current=liveRiders[r.riderId];
+  const newStatus=!(current?.is_online??false);
+  liveRiders[r.riderId]={...current,name:r.name,is_online:newStatus,last_seen:new Date().toISOString()};
+  // Sync to Supabase
+  sb.from(RIDERS_TABLE).upsert({rider_id:r.riderId,name:r.name,is_online:newStatus,last_seen:new Date().toISOString()},{onConflict:'rider_id'}).then(()=>{});
+  renderRiders();
+  showToast(`${r.name} ${newStatus?'signed in':'signed out'}`,'success');
+}
+
+function editRider(id){
+  const localRiders=getLocalRiders();
+  const r=localRiders.find(x=>x.id===id);
+  editingRiderId=id;
+  document.getElementById('modal-rider-sub').textContent=`Rider ${id}`;
+  document.getElementById('modal-rider-name').value=r.name;
+  document.getElementById('modal-rider').classList.add('show');
+}
+
+function saveRiderName(){
+  const name=document.getElementById('modal-rider-name').value.trim();
+  if(!name) return;
+  const localRiders=getLocalRiders();
+  localRiders.find(x=>x.id===editingRiderId).name=name;
+  saveLocalRiders(localRiders);
+  closeRiderModal();
+  renderRiders();
+  showToast('Rider name updated','success');
+}
+
+function closeRiderModal(){document.getElementById('modal-rider').classList.remove('show');}
+document.getElementById('modal-rider').addEventListener('click',e=>{if(e.target===document.getElementById('modal-rider'))closeRiderModal();});
+
+// ── Requests ──────────────────────────────────────────────────────────────────
+function renderRequests(){
+  document.getElementById('requests-count').textContent=allOrders.length;
+  if(!allOrders.length){
+    document.getElementById('requests-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">No requests yet.</td></tr>';
+    return;
+  }
+  document.getElementById('requests-tbody').innerHTML=allOrders.map(o=>{
+    const dateTime=formatDate(o.created_at);
+    const source=o.source??'Website';
+    const sourceClass=source.toLowerCase().includes('whatsapp')?'whatsapp':'';
+    const phone=o.phone??o.customer_phone??'';
+    const name=o.customer_name??o.name??'—';
+    const route=o.pickup&&o.dropoff?`${o.pickup} → ${o.dropoff}`:(o.pickup??o.dropoff??'—');
+    const statusClass=(o.status??'').replace(/ /g,'_').toLowerCase();
+    const statusLabel=STATUS_LABELS[o.status]??o.status??'—';
+    const phoneDisplay=phone?`<a href="tel:${phone}" class="phone-link">${phone}</a>`:'—';
+    const autoCost=calcCost(o.route_distance_m);
+    const displayCost=o.price?`GHS ${Number(o.price).toFixed(2)}`:autoCost?`<span class="cost-badge">~GHS ${autoCost.toFixed(2)}</span>`:'—';
+    const rating=o.rider_rating?`${'⭐'.repeat(o.rider_rating)}`:'';
+    return `
+      <tr>
+        <td style="font-size:12px;color:#6b7280;white-space:nowrap">${dateTime}</td>
+        <td><span class="source-badge ${sourceClass}">${source}</span></td>
+        <td style="font-weight:500">${name}</td>
+        <td>${phoneDisplay}</td>
+        <td style="max-width:120px;font-size:12px">${route}</td>
+        <td>${displayCost}</td>
+        <td><span class="status-text ${statusClass}">${statusLabel}</span>${rating?`<div style="font-size:11px">${rating}</div>`:''}</td>
+        <td><span class="code-text">${o.tracking_code??'—'}</span></td>
+        <td>
+          <select class="status-select" onchange="updateStatus('${o.tracking_code}',this.value,this)">
+            ${STATUSES.map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
+          </select>
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <button class="track-btn" onclick="openTrack('${o.tracking_code}')">📍 Track</button>
+            ${phone?`<button class="wa-btn" onclick="sendWhatsApp('${o.tracking_code}','${phone}','${(name).replace(/'/g,'')}','${(o.pickup??'').replace(/'/g,'')}','${(o.dropoff??'').replace(/'/g,'')}','${o.status??''}')">💬 WA</button>`:''}
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function sendWhatsApp(code,phone,name,pickup,dropoff,status){
+  const trackingUrl='https://zygo-express-hub.lovable.app/#track';
+  const STATUS_MSGS={
+    confirmed:'Hello '+name+'! Your Zygo Express delivery has been *confirmed*! 🛵\n\n📦 *Tracking ID:* '+code+'\n📍 *Pickup:* '+pickup+'\n🏁 *Drop-off:* '+dropoff+'\n\nTrack your parcel: '+trackingUrl+'\n\nThank you for choosing Zygo Express! 🙏',
+    picked_up:'Hello '+name+'! Your parcel has been *picked up* by our rider! 📦\n\n*Tracking ID:* '+code+'\n📍 '+pickup+' → '+dropoff+'\n\nTrack live: '+trackingUrl,
+    in_transit:'Hello '+name+'! Your parcel is *on the way*! 🛵\n\n*Tracking ID:* '+code+'\n🏁 Heading to: '+dropoff+'\n\nTrack live: '+trackingUrl,
+    out_for_delivery:'Hello '+name+'! Your parcel is *out for delivery* and will arrive very soon! 📍\n\n*Tracking ID:* '+code+'\n\nPlease be available to receive it.\nTrack live: '+trackingUrl,
+    delivered:'Hello '+name+'! Your Zygo Express delivery is *complete*! ✅\n\n*Tracking ID:* '+code+'\n\nThank you for choosing Zygo Express! We hope to serve you again. 🙏'
+  };
+  const msg=STATUS_MSGS[status]||('Hello '+name+'! Update on your Zygo Express delivery.\n\n*Tracking ID:* '+code+'\n📍 '+pickup+' → '+dropoff+'\n\nTrack: '+trackingUrl);
+  let p=phone.replace(/\s+/g,'').replace(/^0/,'233');
+  if(!p.startsWith('233'))p='233'+p;
+  window.open('https://wa.me/'+p+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('WhatsApp opened','success');
+}
+
+async function updateStatus(code,newStatus,el){
+  el.disabled=true;
+  const update={status:newStatus};
+  if(newStatus==='confirmed') update.confirmed_at=new Date().toISOString();
+  const {error}=await sb.from(TABLE).update(update).eq('tracking_code',code);
+  el.disabled=false;
+  if(error){showToast('Update failed','error');return;}
+  showToast(`${code} → ${STATUS_LABELS[newStatus]}`,'success');
+  await loadAll();
+}
+
+// ── Track Modal ───────────────────────────────────────────────────────────────
+async function openTrack(code){
+  const o=allOrders.find(x=>x.tracking_code===code);
+  if(!o) return;
+  document.getElementById('track-title').textContent=code;
+  document.getElementById('track-sub').textContent=`${o.pickup??'—'} → ${o.dropoff??'—'}`;
+  const autoCost=calcCost(o.route_distance_m);
+  const costDisplay=o.price?`GHS ${Number(o.price).toFixed(2)}`:autoCost?`~GHS ${autoCost.toFixed(2)} (auto)`:'Not set';
+  const distDisplay=o.route_distance_m?`${(o.route_distance_m/1000).toFixed(1)} km`:'—';
+  document.getElementById('track-info').innerHTML=`
+    <div class="info-row"><span class="info-label">Status</span><span class="info-value">${STATUS_LABELS[o.status]??o.status}</span></div>
+    <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${o.customer_name??o.name??'—'}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${o.phone??'—'}</span></div>
+    <div class="info-row"><span class="info-label">Pickup</span><span class="info-value">${o.pickup??'—'}</span></div>
+    <div class="info-row"><span class="info-label">Drop-off</span><span class="info-value">${o.dropoff??'—'}</span></div>
+    <div class="info-row"><span class="info-label">Distance</span><span class="info-value">${distDisplay}</span></div>
+    <div class="info-row"><span class="info-label">Cost</span><span class="info-value">${costDisplay}</span></div>
+    <div class="info-row"><span class="info-label">Paid</span><span class="info-value">${o.paid_at?'✅ Yes':'❌ No'}</span></div>
+    <div class="info-row"><span class="info-label">Rating</span><span class="info-value">${o.rider_rating?'⭐'.repeat(o.rider_rating):'Not rated'}</span></div>
+    <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>`;
+
+  const riderBox=document.getElementById('rider-live-box');
+  const mapFrame=document.getElementById('track-map');
+  if(o.rider_lat&&o.rider_lng){
+    riderBox.style.display='flex';
+    document.getElementById('rider-coords').textContent=`${Number(o.rider_lat).toFixed(5)}, ${Number(o.rider_lng).toFixed(5)}${o.rider_updated_at?` · ${formatDate(o.rider_updated_at)}`:''}`;
+    mapFrame.style.display='block';
+    mapFrame.src=`https://maps.google.com/maps?q=${o.rider_lat},${o.rider_lng}&z=15&output=embed`;
+  } else {
+    riderBox.style.display='none';
+    if(o.pickup){mapFrame.style.display='block';mapFrame.src=`https://maps.google.com/maps?q=${encodeURIComponent(o.pickup+' Ghana')}&z=13&output=embed`;}
+    else mapFrame.style.display='none';
+  }
+  document.getElementById('modal-track').classList.add('show');
+}
+
+function closeTrackModal(){document.getElementById('modal-track').classList.remove('show');document.getElementById('track-map').src='';}
+document.getElementById('modal-track').addEventListener('click',e=>{if(e.target===document.getElementById('modal-track'))closeTrackModal();});
+
+// ── Refresh buttons ──────────────────────────────────────────────────────────
+async function refreshSection(btn,section){
+  const orig=btn.textContent;
+  btn.textContent='↻ Loading...';
+  await loadAll();
+  btn.textContent=orig;
+  showToast(`${section==='riders'?'Riders':'Requests'} refreshed`,'success');
+}
+
+// ── Log Social DM ────────────────────────────────────────────────────────────────
+function openLogDM(){
+  // Clear form
+  ['dm-name','dm-phone','dm-pickup','dm-dropoff','dm-price','dm-notes'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  document.getElementById('dm-error').style.display='none';
+  document.getElementById('modal-log-dm').classList.add('show');
+}
+
+function closeLogDM(){
+  document.getElementById('modal-log-dm').classList.remove('show');
+}
+
+async function submitLogDM(){
+  const name   = document.getElementById('dm-name').value.trim();
+  const phone  = document.getElementById('dm-phone').value.trim();
+  const pickup = document.getElementById('dm-pickup').value.trim();
+  const dropoff= document.getElementById('dm-dropoff').value.trim();
+  const price  = document.getElementById('dm-price').value.trim();
+  const source = document.getElementById('dm-source').value;
+  const notes  = document.getElementById('dm-notes').value.trim();
+  const errEl  = document.getElementById('dm-error');
+
+  if(!name||!phone||!pickup||!dropoff){
+    errEl.textContent='Please fill in name, phone, pickup and drop-off.';
+    errEl.style.display='block';
+    return;
+  }
+
+  const btn=document.getElementById('dm-submit-btn');
+  btn.textContent='Saving…';
+  btn.disabled=true;
+  errEl.style.display='none';
+
+  // Generate tracking code
+  const code='ZGX-'+Math.random().toString(36).substring(2,8).toUpperCase();
+
+  const record={
+    tracking_code: code,
+    status: 'confirmed',
+    customer_name: name,
+    phone: phone,
+    pickup: pickup,
+    dropoff: dropoff,
+    source: source,
+    price: price?Number(price):null,
+    confirmed_at: new Date().toISOString(),
+    created_at: new Date().toISOString(),
+    currency: 'GHS',
+  };
+
+  if(notes) record.notes=notes;
+
+  const {error}=await sb.from(TABLE).insert(record);
+
+  btn.textContent='📝 Log Order';
+  btn.disabled=false;
+
+  if(error){
+    errEl.textContent='Failed to save order. Please try again.';
+    errEl.style.display='block';
+    return;
+  }
+
+  closeLogDM();
+  showToast(`Order logged for ${name} · ${code}`,'success');
+  await loadAll();
+}
+
+document.getElementById('modal-log-dm').addEventListener('click',e=>{
+  if(e.target===document.getElementById('modal-log-dm')) closeLogDM();
+});
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

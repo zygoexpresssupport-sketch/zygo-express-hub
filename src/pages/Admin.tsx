@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -158,6 +159,14 @@ export default function Admin() {
 
   return (
     <main className="min-h-screen bg-background">
+      <Helmet>
+        <title>Admin Dashboard — Zygo Express</title>
+        <meta name="description" content="Operator dashboard for managing Zygo Express delivery requests and riders." />
+        <meta name="robots" content="noindex,nofollow" />
+        <link rel="canonical" href="https://zygo-express-hub.lovable.app/admin" />
+        <meta property="og:title" content="Admin Dashboard — Zygo Express" />
+        <meta property="og:url" content="https://zygo-express-hub.lovable.app/admin" />
+      </Helmet>
       <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur z-30">
         <div className="container flex items-center justify-between h-16">
           <div className="flex items-center gap-2 font-extrabold">

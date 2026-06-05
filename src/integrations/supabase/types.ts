@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      partner_requests: {
+        Row: {
+          business_name: string
+          business_type: string | null
+          contact_name: string
+          created_at: string
+          email: string | null
+          id: string
+          location: string | null
+          message: string | null
+          phone: string
+          status: string
+        }
+        Insert: {
+          business_name: string
+          business_type?: string | null
+          contact_name: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          message?: string | null
+          phone: string
+          status?: string
+        }
+        Update: {
+          business_name?: string
+          business_type?: string | null
+          contact_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          message?: string | null
+          phone?: string
+          status?: string
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           assigned_rider_id: string | null

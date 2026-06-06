@@ -4,7 +4,7 @@ import { Services } from "@/components/site/Services";
 import { Tracking } from "@/components/site/Tracking";
 import { About } from "@/components/site/About";
 import { Testimonials } from "@/components/site/Testimonials";
-import { Partnership } from "@/components/site/Partnership";
+import { Partnership } from "@/components/Partnership";
 import { FAQ } from "@/components/site/FAQ";
 import { Quote } from "@/components/site/Quote";
 import { QrCode } from "@/components/site/QrCode";

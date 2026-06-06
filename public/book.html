@@ -6,7 +6,75 @@
   <meta name="theme-color" content="#0f0f0f"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <title>Zygo Express — Book Delivery</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+// ── Wa Municipal Location Suggestions ────────────────────────────────────────
+const WA_LOCATIONS = [
+  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing",
+  "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
+  "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
+  "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
+  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
+  "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
+  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
+  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
+  "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
+  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
+];
+
+function setupAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  // Create dropdown
+  const dropdown = document.createElement('div');
+  dropdown.id = inputId + '-suggestions';
+  dropdown.style.cssText = `
+    position:absolute; top:100%; left:0; right:0; z-index:999;
+    background:white; border:1.5px solid #e8e4dc; border-top:none;
+    border-radius:0 0 12px 12px; max-height:200px; overflow-y:auto;
+    box-shadow:0 8px 24px rgba(0,0,0,0.1); display:none;
+  `;
+  input.parentElement.style.position = 'relative';
+  input.parentElement.appendChild(dropdown);
+
+  input.addEventListener('input', () => {
+    const val = input.value.trim().toLowerCase();
+    dropdown.innerHTML = '';
+    if (val.length < 2) { dropdown.style.display = 'none'; return; }
+
+    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
+    if (!matches.length) { dropdown.style.display = 'none'; return; }
+
+    matches.forEach(loc => {
+      const item = document.createElement('div');
+      item.textContent = '📍 ' + loc + ', Wa';
+      item.style.cssText = 'padding:10px 14px; cursor:pointer; font-size:14px; border-bottom:1px solid #f5f5f5; color:#1a1a1a;';
+      item.addEventListener('mousedown', () => {
+        input.value = loc + ', Wa';
+        dropdown.style.display = 'none';
+        estimatePrice();
+      });
+      item.addEventListener('mouseover', () => item.style.background = '#fff7f0');
+      item.addEventListener('mouseout', () => item.style.background = 'white');
+      dropdown.appendChild(item);
+    });
+    dropdown.style.display = 'block';
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+  });
+}
+
+// Init autocomplete for both fields
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    setupAutocomplete('f-pickup');
+    setupAutocomplete('f-dropoff');
+  }, 500);
+});
+
+</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -980,6 +1048,74 @@ function bookAnother() {
   document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
   window.scrollTo(0, 0);
 }
+
+// ── Wa Municipal Location Suggestions ────────────────────────────────────────
+const WA_LOCATIONS = [
+  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing",
+  "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
+  "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
+  "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
+  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
+  "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
+  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
+  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
+  "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
+  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
+];
+
+function setupAutocomplete(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  // Create dropdown
+  const dropdown = document.createElement('div');
+  dropdown.id = inputId + '-suggestions';
+  dropdown.style.cssText = `
+    position:absolute; top:100%; left:0; right:0; z-index:999;
+    background:white; border:1.5px solid #e8e4dc; border-top:none;
+    border-radius:0 0 12px 12px; max-height:200px; overflow-y:auto;
+    box-shadow:0 8px 24px rgba(0,0,0,0.1); display:none;
+  `;
+  input.parentElement.style.position = 'relative';
+  input.parentElement.appendChild(dropdown);
+
+  input.addEventListener('input', () => {
+    const val = input.value.trim().toLowerCase();
+    dropdown.innerHTML = '';
+    if (val.length < 2) { dropdown.style.display = 'none'; return; }
+
+    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
+    if (!matches.length) { dropdown.style.display = 'none'; return; }
+
+    matches.forEach(loc => {
+      const item = document.createElement('div');
+      item.textContent = '📍 ' + loc + ', Wa';
+      item.style.cssText = 'padding:10px 14px; cursor:pointer; font-size:14px; border-bottom:1px solid #f5f5f5; color:#1a1a1a;';
+      item.addEventListener('mousedown', () => {
+        input.value = loc + ', Wa';
+        dropdown.style.display = 'none';
+        estimatePrice();
+      });
+      item.addEventListener('mouseover', () => item.style.background = '#fff7f0');
+      item.addEventListener('mouseout', () => item.style.background = 'white');
+      dropdown.appendChild(item);
+    });
+    dropdown.style.display = 'block';
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+  });
+}
+
+// Init autocomplete for both fields
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    setupAutocomplete('f-pickup');
+    setupAutocomplete('f-dropoff');
+  }, 500);
+});
+
 </script>
 </body>
 </html>

@@ -182,6 +182,11 @@
   </div>
 
   <div class="main-content">
+    <!-- Section Toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button onclick="showSection('orders')" id="btn-orders" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif">📦 Orders</button>
+      <button onclick="showSection('partners')" id="btn-partners" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🤝 Partners</button>
+    </div>
 
     <!-- Riders -->
     <div class="section-card">
@@ -203,6 +208,26 @@
       </div>
       <div id="riders-list"></div>
       <div class="auto-assign-note">New confirmed requests are auto-assigned to the active rider with the fewest deliveries today (ties: earliest sign-in).</div>
+    </div>
+
+    <!-- Partners -->
+    <div class="section-card" id="partners-section" style="display:none">
+      <div class="requests-header">
+        <div class="requests-title">🤝 <span>Partner Requests</span> <span class="count-badge" id="partners-count">0</span></div>
+        <div class="requests-actions">
+          <button class="refresh-btn" onclick="refreshSection(this,'partners')">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Business</th><th>Type</th><th>Contact</th><th>Phone</th><th>Location</th><th>Weekly Vol.</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="partners-tbody">
+            <tr><td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Requests -->
@@ -661,6 +686,62 @@ async function submitLogDM(){
 document.getElementById('modal-log-dm').addEventListener('click',e=>{
   if(e.target===document.getElementById('modal-log-dm')) closeLogDM();
 });
+
+// ── Partners ─────────────────────────────────────────────────────────────────────
+function showSection(section){
+  const ordersEl = document.querySelector('.section-card:nth-of-type(2)');
+  const partnersEl = document.getElementById('partners-section');
+  const btnOrders = document.getElementById('btn-orders');
+  const btnPartners = document.getElementById('btn-partners');
+
+  if(section==='partners'){
+    if(ordersEl) ordersEl.style.display='none';
+    if(partnersEl) partnersEl.style.display='block';
+    btnOrders.style.background='var(--bg)'; btnOrders.style.color='var(--text)'; btnOrders.style.border='1px solid var(--border)';
+    btnPartners.style.background='var(--orange)'; btnPartners.style.color='white'; btnPartners.style.border='none';
+    loadPartners();
+  } else {
+    if(ordersEl) ordersEl.style.display='block';
+    if(partnersEl) partnersEl.style.display='none';
+    btnOrders.style.background='var(--orange)'; btnOrders.style.color='white'; btnOrders.style.border='none';
+    btnPartners.style.background='var(--bg)'; btnPartners.style.color='var(--text)'; btnPartners.style.border='1px solid var(--border)';
+  }
+}
+
+async function loadPartners(){
+  const {data,error} = await sb.from('partner_requests').select('*').order('created_at',{ascending:false});
+  const tbody = document.getElementById('partners-tbody');
+  const badge = document.getElementById('partners-count');
+  if(error||!data||!data.length){
+    tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">No partner requests yet.</td></tr>';
+    return;
+  }
+  badge.textContent = data.length;
+  tbody.innerHTML = data.map(p=>{
+    const date = formatDate(p.created_at);
+    const statusColor = p.status==='approved'?'var(--green)':p.status==='rejected'?'var(--red)':'var(--orange)';
+    return `<tr>
+      <td style="font-size:12px;color:#6b7280;white-space:nowrap">${date}</td>
+      <td style="font-weight:600">${p.business_name}</td>
+      <td style="font-size:12px">${p.business_type||'—'}</td>
+      <td>${p.contact_name}</td>
+      <td><a href="tel:${p.phone}" style="color:var(--orange);font-weight:500">${p.phone}</a></td>
+      <td style="font-size:12px">${p.location||'—'}</td>
+      <td style="font-size:12px">${p.message||'—'}</td>
+      <td><span style="color:${statusColor};font-weight:600;font-size:12px;text-transform:capitalize">${p.status}</span></td>
+      <td style="display:flex;gap:4px">
+        <button onclick="updatePartner('${p.id}','approved')" style="background:#dcfce7;color:var(--green);border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">✓ Approve</button>
+        <button onclick="updatePartner('${p.id}','rejected')" style="background:#fef2f2;color:var(--red);border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updatePartner(id, status){
+  await sb.from('partner_requests').update({status}).eq('id',id);
+  showToast(`Partner ${status}`,'success');
+  loadPartners();
+}
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg,type='success'){

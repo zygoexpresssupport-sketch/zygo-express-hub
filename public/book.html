@@ -722,17 +722,17 @@ window.addEventListener('load', () => {
       </div>
       <div class="zone-card" id="zone-2">
         <div class="zone-price">GHS 16</div>
-        <div class="zone-km">2–4 km</div>
+        <div class="zone-km">3–4 km</div>
         <div class="zone-name">Zone 2</div>
       </div>
       <div class="zone-card" id="zone-3">
         <div class="zone-price">GHS 20</div>
-        <div class="zone-km">4–6 km</div>
+        <div class="zone-km">5–6 km</div>
         <div class="zone-name">Zone 3</div>
       </div>
       <div class="zone-card" id="zone-4">
         <div class="zone-price">GHS 30</div>
-        <div class="zone-km">6+ km</div>
+        <div class="zone-km">7+ km</div>
         <div class="zone-name">Zone 4</div>
       </div>
     </div>
@@ -832,7 +832,7 @@ window.addEventListener('load', () => {
   <div class="success-top">
     <div class="success-ring">✓</div>
     <div class="success-title">You're booked.</div>
-    <div class="success-sub">Your delivery request is confirmed.<br>We'll call you shortly to arrange pickup.</div>
+    <div class="success-sub">Your delivery request is confirmed.<br>We'll reachout to you shortly to arrange pickup.</div>
   </div>
 
   <div class="success-body">
@@ -888,9 +888,9 @@ function generateCode() {
 
 function getZone(km) {
   if (km <= 2) return { price: 13, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
-  if (km <= 4) return { price: 16, name: 'Zone 2 · 2–4 km',  id: 'zone-2' };
-  if (km <= 6) return { price: 20, name: 'Zone 3 · 4–6 km',  id: 'zone-3' };
-  return       { price: 30, name: 'Zone 4 · 6+ km',          id: 'zone-4' };
+  if (km <= 4) return { price: 16, name: 'Zone 2 · 3–4 km',  id: 'zone-2' };
+  if (km <= 6) return { price: 20, name: 'Zone 3 · 5–6 km',  id: 'zone-3' };
+  return       { price: 30, name: 'Zone 4 · 7+ km',          id: 'zone-4' };
 }
 
 function setActiveZone(id) {
@@ -1051,16 +1051,16 @@ function bookAnother() {
 
 // ── Wa Municipal Location Suggestions ────────────────────────────────────────
 const WA_LOCATIONS = [
-  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing",
-  "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
-  "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
+  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Siriyiri",
+  "Dellagio","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
+  "Wa Stc Bus Terminal","Regional Hospital","Wa Municipal Hospital", "Vip station","Bill lab","OA station"
   "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
-  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
+  "Busa","Our home Road","Wa Town","Wa New market Site","Wa sombo",
   "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
-  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
-  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
-  "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
-  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
+  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road","Xavier","DVLA",
+  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Wa poly","Loho",
+  "Kambali","Airstrip","Tindama","Kpongu","Bulenga","Kperisi",
+  "Pirisi","Dokpong","Dorimon Road","Daanko"
 ];
 
 function setupAutocomplete(inputId) {

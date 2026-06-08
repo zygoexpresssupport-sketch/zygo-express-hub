@@ -228,7 +228,7 @@
   let currentFilter = 'all';
   let searchTerm = '';
 
-  // ============ AUTH ============
+    // ============ AUTH ============
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const user = document.getElementById('loginUser').value.trim();
@@ -238,30 +238,26 @@
     err.classList.remove('show');
     btn.disabled = true;
     btn.textContent = 'Signing in...';
+
     try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/admin_login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY
-        },
-        body: JSON.stringify({ _username: user, _password: pass })
+      const { data, error } = await supabase.rpc('admin_login', {
+        _username: user,
+        _password: pass
       });
-      const result = await res.json();
-      if (result.success) {
-        adminToken = result.token;
+      if (error) throw error;
+      if (data && data.success === true) {
+        adminToken = data.token;
         sessionStorage.setItem('adminToken', adminToken);
-        sessionStorage.setItem('adminUser', result.username);
-        showDash(result.username);
+        sessionStorage.setItem('adminUser', data.username);
+        showDash(data.username);
       } else {
         err.textContent = 'Invalid username or password';
         err.classList.add('show');
         btn.disabled = false;
         btn.textContent = 'Sign in';
       }
-    } catch (e) {
-      err.textContent = 'Connection error. Try again.';
+    } catch (ex) {
+      err.textContent = 'Connection error: ' + (ex.message || 'unknown');
       err.classList.add('show');
       btn.disabled = false;
       btn.textContent = 'Sign in';
@@ -272,36 +268,19 @@
     const token = sessionStorage.getItem('adminToken');
     if (!token) { showLogin(); return; }
     try {
-      const res = await fetch(SUPABASE_URL + '/rest/v1/rpc/verify_admin_session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY
-        },
-        body: JSON.stringify({ _token: token })
-      });
-      const result = await res.json();
-      if (result.valid) {
+      const { data, error } = await supabase.rpc('verify_admin_session', { _token: token });
+      if (error) throw error;
+      if (data && data.valid === true) {
         adminToken = token;
-        showDash(result.username);
+        showDash(data.username);
       } else {
         sessionStorage.removeItem('adminToken');
         showLogin();
       }
-    } catch (e) { showLogin(); }
-  }
-
-  document.getElementById('signoutBtn').addEventListener('click', async () => {
-    if (adminToken) {
-      await supabase.from('admin_sessions').delete().eq('token', adminToken);
+    } catch (e) {
+      showLogin();
     }
-    sessionStorage.clear();
-    adminToken = null;
-    showLogin();
-  });
-
-  function showLogin() {
+  }
     document.getElementById('screen-login').classList.add('active');
     document.getElementById('screen-dash').classList.remove('active');
   }

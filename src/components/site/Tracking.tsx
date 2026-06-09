@@ -128,19 +128,37 @@ export const Tracking = () => {
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
     setLoading(true);
-    const { data, error } = await supabase.rpc("lookup_tracking", {
-      _code: parsed.data.toUpperCase(),
-    });
-    setLoading(false);
+    setResult(null);
 
-    if (error) return toast.error("Lookup failed. Please try again.");
+    try {
+      const { data, error } = await supabase.rpc("lookup_tracking", {
+        _code: parsed.data.toUpperCase(),
+      });
 
-    const row = data as any;
-    if (!row) {
-      setResult(null);
-      return toast.error("No shipment found for that code.");
+      if (error) {
+        toast.error("Lookup failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      // Handle both string and object responses
+      let row: any = data;
+      if (typeof data === "string") {
+        try { row = JSON.parse(data); } catch { row = null; }
+      }
+
+      if (!row || (typeof row === "object" && Object.keys(row).length === 0)) {
+        toast.error("No shipment found for that code.");
+        setLoading(false);
+        return;
+      }
+
+      setResult(row);
+    } catch (err) {
+      toast.error("Something went wrong. Please try again.");
     }
-    setResult(row);
+
+    setLoading(false);
   };
 
   // ─── Payment handler ──────────────────────────────────────────────────────

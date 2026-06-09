@@ -2,12 +2,12 @@
 // Supabase Edge Function
 // Triggered automatically when a new order is inserted into quote_requests
 // Uses OpenStreetMap (Nominatim) for geocoding + OSRM for road distance
-// Price = distance_km * GHS 3.20
+// Price = distance_km * GHS 7.5
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const RATE_PER_KM = 3.20;
+const RATE_PER_KM = 7.5;
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
 const OSRM_URL = "https://router.project-osrm.org";
 
@@ -65,7 +65,7 @@ async function getRoadDistance(
 // ── Calculate price from distance ─────────────────────────────────────────────
 function calculatePrice(distanceM: number): number {
   const km = distanceM / 1000;
-  // Minimum charge: GHS 5 (covers short distances)
+  // Minimum charge: GHS 15 (covers short distances)
   const raw = km * RATE_PER_KM;
   return Math.max(5, Math.ceil(raw * 100) / 100);
 }

@@ -135,7 +135,7 @@ export const Tracking = () => {
 
     if (error) return toast.error("Lookup failed. Please try again.");
 
-    const row = (data as any)?.[0];
+    const row = data as any;
     if (!row) {
       setResult(null);
       return toast.error("No shipment found for that code.");

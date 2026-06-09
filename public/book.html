@@ -716,23 +716,23 @@ window.addEventListener('load', () => {
     <div style="padding:16px 0 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px">Delivery Pricing Zones</div>
     <div class="zone-row">
       <div class="zone-card" id="zone-1">
-        <div class="zone-price">GHS 13</div>
+        <div class="zone-price">GHS 15</div>
         <div class="zone-km">0–2 km</div>
         <div class="zone-name">Zone 1</div>
       </div>
       <div class="zone-card" id="zone-2">
-        <div class="zone-price">GHS 16</div>
-        <div class="zone-km">2–4 km</div>
+        <div class="zone-price">GHS 18</div>
+        <div class="zone-km">2.1–4 km</div>
         <div class="zone-name">Zone 2</div>
       </div>
       <div class="zone-card" id="zone-3">
-        <div class="zone-price">GHS 20</div>
-        <div class="zone-km">4–6 km</div>
+        <div class="zone-price">GHS 23</div>
+        <div class="zone-km">4.1–6 km</div>
         <div class="zone-name">Zone 3</div>
       </div>
       <div class="zone-card" id="zone-4">
-        <div class="zone-price">GHS 30</div>
-        <div class="zone-km">6+ km</div>
+        <div class="zone-price">GHS 35</div>
+        <div class="zone-km">6.1-9 km</div>
         <div class="zone-name">Zone 4</div>
       </div>
     </div>
@@ -887,10 +887,10 @@ function generateCode() {
 }
 
 function getZone(km) {
-  if (km <= 2) return { price: 13, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
-  if (km <= 4) return { price: 16, name: 'Zone 2 · 2–4 km',  id: 'zone-2' };
-  if (km <= 6) return { price: 20, name: 'Zone 3 · 4–6 km',  id: 'zone-3' };
-  return       { price: 30, name: 'Zone 4 · 6+ km',          id: 'zone-4' };
+  if (km <= 2) return { price: 15, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
+  if (km <= 4) return { price: 18, name: 'Zone 2 · 2.1–4 km',  id: 'zone-2' };
+  if (km <= 6) return { price: 23, name: 'Zone 3 · 4.1–6 km',  id: 'zone-3' };
+  return       { price: 35, name: 'Zone 4 · 6.1-9 km',          id: 'zone-4' };
 }
 
 function setActiveZone(id) {
@@ -933,7 +933,7 @@ async function estimatePrice() {
     }
   } catch {}
 
-  pAmt.textContent  = 'GHS 13';
+  pAmt.textContent  = 'GHS 15';
   pZone.textContent = 'Zone 1 (minimum charge)';
   pDist.textContent = 'Could not calculate exact distance';
   setActiveZone('zone-1');
@@ -999,12 +999,12 @@ async function submitBooking() {
       <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${phone}</span></div>
       <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${pickup}</span></div>
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${dropoff}</span></div>
-      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${priceNum || 13}</span></div>
+      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${priceNum || 15}</span></div>
     `;
     // Show MoMo card with correct amount
     const momoCard = document.getElementById('momo-card');
     momoCard.style.display = 'block';
-    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 13);
+    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 15);
     window.scrollTo(0, 0);
 
   } catch {

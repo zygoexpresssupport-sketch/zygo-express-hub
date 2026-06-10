@@ -255,16 +255,33 @@ export const Tracking = () => {
                 {!result.paid_at && (
                   <div className="space-y-3">
                     <div className="rounded-xl bg-background border border-border p-3">
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Send Mobile Money to:
-                      </div>
-                      <div className="font-extrabold text-xl text-primary">
-                        0240393582
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        Account name: Zygo Express · MTN MoMo
-                      </div>
-                    </div>
+  <div className="text-xs text-muted-foreground mb-1">
+    Send Mobile Money to:
+  </div>
+  <div className="flex items-center justify-between gap-3">
+    <div>
+      <div className="font-extrabold text-2xl text-primary tracking-wider">
+        0240393582
+      </div>
+      <div className="text-xs text-muted-foreground mt-0.5">
+        Account name: Zygo Express · MTN MoMo
+      </div>
+    </div>
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText("0240393582");
+        toast.success("Number copied!");
+      }}
+      className="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors text-xs font-semibold"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+      </svg>
+      Copy
+    </button>
+  </div>
+</div>
                     <p className="text-xs text-muted-foreground">
                       After payment, send your reference number to us on WhatsApp for confirmation.
                     </p>

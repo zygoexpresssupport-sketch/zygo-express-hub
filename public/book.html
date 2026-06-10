@@ -750,7 +750,7 @@ window.addEventListener('load', () => {
         <div class="input-row">
           <div class="input-wrap">
             <div class="input-label">Full Name</div>
-            <input class="input-field" type="text" id="f-name" placeholder="Jane Mensah" required/>
+            <input class="input-field" type="text" id="f-name" placeholder="Jamil Musah" required/>
           </div>
           <div class="input-wrap">
             <div class="input-label">Phone Number</div>
@@ -950,7 +950,7 @@ async function submitBooking() {
 
   errBox.classList.remove('show');
 
-  if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
+  if (!name || name.length < 4)   { showErr('Please enter your full name.'); return; }
   // Ghana phone validation
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
   const ghanaValid = /^(0[23456789]\d{8}|\+233[23456789]\d{8}|233[23456789]\d{8})$/.test(cleanPhone);
@@ -978,7 +978,7 @@ async function submitBooking() {
       dropoff:       dropoff,
       details:       details || null,
       source:        'Website',
-      price:         priceNum || 13,
+      price:         priceNum || 15,
       currency:      'GHS',
       created_at:    new Date().toISOString(),
     });
@@ -1055,12 +1055,12 @@ const WA_LOCATIONS = [
   "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
   "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
   "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
-  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
+  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Siriyiri",
   "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
   "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
   "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
   "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
-  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
+  "Pirisi","Dokpong","Dorimon Road","Konta"
 ];
 
 function setupAutocomplete(inputId) {

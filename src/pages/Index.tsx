@@ -5,7 +5,7 @@ import { Tracking } from "@/components/site/Tracking";
 import { About } from "@/components/site/About";
 import { Testimonials } from "@/components/site/Testimonials";
 import { Quote } from "@/components/site/Quote";
-import { Partnership } from "@/components/site/Partnership";
+import { Partner } from "@/components/site/Partner";
 import { QrCode } from "@/components/site/QrCode";
 import { Footer } from "@/components/site/Footer";
 

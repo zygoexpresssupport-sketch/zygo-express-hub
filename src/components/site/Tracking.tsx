@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,16 +11,10 @@ import {
   BadgeCheck,
   MapPin,
   XCircle,
+  Copy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-// ─── Validation ───────────────────────────────────────────────────────────────
-const schema = z
-  .string()
-  .trim()
-  .min(4, "Tracking ID too short")
-  .max(24, "Tracking ID too long");
 
 // ─── Status flow ──────────────────────────────────────────────────────────────
 const STATUS_FLOW = [
@@ -53,22 +46,31 @@ type TrackResult = {
   created_at: string;
   price: number | null;
   paid_at: string | null;
-  currency?: string | null;
+  currency: string | null;
+};
+
+// ─── Copy helper ─────────────────────────────────────────────────────────────
+const copyToClipboard = (text: string, label: string) => {
+  navigator.clipboard.writeText(text).then(() => {
+    toast.success(label + " copied!");
+  }).catch(() => {
+    toast.error("Could not copy. Try manually.");
+  });
 };
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export const Tracking = () => {
-  const [id, setId]           = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult]   = useState<TrackResult | null>(null);
+  const [id, setId]             = useState("");
+  const [loading, setLoading]   = useState(false);
+  const [result, setResult]     = useState<TrackResult | null>(null);
   const [searched, setSearched] = useState(false);
 
   // ─── Lookup ───────────────────────────────────────────────────────────────
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const parsed = schema.safeParse(id);
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+    const trimmed = id.trim().toUpperCase();
+    if (!trimmed || trimmed.length < 4) {
+      toast.error("Please enter a valid tracking code.");
       return;
     }
 
@@ -80,14 +82,12 @@ export const Tracking = () => {
       const { data, error } = await supabase
         .from("quote_requests")
         .select("tracking_code, status, pickup, dropoff, created_at, price, paid_at, currency")
-        .ilike("tracking_code", parsed.data.toUpperCase())
+        .ilike("tracking_code", trimmed)
         .limit(1)
         .maybeSingle();
 
       if (error) throw error;
-
       setSearched(true);
-
       if (!data) {
         toast.error("No shipment found for that code.");
       } else {
@@ -100,16 +100,14 @@ export const Tracking = () => {
     setLoading(false);
   };
 
-  // ─── Active step ──────────────────────────────────────────────────────────
+  // ─── Derived state ────────────────────────────────────────────────────────
   const activeIdx = result
-    ? (() => {
-        const idx = STATUS_FLOW.indexOf(result.status as StatusType);
-        return idx === -1 ? 0 : idx;
-      })()
+    ? Math.max(0, STATUS_FLOW.indexOf(result.status as StatusType))
     : 0;
 
   const currency = result?.currency ?? "GHS";
   const isCancelled = result?.status === "cancelled";
+  const hasPrice = result?.price && Number(result.price) > 0;
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
@@ -158,18 +156,20 @@ export const Tracking = () => {
                 <div className="font-bold text-lg font-mono">{result.tracking_code}</div>
               </div>
               <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold uppercase">
-                {isCancelled ? "Cancelled" : (STAGE_META[result.status as StatusType]?.label ?? result.status)}
+                {isCancelled
+                  ? "Cancelled"
+                  : (STAGE_META[result.status as StatusType]?.label ?? result.status)}
               </span>
             </div>
 
-            {/* Cancelled state */}
+            {/* Cancelled */}
             {isCancelled && (
               <div className="flex items-center gap-3 bg-red-50 border border-red-200 rounded-xl p-4">
                 <XCircle className="h-6 w-6 text-red-500 flex-shrink-0" />
                 <div>
                   <div className="font-semibold text-red-600">Delivery Cancelled</div>
                   <div className="text-sm text-muted-foreground">
-                    Please contact us on WhatsApp for assistance.
+                    Contact us on WhatsApp for assistance.
                   </div>
                 </div>
               </div>
@@ -178,38 +178,27 @@ export const Tracking = () => {
             {/* Status progress */}
             {!isCancelled && (
               <div className="grid grid-cols-6 gap-2 relative">
-                {/* Background track */}
                 <div className="absolute top-5 left-[8%] right-[8%] h-0.5 bg-border -z-0" />
-                {/* Active fill */}
                 <div
                   className="absolute top-5 left-[8%] h-0.5 bg-gradient-hero -z-0 transition-smooth"
-                  style={{
-                    width: `${(activeIdx / (STATUS_FLOW.length - 1)) * 84}%`,
-                  }}
+                  style={{ width: `${(activeIdx / (STATUS_FLOW.length - 1)) * 84}%` }}
                 />
                 {STATUS_FLOW.map((s, i) => {
                   const meta = STAGE_META[s];
                   const done = i <= activeIdx;
                   const Icon = meta.icon;
                   return (
-                    <div
-                      key={s}
-                      className="relative z-10 flex flex-col items-center gap-2 text-center"
-                    >
-                      <div
-                        className={`h-10 w-10 rounded-full grid place-items-center transition-bounce ${
-                          done
-                            ? "bg-gradient-hero text-primary-foreground shadow-glow"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
+                    <div key={s} className="relative z-10 flex flex-col items-center gap-2 text-center">
+                      <div className={`h-10 w-10 rounded-full grid place-items-center transition-bounce ${
+                        done
+                          ? "bg-gradient-hero text-primary-foreground shadow-glow"
+                          : "bg-muted text-muted-foreground"
+                      }`}>
                         <Icon className="h-5 w-5" />
                       </div>
-                      <div
-                        className={`text-[10px] font-semibold ${
-                          done ? "text-foreground" : "text-muted-foreground"
-                        }`}
-                      >
+                      <div className={`text-[10px] font-semibold ${
+                        done ? "text-foreground" : "text-muted-foreground"
+                      }`}>
                         {meta.label}
                       </div>
                     </div>
@@ -231,81 +220,78 @@ export const Tracking = () => {
             </div>
 
             {/* Payment section */}
-            {result.price && Number(result.price) > 0 && (
-              <div className="rounded-2xl border border-border bg-muted/30 p-4 sm:p-5 space-y-3">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div>
-                    <div className="text-xs text-muted-foreground">Amount due</div>
-                    <div className="text-2xl font-extrabold">
-                      {currency} {Number(result.price).toFixed(2)}
-                    </div>
-                  </div>
-                  {result.paid_at ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/15 text-green-600 text-xs font-bold uppercase">
-                      <BadgeCheck className="h-4 w-4" /> Paid
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase">
-                      <Smartphone className="h-4 w-4" /> Mobile Money
-                    </span>
-                  )}
-                </div>
+            <div className="rounded-2xl border border-border bg-muted/30 p-4 sm:p-5 space-y-3">
 
-                {/* MoMo payment instructions */}
-                {!result.paid_at && (
-                  <div className="space-y-3">
-                    <div className="rounded-xl bg-background border border-border p-3">
-  <div className="text-xs text-muted-foreground mb-1">
-    Send Mobile Money to:
-  </div>
-  <div className="flex items-center justify-between gap-3">
-    <div>
-      <div className="font-extrabold text-2xl text-primary tracking-wider">
-        0240393582
-      </div>
-      <div className="text-xs text-muted-foreground mt-0.5">
-        Account name: Zygo Express · MTN MoMo
-      </div>
-    </div>
-    <button
-      onClick={() => {
-        navigator.clipboard.writeText("0240393582");
-        toast.success("Number copied!");
-      }}
-      className="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors text-xs font-semibold"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-      </svg>
-      Copy
-    </button>
-  </div>
-</div>
-                    <p className="text-xs text-muted-foreground">
-                      After payment, send your reference number to us on WhatsApp for confirmation.
-                    </p>
+              {/* Amount */}
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <div className="text-xs text-muted-foreground">Amount due</div>
+                  <div className="text-2xl font-extrabold">
+                    {hasPrice
+                      ? `${currency} ${Number(result.price).toFixed(2)}`
+                      : "To be confirmed"}
                   </div>
+                </div>
+                {result.paid_at ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/15 text-green-600 text-xs font-bold uppercase">
+                    <BadgeCheck className="h-4 w-4" /> Paid
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase">
+                    <Smartphone className="h-4 w-4" /> Mobile Money
+                  </span>
                 )}
               </div>
-            )}
+
+              {/* MoMo number — always show if not paid */}
+              {!result.paid_at && (
+                <div className="space-y-3">
+                  <div className="rounded-xl bg-background border border-border p-4">
+                    <div className="text-xs text-muted-foreground mb-2">
+                      Send Mobile Money to:
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-extrabold text-2xl text-primary tracking-wider">
+                          0240393582
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Account: Zygo Express · MTN MoMo
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => copyToClipboard("0240393582", "MoMo number")}
+                        className="flex flex-col items-center gap-1 px-4 py-3 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl transition-colors text-xs font-bold flex-shrink-0"
+                      >
+                        <Copy className="h-5 w-5" />
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    After paying, send your MoMo reference to us on WhatsApp for confirmation.
+                  </p>
+                </div>
+              )}
+            </div>
 
             {/* Booked date */}
             <div className="text-xs text-muted-foreground">
               Booked: {new Date(result.created_at).toLocaleString()}
             </div>
 
-            {/* Help */}
-            <div className="bg-muted/30 rounded-xl p-4 text-sm text-center space-y-1">
-              <div className="font-semibold">Need help?</div>
-              <div className="text-muted-foreground text-xs">
+            {/* WhatsApp help */}
+            <div className="bg-muted/30 rounded-xl p-4 text-center space-y-2">
+              <div className="font-semibold text-sm">Need help?</div>
+              <div className="text-xs text-muted-foreground">
                 WhatsApp us and we'll sort it out immediately
               </div>
               <a
                 href="https://wa.me/233202858011"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-2 px-4 py-2 bg-green-500 text-white rounded-xl text-sm font-semibold"
+                className="inline-flex items-center gap-2 mt-1 px-5 py-2.5 bg-green-500 text-white rounded-xl text-sm font-bold"
               >
                 💬 WhatsApp Us
               </a>

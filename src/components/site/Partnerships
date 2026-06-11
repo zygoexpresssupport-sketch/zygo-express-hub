@@ -12,9 +12,9 @@ const BENEFITS = [
   { icon: Building2, title: "Dashboard Access", desc: "Track all your deliveries in one place. Full visibility, always." },
 ];
 
-const TYPES = ["Pharmacy", "Supermarket", "Restaurant", "Hospital/Clinic", "School", "Retail Shop", "E-commerce", "Other"];
+const TYPES = ["Pharmacy", "Supermarket", "Restaurant", "Hospital/Clinic", "Transport Operator", "Retail Shop", "E-commerce", "Other"];
 
-export const Partnership = () => {
+export const Partner = () => {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 

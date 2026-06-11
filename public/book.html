@@ -716,23 +716,23 @@ window.addEventListener('load', () => {
     <div style="padding:16px 0 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px">Delivery Pricing Zones</div>
     <div class="zone-row">
       <div class="zone-card" id="zone-1">
-        <div class="zone-price">GHS 15</div>
+        <div class="zone-price">GHS 13</div>
         <div class="zone-km">0–2 km</div>
         <div class="zone-name">Zone 1</div>
       </div>
       <div class="zone-card" id="zone-2">
-        <div class="zone-price">GHS 18</div>
-        <div class="zone-km">2.1–4 km</div>
+        <div class="zone-price">GHS 16</div>
+        <div class="zone-km">2–4 km</div>
         <div class="zone-name">Zone 2</div>
       </div>
       <div class="zone-card" id="zone-3">
-        <div class="zone-price">GHS 23</div>
-        <div class="zone-km">4.1–6 km</div>
+        <div class="zone-price">GHS 20</div>
+        <div class="zone-km">4–6 km</div>
         <div class="zone-name">Zone 3</div>
       </div>
       <div class="zone-card" id="zone-4">
-        <div class="zone-price">GHS 35</div>
-        <div class="zone-km">6.1-9 km</div>
+        <div class="zone-price">GHS 30</div>
+        <div class="zone-km">6+ km</div>
         <div class="zone-name">Zone 4</div>
       </div>
     </div>
@@ -750,7 +750,7 @@ window.addEventListener('load', () => {
         <div class="input-row">
           <div class="input-wrap">
             <div class="input-label">Full Name</div>
-            <input class="input-field" type="text" id="f-name" placeholder="Jamil Musah" required/>
+            <input class="input-field" type="text" id="f-name" placeholder="Jane Mensah" required/>
           </div>
           <div class="input-wrap">
             <div class="input-label">Phone Number</div>
@@ -883,14 +883,17 @@ window.addEventListener('load', () => {
 });
 
 function generateCode() {
-  return 'ZGX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  // Use crypto API for secure random codes
+  const arr = new Uint8Array(4);
+  crypto.getRandomValues(arr);
+  return 'ZGX-' + Array.from(arr, b => b.toString(36)).join('').substring(0,6).toUpperCase();
 }
 
 function getZone(km) {
-  if (km <= 2) return { price: 15, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
-  if (km <= 4) return { price: 18, name: 'Zone 2 · 2.1–4 km',  id: 'zone-2' };
-  if (km <= 6) return { price: 23, name: 'Zone 3 · 4.1–6 km',  id: 'zone-3' };
-  return       { price: 35, name: 'Zone 4 · 6.1-9 km',          id: 'zone-4' };
+  if (km <= 2) return { price: 13, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
+  if (km <= 4) return { price: 16, name: 'Zone 2 · 2–4 km',  id: 'zone-2' };
+  if (km <= 6) return { price: 20, name: 'Zone 3 · 4–6 km',  id: 'zone-3' };
+  return       { price: 30, name: 'Zone 4 · 6+ km',          id: 'zone-4' };
 }
 
 function setActiveZone(id) {
@@ -933,7 +936,7 @@ async function estimatePrice() {
     }
   } catch {}
 
-  pAmt.textContent  = 'GHS 15';
+  pAmt.textContent  = 'GHS 13';
   pZone.textContent = 'Zone 1 (minimum charge)';
   pDist.textContent = 'Could not calculate exact distance';
   setActiveZone('zone-1');
@@ -950,7 +953,7 @@ async function submitBooking() {
 
   errBox.classList.remove('show');
 
-  if (!name || name.length < 4)   { showErr('Please enter your full name.'); return; }
+  if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
   // Ghana phone validation
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
   const ghanaValid = /^(0[23456789]\d{8}|\+233[23456789]\d{8}|233[23456789]\d{8})$/.test(cleanPhone);
@@ -965,8 +968,14 @@ async function submitBooking() {
   btn.innerHTML = '<div class="spinner"></div>&nbsp; Booking…';
 
   const code      = generateCode();
+  // Get price from zone calculation - validated server-side after insert
   const priceText = document.getElementById('p-amount').textContent;
-  const priceNum  = parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]);
+  const priceNum  = Math.max(13, parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]));
+  // Validate: price must be one of our valid zone prices
+  const validPrices = [13, 16, 20, 30];
+  const finalPrice  = validPrices.reduce((prev,curr) => 
+    Math.abs(curr-priceNum) < Math.abs(prev-priceNum) ? curr : prev
+  );
 
   try {
     const { error } = await sb.from('quote_requests').insert({
@@ -978,7 +987,7 @@ async function submitBooking() {
       dropoff:       dropoff,
       details:       details || null,
       source:        'Website',
-      price:         priceNum || 15,
+      price:         finalPrice || 13,
       currency:      'GHS',
       created_at:    new Date().toISOString(),
     });
@@ -994,17 +1003,19 @@ async function submitBooking() {
     document.getElementById('screen-form').style.display   = 'none';
     document.getElementById('screen-success').style.display = 'block';
     document.getElementById('s-code').textContent = code;
+    // Sanitize before rendering to prevent XSS
+    const sx = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     document.getElementById('s-summary').innerHTML = `
-      <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${name}</span></div>
-      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${phone}</span></div>
-      <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${pickup}</span></div>
-      <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${dropoff}</span></div>
-      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${priceNum || 15}</span></div>
+      <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${sx(name)}</span></div>
+      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${sx(phone)}</span></div>
+      <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
+      <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
+      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice || 13}</span></div>
     `;
     // Show MoMo card with correct amount
     const momoCard = document.getElementById('momo-card');
     momoCard.style.display = 'block';
-    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 15);
+    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 13);
     window.scrollTo(0, 0);
 
   } catch {
@@ -1055,12 +1066,12 @@ const WA_LOCATIONS = [
   "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
   "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
   "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
-  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Siriyiri",
+  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
   "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
   "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
   "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
   "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
-  "Pirisi","Dokpong","Dorimon Road","Konta"
+  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
 ];
 
 function setupAutocomplete(inputId) {

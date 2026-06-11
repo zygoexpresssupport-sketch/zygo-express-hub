@@ -271,10 +271,10 @@
         <option value="Walk-in">Walk-in</option>
       </select>
     </div>
-    <div class="field"><label>Customer Name</label><input type="text" id="dm-name" placeholder="e.g. Sadiq Seidu"/></div>
+    <div class="field"><label>Customer Name</label><input type="text" id="dm-name" placeholder="e.g. Kofi Mensah"/></div>
     <div class="field"><label>Phone Number</label><input type="tel" id="dm-phone" placeholder="e.g. 0244123456"/></div>
-    <div class="field"><label>Pickup Location</label><input type="text" id="dm-pickup" placeholder="e.g. Kpaguri,Accra"/></div>
-    <div class="field"><label>Drop-off Location</label><input type="text" id="dm-dropoff" placeholder="e.g. Kambali, Wa"/></div>
+    <div class="field"><label>Pickup Location</label><input type="text" id="dm-pickup" placeholder="e.g. Osu, Accra"/></div>
+    <div class="field"><label>Drop-off Location</label><input type="text" id="dm-dropoff" placeholder="e.g. East Legon, Accra"/></div>
     <div class="field"><label>Price (GHS) — optional</label><input type="number" id="dm-price" placeholder="Leave blank to auto-calculate"/></div>
     <div class="field"><label>Notes — optional</label><input type="text" id="dm-notes" placeholder="Any special instructions"/></div>
 
@@ -316,16 +316,16 @@ const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
 const TABLE = "quote_requests";
 const RIDERS_TABLE = "riders";
-const RATE_PER_KM = 7.50;
-const ADMINS = [{user:"bonkanwonaa",pass:"zygo2858#"},{user:"admin",pass:"admin123"}];
+const RATE_PER_KM = 3.20;
+// Credentials validated via Supabase Auth — not stored client-side
 const STATUSES = ["pending","confirmed","picked_up","in_transit","out_for_delivery","delivered","cancelled"];
 const STATUS_LABELS = {pending:"Pending",confirmed:"Confirmed",picked_up:"Picked Up",in_transit:"In Transit",out_for_delivery:"Out For Delivery",delivered:"Delivered",cancelled:"Cancelled"};
 
 // Local rider config (names + IDs)
 const RIDER_CONFIG = [
-  {id:"RIDER-001",name:"Mohammed"},
-  {id:"RIDER-002",name:"Sherif"},
-  {id:"RIDER-003",name:"Dery"},
+  {id:"RIDER-001",name:"Kofi"},
+  {id:"RIDER-002",name:"Ama"},
+  {id:"RIDER-003",name:"Kwame"},
 ];
 
 function getLocalRiders(){
@@ -356,15 +356,25 @@ window.addEventListener('load',async()=>{
 
 function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
 
-function doLogin(){
+async function doLogin(){
   const u=document.getElementById('admin-user').value.trim().toLowerCase();
   const p=document.getElementById('admin-pass').value.trim();
-  if(!ADMINS.find(a=>a.user===u&&a.pass===p)){document.getElementById('login-err').classList.add('show');return;}
+  if(!u||!p){document.getElementById('login-err').classList.add('show');return;}
+  // Use Supabase Auth for secure login
+  const {data,error}=await sb.auth.signInWithPassword({email:u,password:p});
+  if(error||!data.user){
+    document.getElementById('login-err').classList.add('show');
+    return;
+  }
   localStorage.setItem('zygo_admin_v4','1');
   showMain();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
-function doLogout(){localStorage.removeItem('zygo_admin_v4');showScreen('login');}
+async function doLogout(){
+  await sb.auth.signOut();
+  localStorage.removeItem('zygo_admin_v4');
+  showScreen('login');
+}
 
 async function showMain(){
   showScreen('main');
@@ -594,7 +604,7 @@ async function openTrack(code){
     mapFrame.src=`https://maps.google.com/maps?q=${o.rider_lat},${o.rider_lng}&z=15&output=embed`;
   } else {
     riderBox.style.display='none';
-    if(o.pickup){mapFrame.style.display='block';mapFrame.src=`https://maps.google.com/maps?q=${encodeURIComponent(o.pickup+' Ghana')}&z=15&output=embed`;}
+    if(o.pickup){mapFrame.style.display='block';mapFrame.src=`https://maps.google.com/maps?q=${encodeURIComponent(o.pickup+' Ghana')}&z=13&output=embed`;}
     else mapFrame.style.display='none';
   }
   document.getElementById('modal-track').classList.add('show');
@@ -752,6 +762,17 @@ async function updatePartner(id, status){
   await sb.from('partner_requests').update({status}).eq('id',id);
   showToast(`Partner ${status}`,'success');
   loadPartners();
+}
+
+// ── XSS Sanitizer ────────────────────────────────────────────────────────────────
+function sanitize(str){
+  if(!str) return '—';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────

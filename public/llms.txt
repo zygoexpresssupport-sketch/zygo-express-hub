@@ -6,7 +6,7 @@ Zygo Express is a registered last-mile delivery business in Wa, Ghana. We pick u
 
 ## Pages
 
-- [Home](/): Service overview, booking, live tracking, pricing zones, FAQ, and partnership signup.
+- [Home](/): Service overview, booking, live tracking, pricing zones, FAQ, and partner signup.
 
 ## Optional
 

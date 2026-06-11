@@ -8,7 +8,7 @@ const FAQS = [
   },
   {
     q: "How much does a delivery cost?",
-    a: "Our pricing is zone-based and transparent. Zone 1 (0–2km) costs GHS 13, Zone 2 (2–4km) costs GHS 16, Zone 3 (4–6km) costs GHS 20, and Zone 4 (6km+) costs GHS 30. The price is calculated automatically when you enter your locations.",
+    a: "Our pricing is zone-based and transparent. Zone 1 (0–2km) costs GHS 15, Zone 2 (2.1–4km) costs GHS 18, Zone 3 (4.1–6km) costs GHS 23, and Zone 4 (6.1-9km) costs GHS 35. The price is calculated automatically when you enter your locations.",
   },
   {
     q: "How do I track my parcel?",

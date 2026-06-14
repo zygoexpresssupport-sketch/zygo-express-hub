@@ -361,8 +361,8 @@ async function doLogin(){
   const p=document.getElementById('admin-pass').value.trim();
   // Secure: hash-compare credentials
   const CREDS=[
-    {u:'emmanuel',h:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'},
-    {u:'admin',   h:'8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'}
+    {u:'emmanuel',h:'e9ad32c345fbbd17fef7e7d527063ede7e431dd0638c37851ba2bc33c4937fef'},
+    {u:'admin',   h:'e9ad32c345fbbd17fef7e7d527063ede7e431dd0638c37851ba2bc33c4937fef'}
   ];
   const enc=new TextEncoder();
   const hashBuf=await crypto.subtle.digest('SHA-256',enc.encode(p));

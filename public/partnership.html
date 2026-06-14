@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#f97316"/>
+<title>Partner with Zygo Express</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#f97316;--ink:#0f0f0f;--paper:#fafaf8;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;}
+.topbar{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--ink);position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-mark{width:34px;height:34px;background:var(--orange);border-radius:8px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:white;}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:white;}
+.logo-name em{color:var(--orange);font-style:normal;}
+.back-link{color:rgba(255,255,255,0.6);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:4px;}
+
+.hero{background:var(--orange);padding:40px 20px 48px;text-align:center;}
+.hero-title{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:white;line-height:1.1;letter-spacing:-1px;margin-bottom:10px;}
+.hero-sub{color:rgba(255,255,255,0.85);font-size:15px;line-height:1.6;max-width:360px;margin:0 auto;}
+
+.content{padding:24px 16px 40px;max-width:600px;margin:0 auto;}
+
+.benefits-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;}
+.benefit-card{background:white;border:1px solid var(--stone);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.benefit-icon{font-size:24px;}
+.benefit-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.benefit-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+.perks{background:white;border:1px solid var(--stone);border-radius:14px;padding:16px;margin-bottom:20px;}
+.perk{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--stone);font-size:13px;font-weight:600;}
+.perk:last-child{border-bottom:none;}
+.perk-dot{width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;}
+
+.form-card{background:white;border:1px solid var(--stone);border-radius:16px;padding:20px;margin-bottom:16px;}
+.form-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;}
+.form-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;background:var(--paper);border:1.5px solid var(--stone);border-radius:var(--r);padding:13px 14px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.submit-btn{width:100%;padding:17px;background:var(--ink);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;}
+.submit-btn:active{opacity:0.9;}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.submit-note{text-align:center;font-size:12px;color:var(--muted);margin-top:10px;}
+.error-msg{background:#fef2f2;border:1.5px solid #fecaca;color:var(--red);padding:12px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;}
+.error-msg.show{display:block;}
+.success-box{text-align:center;padding:32px 20px;}
+.success-icon{font-size:56px;margin-bottom:16px;}
+.success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:8px;}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.6;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="https://zygo-express-hub.lovable.app" class="logo">
+    <div class="logo-mark">ZE</div>
+    <div class="logo-name">Zygo<em>Express</em></div>
+  </a>
+  <a href="https://zygo-express-hub.lovable.app" class="back-link">← Back</a>
+</div>
+
+<div class="hero">
+  <div class="hero-title">Partner with<br>Zygo Express</div>
+  <div class="hero-sub">Join businesses across Wa who rely on us for fast, reliable deliveries every day.</div>
+</div>
+
+<div class="content">
+  <div class="benefits-grid">
+    <div class="benefit-card"><div class="benefit-icon">⚡</div><div class="benefit-title">Priority Pickups</div><div class="benefit-desc">Your parcels jump the queue. Dedicated riders for your account.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">📉</div><div class="benefit-title">Volume Discounts</div><div class="benefit-desc">The more you send, the less you pay. Custom pricing.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">💬</div><div class="benefit-title">Direct Support</div><div class="benefit-desc">WhatsApp line to our team. No queues, no waiting.</div></div>
+    <div class="benefit-card"><div class="benefit-icon">📊</div><div class="benefit-title">Full Dashboard</div><div class="benefit-desc">Track all deliveries in one place, always.</div></div>
+  </div>
+
+  <div class="perks">
+    <div class="perk"><div class="perk-dot"></div>No registration fee</div>
+    <div class="perk"><div class="perk-dot"></div>No monthly commitment</div>
+    <div class="perk"><div class="perk-dot"></div>Activated within 24 hours</div>
+    <div class="perk"><div class="perk-dot"></div>MTN MoMo payments accepted</div>
+  </div>
+
+  <div class="form-card">
+    <div id="form-content">
+      <div class="form-title">Register your business</div>
+      <div class="form-sub">No sensitive info required. Just the basics.</div>
+      <div class="error-msg" id="err"></div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Business Name *</label>
+          <input type="text" id="p-biz" placeholder="e.g. Kofi's Pharmacy"/>
+        </div>
+        <div class="field">
+          <label>Business Type</label>
+          <select id="p-type">
+            <option value="">Select…</option>
+            <option>Pharmacy</option><option>Supermarket</option><option>Restaurant</option>
+            <option>Hospital/Clinic</option><option>School</option><option>Retail Shop</option>
+            <option>E-commerce</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Contact Name *</label>
+          <input type="text" id="p-name" placeholder="Your name"/>
+        </div>
+        <div class="field">
+          <label>Phone *</label>
+          <input type="tel" id="p-phone" placeholder="0244 123 456"/>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Location in Wa</label>
+          <input type="text" id="p-loc" placeholder="e.g. Kpaguri"/>
+        </div>
+        <div class="field">
+          <label>Email (optional)</label>
+          <input type="email" id="p-email" placeholder="you@email.com"/>
+        </div>
+      </div>
+      <div class="field">
+        <label>Weekly Deliveries (approx)</label>
+        <input type="text" id="p-msg" placeholder="e.g. 10–20 deliveries/week"/>
+      </div>
+
+      <button class="submit-btn" id="p-btn" onclick="submitPartner()">Apply for Partnership →</button>
+      <div class="submit-note">We'll contact you within 24 hours · No commitment required</div>
+    </div>
+
+    <div id="success-content" class="success-box" style="display:none">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Application Received!</div>
+      <div class="success-sub">Thank you! Our team will contact you within 24 hours to set up your partnership account.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function submitPartner(){
+  const biz   = document.getElementById('p-biz').value.trim();
+  const type  = document.getElementById('p-type').value;
+  const name  = document.getElementById('p-name').value.trim();
+  const phone = document.getElementById('p-phone').value.trim();
+  const loc   = document.getElementById('p-loc').value.trim();
+  const email = document.getElementById('p-email').value.trim();
+  const msg   = document.getElementById('p-msg').value.trim();
+  const err   = document.getElementById('err');
+  const btn   = document.getElementById('p-btn');
+
+  err.classList.remove('show');
+  if(!biz){err.textContent='Please enter your business name.';err.classList.add('show');return;}
+  if(!name){err.textContent='Please enter your contact name.';err.classList.add('show');return;}
+  if(!phone||phone.length<7){err.textContent='Please enter a valid phone number.';err.classList.add('show');return;}
+
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span>';
+
+  const {error} = await sb.from('partner_requests').insert({
+    business_name: biz, business_type: type||null,
+    contact_name: name, phone, email:email||null,
+    location: loc||null, message: msg||null,
+    status:'pending', created_at: new Date().toISOString()
+  });
+
+  btn.disabled=false;
+  btn.innerHTML='Apply for Partnership →';
+
+  if(error){err.textContent='Submission failed. Please try again.';err.classList.add('show');return;}
+  document.getElementById('form-content').style.display='none';
+  document.getElementById('success-content').style.display='block';
+}
+</script>
+</body>
+</html>

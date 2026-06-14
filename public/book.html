@@ -1,788 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <meta name="theme-color" content="#0f0f0f"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <title>Zygo Express — Book Delivery</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-// ── Wa Municipal Location Suggestions ────────────────────────────────────────
-const WA_LOCATIONS = [
-  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing",
-  "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
-  "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
-  "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
-  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
-  "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
-  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
-  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
-  "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
-  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
-];
-
-function setupAutocomplete(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  // Create dropdown
-  const dropdown = document.createElement('div');
-  dropdown.id = inputId + '-suggestions';
-  dropdown.style.cssText = `
-    position:absolute; top:100%; left:0; right:0; z-index:999;
-    background:white; border:1.5px solid #e8e4dc; border-top:none;
-    border-radius:0 0 12px 12px; max-height:200px; overflow-y:auto;
-    box-shadow:0 8px 24px rgba(0,0,0,0.1); display:none;
-  `;
-  input.parentElement.style.position = 'relative';
-  input.parentElement.appendChild(dropdown);
-
-  input.addEventListener('input', () => {
-    const val = input.value.trim().toLowerCase();
-    dropdown.innerHTML = '';
-    if (val.length < 2) { dropdown.style.display = 'none'; return; }
-
-    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
-    if (!matches.length) { dropdown.style.display = 'none'; return; }
-
-    matches.forEach(loc => {
-      const item = document.createElement('div');
-      item.textContent = '📍 ' + loc + ', Wa';
-      item.style.cssText = 'padding:10px 14px; cursor:pointer; font-size:14px; border-bottom:1px solid #f5f5f5; color:#1a1a1a;';
-      item.addEventListener('mousedown', () => {
-        input.value = loc + ', Wa';
-        dropdown.style.display = 'none';
-        estimatePrice();
-      });
-      item.addEventListener('mouseover', () => item.style.background = '#fff7f0');
-      item.addEventListener('mouseout', () => item.style.background = 'white');
-      dropdown.appendChild(item);
-    });
-    dropdown.style.display = 'block';
-  });
-
-  input.addEventListener('blur', () => {
-    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
-  });
-}
-
-// Init autocomplete for both fields
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    setupAutocomplete('f-pickup');
-    setupAutocomplete('f-dropoff');
-  }, 500);
-});
-
-</script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Satoshi:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --ink:     #0f0f0f;
-      --paper:   #fafaf8;
-      --orange:  #f97316;
-      --amber:   #f59e0b;
-      --cream:   #fff9f0;
-      --stone:   #e8e4dc;
-      --muted:   #9c9589;
-      --green:   #16a34a;
-      --red:     #dc2626;
-      --r:       12px;
-    }
-
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-    body {
-      background: var(--paper);
-      color: var(--ink);
-      font-family: 'Satoshi', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── TOPBAR ── */
-    .topbar {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--ink);
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo-mark {
-      width: 34px;
-      height: 34px;
-      background: var(--orange);
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 16px;
-      color: white;
-      letter-spacing: -1px;
-    }
-
-    .logo-name {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 800;
-      font-size: 17px;
-      color: white;
-      letter-spacing: -0.3px;
-    }
-
-    .logo-name em { color: var(--orange); font-style: normal; }
-
-    .topbar-pill {
-      background: rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.7);
-      font-size: 11px;
-      font-weight: 500;
-      padding: 5px 10px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.15);
-    }
-
-    /* ── HERO STRIP ── */
-    .hero {
-      background: var(--ink);
-      padding: 28px 20px 40px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-bg-text {
-      position: absolute;
-      right: -10px;
-      top: -10px;
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 110px;
-      color: rgba(255,255,255,0.03);
-      line-height: 1;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--orange);
-      color: white;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 5px 12px;
-      border-radius: 4px;
-      margin-bottom: 14px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .hero-title {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 36px;
-      color: white;
-      line-height: 1.05;
-      letter-spacing: -1px;
-      margin-bottom: 12px;
-    }
-
-    .hero-title span {
-      color: var(--orange);
-    }
-
-    .hero-sub {
-      color: rgba(255,255,255,0.55);
-      font-size: 14px;
-      line-height: 1.65;
-      max-width: 320px;
-    }
-
-    /* ── ZONE CARDS ── */
-    .zone-section {
-      padding: 20px 20px 0;
-      background: var(--ink);
-    }
-
-    .zone-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .zone-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px;
-      padding: 12px 8px;
-      text-align: center;
-      transition: all 0.2s;
-    }
-
-    .zone-card.active {
-      background: var(--orange);
-      border-color: var(--orange);
-    }
-
-    .zone-card.active .zone-price,
-    .zone-card.active .zone-km,
-    .zone-card.active .zone-name { color: white; }
-
-    .zone-price {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 800;
-      font-size: 15px;
-      color: var(--orange);
-    }
-
-    .zone-card.active .zone-price { color: white; }
-
-    .zone-km {
-      font-size: 10px;
-      color: rgba(255,255,255,0.4);
-      margin-top: 2px;
-      font-weight: 500;
-    }
-
-    .zone-name {
-      font-size: 9px;
-      color: rgba(255,255,255,0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 3px;
-    }
-
-    /* ── FORM ── */
-    .form-container {
-      background: var(--ink);
-      padding: 0 16px 0;
-    }
-
-    .form-card {
-      background: var(--paper);
-      border-radius: 20px 20px 0 0;
-      padding: 28px 20px;
-      margin-top: 20px;
-      position: relative;
-    }
-
-    .form-card::before {
-      content: '';
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 36px;
-      height: 4px;
-      background: var(--stone);
-      border-radius: 2px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .group-label {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .input-wrap {
-      margin-bottom: 10px;
-    }
-
-    .input-wrap:last-child { margin-bottom: 0; }
-
-    .input-label {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      margin-bottom: 5px;
-      display: block;
-    }
-
-    .input-field {
-      width: 100%;
-      background: white;
-      border: 1.5px solid var(--stone);
-      border-radius: var(--r);
-      padding: 14px 16px;
-      font-size: 15px;
-      font-family: 'Satoshi', sans-serif;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
-    }
-
-    .input-field:focus {
-      border-color: var(--orange);
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
-    }
-
-    .input-field::placeholder { color: #bbb; }
-
-    .input-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    /* Route visual */
-    .route-group {
-      position: relative;
-    }
-
-    .route-track {
-      position: absolute;
-      left: 22px;
-      top: 54px;
-      bottom: 54px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--amber), var(--orange));
-      border-radius: 1px;
-    }
-
-    .route-dot {
-      position: absolute;
-      left: 16px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      z-index: 2;
-    }
-
-    .route-dot-top {
-      top: 20px;
-      background: var(--amber);
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.2);
-    }
-
-    .route-dot-bottom {
-      bottom: 20px;
-      background: var(--orange);
-      box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
-    }
-
-    .route-group .input-field { padding-left: 38px; }
-
-    /* Divider */
-    .divider {
-      height: 1px;
-      background: var(--stone);
-      margin: 20px 0;
-    }
-
-    /* Price estimate */
-    .price-reveal {
-      background: var(--cream);
-      border: 1.5px solid rgba(249,115,22,0.2);
-      border-radius: var(--r);
-      padding: 16px;
-      display: none;
-      margin-bottom: 10px;
-    }
-
-    .price-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .price-left { }
-    .price-tag { font-size: 11px; font-weight: 700; color: #c2410c; text-transform: uppercase; letter-spacing: 0.5px; }
-    .price-zone-name { font-size: 13px; color: var(--muted); margin-top: 2px; }
-    .price-dist { font-size: 11px; color: var(--muted); margin-top: 1px; }
-
-    .price-amount {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 32px;
-      color: var(--orange);
-      letter-spacing: -1px;
-    }
-
-    /* Notes */
-    .notes-field {
-      resize: none;
-      min-height: 80px;
-    }
-
-    /* Submit */
-    .submit-section {
-      padding: 0 16px 40px;
-      background: var(--paper);
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 18px;
-      background: var(--ink);
-      color: white;
-      border: none;
-      border-radius: var(--r);
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      letter-spacing: -0.3px;
-    }
-
-    .submit-btn:active { transform: scale(0.98); opacity: 0.9; }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .submit-note {
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-
-    /* Trust row */
-    .trust-row {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      padding: 16px 20px 0;
-      background: var(--paper);
-    }
-
-    .trust-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-    }
-
-    .trust-item span { font-size: 18px; }
-
-    /* Error */
-    .error-msg {
-      background: #fef2f2;
-      border: 1.5px solid #fecaca;
-      color: var(--red);
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      margin-bottom: 14px;
-      display: none;
-    }
-    .error-msg.show { display: block; }
-
-    /* ── SUCCESS ── */
-    #screen-success { display: none; }
-
-    .success-top {
-      background: var(--ink);
-      min-height: 50vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .success-ring {
-      width: 90px;
-      height: 90px;
-      border-radius: 50%;
-      background: var(--orange);
-      display: grid;
-      place-items: center;
-      font-size: 38px;
-      margin-bottom: 24px;
-      position: relative;
-      z-index: 1;
-      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .success-title {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 30px;
-      color: white;
-      letter-spacing: -1px;
-      margin-bottom: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .success-sub {
-      color: rgba(255,255,255,0.55);
-      font-size: 14px;
-      line-height: 1.65;
-      position: relative;
-      z-index: 1;
-    }
-
-    .success-body { padding: 0 16px 40px; background: var(--paper); }
-
-    .code-block {
-      background: var(--ink);
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      margin-top: -20px;
-      margin-bottom: 14px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .code-label {
-      font-size: 10px;
-      color: rgba(255,255,255,0.4);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 8px;
-    }
-
-    .code-value {
-      font-family: 'Cabinet Grotesk', sans-serif;
-      font-weight: 900;
-      font-size: 34px;
-      color: var(--orange);
-      letter-spacing: 3px;
-    }
-
-    .code-hint {
-      font-size: 11px;
-      color: rgba(255,255,255,0.3);
-      margin-top: 6px;
-    }
-
-    .summary-card {
-      background: white;
-      border: 1px solid var(--stone);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 14px;
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--stone);
-      font-size: 13px;
-    }
-
-    .summary-row:last-child { border-bottom: none; }
-    .summary-key { color: var(--muted); }
-    .summary-val { font-weight: 600; text-align: right; max-width: 55%; }
-    .summary-val.price { color: var(--orange); font-family: 'Cabinet Grotesk', sans-serif; font-size: 16px; font-weight: 800; }
-
-    .btn-primary {
-      display: block; width: 100%; padding: 17px;
-      background: var(--orange); color: white; border: none;
-      border-radius: var(--r); font-family: 'Cabinet Grotesk', sans-serif;
-      font-size: 16px; font-weight: 800; text-align: center;
-      text-decoration: none; cursor: pointer; margin-bottom: 10px;
-      letter-spacing: -0.3px; transition: opacity 0.2s;
-    }
-    .btn-primary:active { opacity: 0.88; }
-
-    .btn-ghost {
-      display: block; width: 100%; padding: 15px;
-      background: white; border: 1.5px solid var(--stone); color: var(--ink);
-      border-radius: var(--r); font-family: 'Cabinet Grotesk', sans-serif;
-      font-size: 15px; font-weight: 700; text-align: center;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .btn-ghost:active { background: var(--stone); }
-
-    .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    /* MoMo Payment */
-    .momo-card {
-      background: white;
-      border: 1.5px solid #fcd34d;
-      border-radius: 16px;
-      overflow: hidden;
-      margin-bottom: 14px;
-    }
-    .momo-header {
-      background: #fffbeb;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid #fde68a;
-    }
-    .momo-icon { font-size: 28px; }
-    .momo-title { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 15px; color: #92400e; }
-    .momo-sub { font-size: 12px; color: #b45309; margin-top: 2px; }
-    .momo-number-wrap { padding: 16px; text-align: center; border-bottom: 1px solid #fde68a; }
-    .momo-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .momo-number { font-family: 'Cabinet Grotesk', sans-serif; font-size: 28px; font-weight: 900; color: var(--ink); letter-spacing: 2px; }
-    .momo-name { font-size: 12px; color: var(--muted); margin-top: 4px; }
-    .momo-copy-btn {
-      margin-top: 10px; padding: 8px 20px;
-      background: #f59e0b; color: white; border: none;
-      border-radius: 8px; font-family: 'Cabinet Grotesk', sans-serif;
-      font-size: 13px; font-weight: 700; cursor: pointer;
-    }
-    .momo-copy-btn:active { opacity: 0.85; }
-    .momo-steps { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #fde68a; }
-    .momo-step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.5; }
-    .step-num {
-      width: 22px; height: 22px; border-radius: 50%;
-      background: #f59e0b; color: white;
-      display: grid; place-items: center;
-      font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
-    }
-    .momo-note { padding: 12px 16px; font-size: 12px; color: #b45309; background: #fffbeb; }
-
-    .badge-row {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .badge {
-      background: rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.5);
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0f0f0f"/>
+<title>Zygo Express — Book Delivery</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#f97316;--amber:#f59e0b;--ink:#0f0f0f;--paper:#fafaf8;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+.topbar{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--ink);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:34px;height:34px;background:var(--orange);border-radius:8px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:white;}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:white;}
+.logo-name em{color:var(--orange);font-style:normal;}
+.topbar-pill{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:11px;font-weight:500;padding:5px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);}
+
+.hero{background:var(--ink);padding:28px 20px 44px;position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;bottom:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,0.04);border-radius:50%;}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;font-size:11px;font-weight:700;padding:5px 12px;border-radius:4px;margin-bottom:14px;letter-spacing:0.5px;text-transform:uppercase;}
+.hero-title{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:white;line-height:1.05;letter-spacing:-1px;margin-bottom:10px;}
+.hero-title span{color:var(--orange);}
+.hero-sub{color:rgba(255,255,255,0.55);font-size:14px;line-height:1.65;max-width:320px;}
+
+/* Zone Cards */
+.zone-wrap{background:var(--ink);padding:0 20px 20px;}
+.zone-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:14px 0 10px;}
+.zone-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.zone-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 6px;text-align:center;transition:all 0.2s;}
+.zone-card.active{background:var(--orange);border-color:var(--orange);}
+.zone-price{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--orange);}
+.zone-card.active .zone-price{color:white;}
+.zone-km{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;}
+.zone-card.active .zone-km{color:rgba(255,255,255,0.8);}
+.zone-name{font-size:8px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.zone-card.active .zone-name{color:rgba(255,255,255,0.7);}
+
+/* Form */
+.form-wrap{padding:0 16px 40px;background:var(--ink);}
+.form-card{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px;position:relative;}
+.form-card::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:36px;height:4px;background:var(--stone);border-radius:2px;}
+.group-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;margin-top:20px;display:flex;align-items:center;gap:6px;}
+.group-label:first-of-type{margin-top:0;}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.input-wrap{margin-bottom:10px;position:relative;}
+.input-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block;}
+.input-field{width:100%;background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;}
+.input-field:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.1);}
+.input-field::placeholder{color:#bbb;}
+textarea.input-field{min-height:72px;resize:none;}
+.divider{height:1px;background:var(--stone);margin:20px 0;}
+
+/* Route */
+.route-group{position:relative;}
+.route-track{position:absolute;left:22px;top:54px;bottom:54px;width:2px;background:linear-gradient(to bottom,var(--amber),var(--orange));border-radius:1px;}
+.route-dot{position:absolute;left:16px;width:12px;height:12px;border-radius:50%;z-index:2;}
+.route-dot-top{top:20px;background:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,0.2);}
+.route-dot-bot{bottom:20px;background:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.2);}
+.route-group .input-field{padding-left:38px;}
+
+/* Autocomplete */
+.suggestions{position:absolute;top:100%;left:0;right:0;z-index:999;background:white;border:1.5px solid var(--stone);border-top:none;border-radius:0 0 12px 12px;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:none;}
+.suggestion-item{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid #f5f5f5;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.suggestion-item:hover{background:#fff7f0;}
+.suggestion-item:last-child{border-bottom:none;}
+
+/* Price reveal */
+.price-reveal{background:#fff7f0;border:1.5px solid #fed7aa;border-radius:var(--r);padding:16px;display:none;margin-bottom:12px;}
+.price-top{display:flex;align-items:center;justify-content:space-between;}
+.price-tag{font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;}
+.price-zone{font-size:13px;color:var(--muted);margin-top:2px;}
+.price-dist{font-size:11px;color:var(--muted);margin-top:1px;}
+.price-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:var(--orange);letter-spacing:-1px;}
+
+/* Submit */
+.submit-section{padding:0 16px 40px;background:var(--paper);}
+.trust-row{display:flex;justify-content:center;gap:16px;padding:0 0 16px;flex-wrap:wrap;}
+.trust-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);}
+.trust-item span{font-size:18px;}
+.submit-btn{width:100%;padding:18px;background:var(--ink);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;letter-spacing:-0.3px;}
+.submit-btn:active{transform:scale(0.98);opacity:0.9;}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.submit-note{text-align:center;font-size:12px;color:var(--muted);margin-top:10px;}
+
+/* Error */
+.error-msg{background:#fef2f2;border:1.5px solid #fecaca;color:var(--red);padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;}
+.error-msg.show{display:block;}
+
+/* SUCCESS */
+#screen-success{display:none;}
+.success-top{background:var(--ink);padding:48px 20px 56px;text-align:center;position:relative;overflow:hidden;}
+.success-top::before{content:'';position:absolute;width:300px;height:300px;background:rgba(255,255,255,0.04);border-radius:50%;top:-100px;left:-80px;}
+.success-ring{width:80px;height:80px;border-radius:50%;background:var(--orange);display:grid;place-items:center;margin:0 auto 20px;font-size:36px;position:relative;z-index:1;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.success-title{font-family:'Syne',sans-serif;font-weight:900;font-size:28px;color:white;letter-spacing:-1px;margin-bottom:8px;position:relative;z-index:1;}
+.success-sub{color:rgba(255,255,255,0.55);font-size:14px;line-height:1.6;position:relative;z-index:1;}
+
+.success-body{padding:0 16px 40px;background:var(--paper);}
+
+/* Tracking code card */
+.code-block{background:var(--ink);border-radius:16px;padding:24px;text-align:center;margin-top:-24px;margin-bottom:12px;position:relative;z-index:2;}
+.code-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+.code-value{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:var(--orange);letter-spacing:4px;}
+.code-hint{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;}
+.copy-code-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.copy-code-btn:active{opacity:0.8;}
+
+/* Summary card */
+.summary-card{background:white;border:1px solid var(--stone);border-radius:14px;overflow:hidden;margin-bottom:12px;}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--stone);font-size:13px;}
+.summary-row:last-child{border-bottom:none;}
+.summary-key{color:var(--muted);}
+.summary-val{font-weight:600;text-align:right;max-width:55%;}
+.summary-val.price{color:var(--orange);font-family:'Syne',sans-serif;font-size:17px;font-weight:800;}
+.summary-val.paid{color:var(--green);}
+
+/* MoMo card */
+.momo-card{background:white;border:1.5px solid #fcd34d;border-radius:16px;overflow:hidden;margin-bottom:12px;}
+.momo-header{background:#fffbeb;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #fde68a;}
+.momo-icon{font-size:26px;}
+.momo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#92400e;}
+.momo-sub{font-size:12px;color:#b45309;margin-top:2px;}
+.momo-number-wrap{padding:16px;text-align:center;border-bottom:1px solid #fde68a;}
+.momo-label-sm{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.momo-number{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;color:var(--ink);letter-spacing:2px;}
+.momo-name-sm{font-size:12px;color:var(--muted);margin-top:4px;}
+.momo-copy-btn{margin-top:10px;padding:8px 20px;background:#f59e0b;color:white;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.momo-ref-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin:12px 16px;font-size:13px;}
+.momo-ref-label{font-size:11px;color:#b45309;font-weight:700;margin-bottom:4px;}
+.momo-ref-code{font-family:monospace;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:2px;}
+.momo-steps{padding:12px 16px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid #fde68a;}
+.momo-step{display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5;}
+.step-num{width:20px;height:20px;border-radius:50%;background:#f59e0b;color:white;display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.momo-note{padding:10px 16px;font-size:11px;color:#b45309;background:#fffbeb;}
+
+.btn-primary{display:block;width:100%;padding:16px;background:var(--orange);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;letter-spacing:-0.3px;}
+.btn-ghost{display:block;width:100%;padding:14px;background:white;border:1.5px solid var(--stone);color:var(--ink);border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;text-align:center;cursor:pointer;}
+
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════ BOOKING FORM ═══════════════ -->
+<!-- BOOKING FORM -->
 <div id="screen-form">
-
-  <!-- Topbar -->
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark">ZE</div>
       <div class="logo-name">Zygo<em>Express</em></div>
     </div>
-    <div class="topbar-pill">🇬🇭 Ghana Delivery</div>
+    <div class="topbar-pill">🇬🇭 Wa, Ghana</div>
   </div>
 
-  <!-- Hero -->
   <div class="hero">
-    <div class="hero-bg-text">ZE</div>
-    <div class="hero-eyebrow">⚡ Book in 60 seconds</div>
+    <div class="hero-tag">⚡ Book in 60 seconds</div>
     <div class="hero-title">Your parcel.<br><span>Delivered fast.</span></div>
-    <div class="hero-sub">Same-day pickups across Wa & Upper West. Real-time rider tracking. Transparent pricing.</div>
-    <div class="badge-row">
-      <div class="badge">✓ Instant confirmation</div>
-      <div class="badge">✓ Live GPS tracking</div>
-      <div class="badge">✓ All Ghana networks</div>
-    </div>
+    <div class="hero-sub">Same-day pickups across Wa & Upper West. Real-time tracking included.</div>
   </div>
 
-  <!-- Zone pricing -->
-  <div class="zone-section">
-    <div style="padding:16px 0 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px">Delivery Pricing Zones</div>
+  <div class="zone-wrap">
+    <div class="zone-label">Delivery Pricing Zones</div>
     <div class="zone-row">
-      <div class="zone-card" id="zone-1">
-        <div class="zone-price">GHS 13</div>
-        <div class="zone-km">0–2 km</div>
-        <div class="zone-name">Zone 1</div>
-      </div>
-      <div class="zone-card" id="zone-2">
-        <div class="zone-price">GHS 16</div>
-        <div class="zone-km">2–4 km</div>
-        <div class="zone-name">Zone 2</div>
-      </div>
-      <div class="zone-card" id="zone-3">
-        <div class="zone-price">GHS 20</div>
-        <div class="zone-km">4–6 km</div>
-        <div class="zone-name">Zone 3</div>
-      </div>
-      <div class="zone-card" id="zone-4">
-        <div class="zone-price">GHS 30</div>
-        <div class="zone-km">6+ km</div>
-        <div class="zone-name">Zone 4</div>
-      </div>
+      <div class="zone-card" id="zone-1"><div class="zone-price">GHS 13</div><div class="zone-km">0–2 km</div><div class="zone-name">Zone 1</div></div>
+      <div class="zone-card" id="zone-2"><div class="zone-price">GHS 16</div><div class="zone-km">2.1–4 km</div><div class="zone-name">Zone 2</div></div>
+      <div class="zone-card" id="zone-3"><div class="zone-price">GHS 20</div><div class="zone-km">4.1–6 km</div><div class="zone-name">Zone 3</div></div>
+      <div class="zone-card" id="zone-4"><div class="zone-price">GHS 30</div><div class="zone-km">6.1–9 km</div><div class="zone-name">Zone 4</div></div>
     </div>
   </div>
 
-  <!-- Form -->
-  <div class="form-container">
+  <div class="form-wrap">
     <div class="form-card">
-
       <div class="error-msg" id="error-box"></div>
 
-      <!-- Contact -->
-      <div class="form-group">
-        <div class="group-label">👤 Your Details</div>
-        <div class="input-row">
-          <div class="input-wrap">
-            <div class="input-label">Full Name</div>
-            <input class="input-field" type="text" id="f-name" placeholder="Jane Mensah" required/>
-          </div>
-          <div class="input-wrap">
-            <div class="input-label">Phone Number</div>
-            <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456" required/>
-          </div>
+      <div class="group-label">👤 Your Details</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <span class="input-label">Full Name</span>
+          <input class="input-field" type="text" id="f-name" placeholder="Jane Mensah" required/>
+        </div>
+        <div class="input-wrap">
+          <span class="input-label">Phone Number</span>
+          <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456" required/>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Route -->
-      <div class="form-group route-group">
-        <div class="group-label">📍 Delivery Route</div>
+      <div class="group-label">📍 Delivery Route</div>
+      <div class="route-group">
         <div class="route-dot route-dot-top"></div>
         <div class="route-track"></div>
-        <div class="route-dot route-dot-bottom"></div>
+        <div class="route-dot route-dot-bot"></div>
         <div class="input-wrap">
-          <div class="input-label">Pickup Location</div>
-          <input class="input-field" type="text" id="f-pickup" placeholder="e.g. Kpaguri, Wa Polytechnic, Nakori" required onblur="estimatePrice()"/>
+          <span class="input-label">Pickup Location</span>
+          <input class="input-field" type="text" id="f-pickup" placeholder="e.g. Kpaguri, Wa Hospital" required autocomplete="off"/>
+          <div class="suggestions" id="pickup-suggestions"></div>
         </div>
         <div class="input-wrap" style="margin-top:10px">
-          <div class="input-label">Drop-off Location</div>
-          <input class="input-field" type="text" id="f-dropoff" placeholder="e.g. Jahan, Ssnit, Dobile" required onblur="estimatePrice()"/>
+          <span class="input-label">Drop-off Location</span>
+          <input class="input-field" type="text" id="f-dropoff" placeholder="e.g. Jahan, Ssnit" required autocomplete="off"/>
+          <div class="suggestions" id="dropoff-suggestions"></div>
         </div>
       </div>
 
-      <!-- Price estimate -->
       <div class="price-reveal" id="price-reveal">
-        <div class="price-row">
-          <div class="price-left">
+        <div class="price-top">
+          <div>
             <div class="price-tag">Estimated Cost</div>
-            <div class="price-zone-name" id="p-zone">Calculating…</div>
+            <div class="price-zone" id="p-zone">Calculating…</div>
             <div class="price-dist" id="p-dist"></div>
           </div>
           <div class="price-amount" id="p-amount">—</div>
@@ -791,37 +220,27 @@ window.addEventListener('load', () => {
 
       <div class="divider"></div>
 
-      <!-- Notes -->
-      <div class="form-group">
-        <div class="group-label">📦 Parcel Details <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.6">(optional)</span></div>
-        <div class="input-wrap">
-          <textarea class="input-field notes-field" id="f-details" placeholder="Size, weight, fragile, special handling…"></textarea>
-        </div>
+      <div class="group-label">📦 Parcel Details <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.5;font-size:10px">(optional)</span></div>
+      <div class="input-wrap">
+        <textarea class="input-field" id="f-details" placeholder="Size, weight, fragile items, special instructions…"></textarea>
       </div>
-
     </div>
   </div>
 
-  <!-- Trust + Submit -->
   <div class="submit-section">
-    <div class="trust-row" style="margin-bottom:16px;padding:0">
+    <div class="trust-row">
       <div class="trust-item"><span>⚡</span>Same Day</div>
       <div class="trust-item"><span>📍</span>Live Track</div>
       <div class="trust-item"><span>💰</span>Fair Price</div>
       <div class="trust-item"><span>🛡️</span>Insured</div>
     </div>
-    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
-      Confirm Booking →
-    </button>
+    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">Confirm Booking →</button>
     <div class="submit-note">No payment needed now · We'll contact you to confirm</div>
   </div>
-
 </div>
 
-
-<!-- ═══════════════ SUCCESS ═══════════════ -->
+<!-- SUCCESS -->
 <div id="screen-success">
-
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark">ZE</div>
@@ -831,20 +250,24 @@ window.addEventListener('load', () => {
 
   <div class="success-top">
     <div class="success-ring">✓</div>
-    <div class="success-title">You're booked.</div>
-    <div class="success-sub">Your delivery request is confirmed.<br>We'll call you shortly to arrange pickup.</div>
+    <div class="success-title">You're booked!</div>
+    <div class="success-sub">Your delivery request is confirmed.<br>We'll call you to arrange pickup.</div>
   </div>
 
   <div class="success-body">
+    <!-- Tracking Code -->
     <div class="code-block">
       <div class="code-label">Your Tracking ID</div>
       <div class="code-value" id="s-code">ZGX-XXXXXX</div>
       <div class="code-hint">Use this to track your parcel anytime</div>
+      <button class="copy-code-btn" onclick="copyCode()" id="copy-code-btn">📋 Copy Tracking ID</button>
     </div>
 
+    <!-- Order Summary -->
     <div class="summary-card" id="s-summary"></div>
 
-    <div class="momo-card" id="momo-card" style="display:none">
+    <!-- MoMo Payment -->
+    <div class="momo-card">
       <div class="momo-header">
         <div class="momo-icon">📱</div>
         <div>
@@ -853,129 +276,196 @@ window.addEventListener('load', () => {
         </div>
       </div>
       <div class="momo-number-wrap">
-        <div class="momo-label">Send to this number</div>
-        <div class="momo-number" id="momo-display">0240393582</div>
-        <div class="momo-name">Zygo Express</div>
+        <div class="momo-label-sm">Send to this number</div>
+        <div class="momo-number">0240393582</div>
+        <div class="momo-name-sm">Zygo Express</div>
         <button class="momo-copy-btn" onclick="copyMomo()">Copy Number</button>
       </div>
-      <div class="momo-steps">
-        <div class="momo-step"><span class="step-num">1</span> Dial <strong>*170#</strong> on your MTN phone</div>
-        <div class="momo-step"><span class="step-num">2</span> Select <strong>Transfer Money → MoMo User</strong></div>
-        <div class="momo-step"><span class="step-num">3</span> Send <strong id="momo-amount-display">the delivery amount</strong> to <strong>0240393582</strong></div>
-        <div class="momo-step"><span class="step-num">4</span> Use your <strong>Tracking ID</strong> as reference</div>
+      <div class="momo-ref-box">
+        <div class="momo-ref-label">📋 Use as MoMo Reference</div>
+        <div class="momo-ref-code" id="momo-ref-code">ZGX-XXXXXX</div>
       </div>
-      <div class="momo-note">💡 Payment confirms your booking. We'll call you once verified.</div>
+      <div class="momo-steps">
+        <div class="momo-step"><div class="step-num">1</div>Dial <strong>*170#</strong> on your MTN phone</div>
+        <div class="momo-step"><div class="step-num">2</div>Select <strong>Transfer Money → MoMo User</strong></div>
+        <div class="momo-step"><div class="step-num">3</div>Send <strong id="momo-amount">GHS 13</strong> to <strong>0240393582</strong></div>
+        <div class="momo-step"><div class="step-num">4</div>Enter <strong id="momo-ref-step">your tracking ID</strong> as reference</div>
+      </div>
+      <div class="momo-note">💡 Payment confirms your booking. We'll call once verified.</div>
     </div>
-    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary">📍 Track My Parcel</a>
+
+    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary" id="track-link">📍 Track My Parcel</a>
     <div class="btn-ghost" onclick="bookAnother()">+ Book Another Delivery</div>
   </div>
-
 </div>
-
 
 <script>
 const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
-let sb;
+const GOOGLE_MAPS_KEY = ""; // Add your Google Maps API key here if available
+let sb, currentCode = '';
 
 window.addEventListener('load', () => {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  setupAutocomplete('f-pickup',  'pickup-suggestions');
+  setupAutocomplete('f-dropoff', 'dropoff-suggestions');
+  document.getElementById('f-pickup').addEventListener('blur',  () => setTimeout(estimatePrice, 300));
+  document.getElementById('f-dropoff').addEventListener('blur', () => setTimeout(estimatePrice, 300));
 });
 
+// ── Wa Locations ──────────────────────────────────────────────────────────────
+const WA_LOCATIONS = [
+  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing","Kparimbo",
+  "Wa Polytechnic","Wa Technical Institute","Wa Central Market","Wa Bus Terminal",
+  "Wa Hospital","Wa Municipal Hospital","Fuo","Bamahu","Charia","Dobile Transit",
+  "Kpong","Kpongu","Tendamba","Busa","Funsi Road","Wa Town","Wa New Site",
+  "Kpoglu","Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
+  "Catholic Hospital","Airstrip","Magazine Road","Real Spicy","Kumbehi",
+  "Lowcost","RST","Zongo","Mabia","Loho","Kambali","Nyanshegu","Tindama",
+  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road","UDS","Wa UDS",
+  "Wa Market","Wa Round About","Nkoranza","Bulenga","Sankana Road"
+];
+
+function setupAutocomplete(inputId, suggestId) {
+  const input = document.getElementById(inputId);
+  const box   = document.getElementById(suggestId);
+  input.addEventListener('input', () => {
+    const val = input.value.trim().toLowerCase();
+    box.innerHTML = '';
+    if (val.length < 1) { box.style.display = 'none'; return; }
+    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
+    if (!matches.length) { box.style.display = 'none'; return; }
+    matches.forEach(loc => {
+      const item = document.createElement('div');
+      item.className = 'suggestion-item';
+      item.innerHTML = `<span>📍</span>${loc}, Wa`;
+      item.addEventListener('mousedown', () => {
+        input.value = loc + ', Wa';
+        box.style.display = 'none';
+        setTimeout(estimatePrice, 200);
+      });
+      box.appendChild(item);
+    });
+    box.style.display = 'block';
+  });
+  input.addEventListener('blur', () => setTimeout(() => { box.style.display = 'none'; }, 200));
+}
+
+// ── Zone Pricing ──────────────────────────────────────────────────────────────
+function getZone(km) {
+  if (km <= 2.0)  return { price:13, name:'Zone 1 · 0–2 km',    id:'zone-1' };
+  if (km <= 4.0)  return { price:16, name:'Zone 2 · 2.1–4 km',  id:'zone-2' };
+  if (km <= 6.0)  return { price:20, name:'Zone 3 · 4.1–6 km',  id:'zone-3' };
+  return           { price:30, name:'Zone 4 · 6.1–9 km',        id:'zone-4' };
+}
+
+function highlightZone(id) {
+  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+// ── Price Estimation (OSRM + Nominatim) ──────────────────────────────────────
+async function estimatePrice() {
+  const pickup  = document.getElementById('f-pickup').value.trim();
+  const dropoff = document.getElementById('f-dropoff').value.trim();
+  if (!pickup || !dropoff || pickup.length < 2 || dropoff.length < 2) return;
+
+  const reveal = document.getElementById('price-reveal');
+  const pAmt   = document.getElementById('p-amount');
+  const pZone  = document.getElementById('p-zone');
+  const pDist  = document.getElementById('p-dist');
+
+  reveal.style.display = 'block';
+  pAmt.textContent  = '…';
+  pZone.textContent = 'Calculating route distance…';
+  pDist.textContent = '';
+
+  try {
+    // Geocode using Nominatim with Wa context
+    const geoBase = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh';
+    const [pRes, dRes] = await Promise.all([
+      fetch(`${geoBase}&q=${encodeURIComponent(pickup + ', Wa, Upper West, Ghana')}`, { headers:{'User-Agent':'ZygoExpress/1.0'} }).then(r=>r.json()),
+      fetch(`${geoBase}&q=${encodeURIComponent(dropoff + ', Wa, Upper West, Ghana')}`, { headers:{'User-Agent':'ZygoExpress/1.0'} }).then(r=>r.json()),
+    ]);
+
+    if (pRes.length && dRes.length) {
+      const oLat=parseFloat(pRes[0].lat), oLng=parseFloat(pRes[0].lon);
+      const dLat=parseFloat(dRes[0].lat), dLng=parseFloat(dRes[0].lon);
+
+      // Get road distance from OSRM
+      const routeRes = await fetch(
+        `https://router.project-osrm.org/route/v1/driving/${oLng},${oLat};${dLng},${dLat}?overview=false`
+      ).then(r=>r.json());
+
+      if (routeRes.code === 'Ok' && routeRes.routes?.[0]) {
+        const distM = routeRes.routes[0].distance;
+        const km    = distM / 1000;
+        const zone  = getZone(km);
+        pAmt.textContent  = `GHS ${zone.price}`;
+        pZone.textContent = zone.name;
+        pDist.textContent = `Road distance: ${km.toFixed(2)} km`;
+        highlightZone(zone.id);
+        return;
+      }
+    }
+
+    // Fallback
+    pAmt.textContent  = 'GHS 13';
+    pZone.textContent = 'Zone 1 (minimum · could not calculate exact distance)';
+    pDist.textContent = 'Try entering full location names e.g. "Kpaguri, Wa"';
+    highlightZone('zone-1');
+
+  } catch {
+    pAmt.textContent  = 'GHS 13';
+    pZone.textContent = 'Zone 1 (minimum)';
+    highlightZone('zone-1');
+  }
+}
+
+// ── Generate secure tracking code ─────────────────────────────────────────────
 function generateCode() {
-  // Use crypto API for secure random codes
-  const arr = new Uint8Array(4);
+  const arr = new Uint8Array(5);
   crypto.getRandomValues(arr);
   return 'ZGX-' + Array.from(arr, b => b.toString(36)).join('').substring(0,6).toUpperCase();
 }
 
-function getZone(km) {
-  if (km <= 2) return { price: 13, name: 'Zone 1 · 0–2 km',  id: 'zone-1' };
-  if (km <= 4) return { price: 16, name: 'Zone 2 · 2–4 km',  id: 'zone-2' };
-  if (km <= 6) return { price: 20, name: 'Zone 3 · 4–6 km',  id: 'zone-3' };
-  return       { price: 30, name: 'Zone 4 · 6+ km',          id: 'zone-4' };
-}
-
-function setActiveZone(id) {
-  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
-  document.getElementById(id)?.classList.add('active');
-}
-
-async function estimatePrice() {
-  const pickup  = document.getElementById('f-pickup').value.trim();
-  const dropoff = document.getElementById('f-dropoff').value.trim();
-  if (!pickup || !dropoff) return;
-
-  const reveal = document.getElementById('price-reveal');
-  const pZone  = document.getElementById('p-zone');
-  const pDist  = document.getElementById('p-dist');
-  const pAmt   = document.getElementById('p-amount');
-
-  reveal.style.display = 'block';
-  pZone.textContent = 'Calculating route…';
-  pAmt.textContent  = '…';
-  pDist.textContent = '';
-
-  try {
-    const [p, d] = await Promise.all([
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pickup+', Wa, Upper West, Ghana')}&format=json&limit=1`,  { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
-      fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(dropoff+', Wa, Upper West, Ghana')}&format=json&limit=1`, { headers: { 'User-Agent': 'ZygoExpress/1.0' } }).then(r => r.json()),
-    ]);
-
-    if (p.length && d.length) {
-      const route = await fetch(`https://router.project-osrm.org/route/v1/driving/${p[0].lon},${p[0].lat};${d[0].lon},${d[0].lat}?overview=false`).then(r => r.json());
-      if (route.code === 'Ok') {
-        const km   = route.routes[0].distance / 1000;
-        const zone = getZone(km);
-        pAmt.textContent  = `GHS ${zone.price}`;
-        pZone.textContent = zone.name;
-        pDist.textContent = `Road distance: ${km.toFixed(1)} km`;
-        setActiveZone(zone.id);
-        return;
-      }
-    }
-  } catch {}
-
-  pAmt.textContent  = 'GHS 13';
-  pZone.textContent = 'Zone 1 (minimum charge)';
-  pDist.textContent = 'Could not calculate exact distance';
-  setActiveZone('zone-1');
-}
-
+// ── Submit ────────────────────────────────────────────────────────────────────
 async function submitBooking() {
   const name    = document.getElementById('f-name').value.trim();
   const phone   = document.getElementById('f-phone').value.trim();
   const pickup  = document.getElementById('f-pickup').value.trim();
   const dropoff = document.getElementById('f-dropoff').value.trim();
   const details = document.getElementById('f-details').value.trim();
-  const errBox  = document.getElementById('error-box');
   const btn     = document.getElementById('submit-btn');
+  const errBox  = document.getElementById('error-box');
 
   errBox.classList.remove('show');
 
   if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
+
   // Ghana phone validation
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-  const ghanaValid = /^(0[23456789]\d{8}|\+233[23456789]\d{8}|233[23456789]\d{8})$/.test(cleanPhone);
-  if (!phone || !ghanaValid) {
-    showErr('Please enter a valid Ghana phone number (e.g. 0244 123 456).');
-    return;
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g,'');
+  if (!/^(0[2345679]\d{8}|233[2345679]\d{8}|\+233[2345679]\d{8})$/.test(cleanPhone)) {
+    showErr('Please enter a valid Ghana phone number e.g. 0244 123 456'); return;
   }
-  if (!pickup)                    { showErr('Please enter a pickup location.'); return; }
-  if (!dropoff)                   { showErr('Please enter a drop-off location.'); return; }
+  if (!pickup)  { showErr('Please enter a pickup location.'); return; }
+  if (!dropoff) { showErr('Please enter a drop-off location.'); return; }
 
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div>&nbsp; Booking…';
+  btn.innerHTML = '<div class="spinner"></div>&nbsp;Booking…';
 
-  const code      = generateCode();
-  // Get price from zone calculation - validated server-side after insert
-  const priceText = document.getElementById('p-amount').textContent;
-  const priceNum  = Math.max(13, parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]));
-  // Validate: price must be one of our valid zone prices
-  const validPrices = [13, 16, 20, 30];
-  const finalPrice  = validPrices.reduce((prev,curr) => 
-    Math.abs(curr-priceNum) < Math.abs(prev-priceNum) ? curr : prev
-  );
+  // Snap price to valid zone
+  const priceText  = document.getElementById('p-amount').textContent;
+  const priceNum   = parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]);
+  const validPrices= [13, 16, 20, 30];
+  const finalPrice = validPrices.includes(priceNum) ? priceNum :
+    validPrices.reduce((p,c) => Math.abs(c-priceNum) < Math.abs(p-priceNum) ? c : p);
+
+  const code = generateCode();
+  currentCode = code;
+
+  const sx = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   try {
     const { error } = await sb.from('quote_requests').insert({
@@ -987,7 +477,7 @@ async function submitBooking() {
       dropoff:       dropoff,
       details:       details || null,
       source:        'Website',
-      price:         finalPrice || 13,
+      price:         finalPrice,
       currency:      'GHS',
       created_at:    new Date().toISOString(),
     });
@@ -999,134 +489,75 @@ async function submitBooking() {
       return;
     }
 
-    // Show success
-    document.getElementById('screen-form').style.display   = 'none';
+    // Show success screen
+    document.getElementById('screen-form').style.display    = 'none';
     document.getElementById('screen-success').style.display = 'block';
-    document.getElementById('s-code').textContent = code;
-    // Sanitize before rendering to prevent XSS
-    const sx = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+    // Populate tracking code everywhere
+    document.getElementById('s-code').textContent          = code;
+    document.getElementById('momo-ref-code').textContent   = code;
+    document.getElementById('momo-ref-step').textContent   = code;
+    document.getElementById('momo-amount').textContent     = `GHS ${finalPrice}`;
+
+    // Update track link with code pre-filled
+    document.getElementById('track-link').href =
+      `https://zygo-express-hub.lovable.app/#track?code=${code}`;
+
+    // Summary
     document.getElementById('s-summary').innerHTML = `
       <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${sx(name)}</span></div>
       <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${sx(phone)}</span></div>
       <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
-      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice || 13}</span></div>
+      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice}</span></div>
     `;
-    // Show MoMo card with correct amount
-    const momoCard = document.getElementById('momo-card');
-    momoCard.style.display = 'block';
-    document.getElementById('momo-amount-display').textContent = 'GHS ' + (priceNum || 13);
+
     window.scrollTo(0, 0);
 
-  } catch {
-    showErr('Something went wrong. Please check your connection and try again.');
+  } catch (err) {
+    showErr('Something went wrong. Check your connection and try again.');
     btn.disabled = false;
     btn.innerHTML = 'Confirm Booking →';
   }
-}
-
-function copyMomo() {
-  navigator.clipboard.writeText('0240393582').then(() => {
-    const btn = document.querySelector('.momo-copy-btn');
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = 'Copy Number', 2000);
-  }).catch(() => {
-    // Fallback for older browsers
-    const el = document.createElement('input');
-    el.value = '0240393582';
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    const btn = document.querySelector('.momo-copy-btn');
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = 'Copy Number', 2000);
-  });
 }
 
 function showErr(msg) {
   const b = document.getElementById('error-box');
   b.textContent = msg;
   b.classList.add('show');
-  b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  b.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function copyCode() {
+  const code = document.getElementById('s-code').textContent;
+  navigator.clipboard.writeText(code).catch(() => {
+    const el = document.createElement('input');
+    el.value = code;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  });
+  const btn = document.getElementById('copy-code-btn');
+  btn.textContent = '✅ Copied!';
+  setTimeout(() => btn.innerHTML = '📋 Copy Tracking ID', 2000);
+}
+
+function copyMomo() {
+  navigator.clipboard.writeText('0240393582').catch(() => {});
+  const btn = document.querySelector('.momo-copy-btn');
+  btn.textContent = '✅ Copied!';
+  setTimeout(() => btn.textContent = 'Copy Number', 2000);
 }
 
 function bookAnother() {
-  document.getElementById('screen-form').style.display   = 'block';
+  document.getElementById('screen-form').style.display    = 'block';
   document.getElementById('screen-success').style.display = 'none';
   ['f-name','f-phone','f-pickup','f-dropoff','f-details'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('price-reveal').style.display = 'none';
   document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
   window.scrollTo(0, 0);
 }
-
-// ── Wa Municipal Location Suggestions ────────────────────────────────────────
-const WA_LOCATIONS = [
-  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing",
-  "Kparimbo","Wa Polytechnic","Wa Technical Institute","Wa Central Market",
-  "Wa Bus Terminal","Wa Hospital","Wa Municipal Hospital","Fuo",
-  "Bamahu","Charia","Dobile Transit","Kpong","Kpongu","Tendamba",
-  "Busa","Funsi Road","Wa Town","Wa New Site","Kpoglu","Natoraayiri",
-  "Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
-  "Catholic Hospital","Ahamed Arab School","Airstrip","Magazine Road",
-  "Real Spicy","Kumbehi","Lowcost","RST","Zongo","Mabia","Loho",
-  "Kambali","Nyanshegu","Tindama","Kpongu","Bulenga","Kperisi",
-  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road"
-];
-
-function setupAutocomplete(inputId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-
-  // Create dropdown
-  const dropdown = document.createElement('div');
-  dropdown.id = inputId + '-suggestions';
-  dropdown.style.cssText = `
-    position:absolute; top:100%; left:0; right:0; z-index:999;
-    background:white; border:1.5px solid #e8e4dc; border-top:none;
-    border-radius:0 0 12px 12px; max-height:200px; overflow-y:auto;
-    box-shadow:0 8px 24px rgba(0,0,0,0.1); display:none;
-  `;
-  input.parentElement.style.position = 'relative';
-  input.parentElement.appendChild(dropdown);
-
-  input.addEventListener('input', () => {
-    const val = input.value.trim().toLowerCase();
-    dropdown.innerHTML = '';
-    if (val.length < 2) { dropdown.style.display = 'none'; return; }
-
-    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
-    if (!matches.length) { dropdown.style.display = 'none'; return; }
-
-    matches.forEach(loc => {
-      const item = document.createElement('div');
-      item.textContent = '📍 ' + loc + ', Wa';
-      item.style.cssText = 'padding:10px 14px; cursor:pointer; font-size:14px; border-bottom:1px solid #f5f5f5; color:#1a1a1a;';
-      item.addEventListener('mousedown', () => {
-        input.value = loc + ', Wa';
-        dropdown.style.display = 'none';
-        estimatePrice();
-      });
-      item.addEventListener('mouseover', () => item.style.background = '#fff7f0');
-      item.addEventListener('mouseout', () => item.style.background = 'white');
-      dropdown.appendChild(item);
-    });
-    dropdown.style.display = 'block';
-  });
-
-  input.addEventListener('blur', () => {
-    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
-  });
-}
-
-// Init autocomplete for both fields
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    setupAutocomplete('f-pickup');
-    setupAutocomplete('f-dropoff');
-  }, 500);
-});
-
 </script>
 </body>
 </html>

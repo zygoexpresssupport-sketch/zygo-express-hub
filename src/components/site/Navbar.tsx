@@ -9,8 +9,8 @@ const MAIN_LINKS = [
 ];
 
 const MORE_LINKS = [
-  { label: "🤝 Partner with Us", href: "#partner" },
-  { label: "❓ FAQ",             href: "#faq" },
+  { label: "🤝 Partner with Us", href: "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/partnership.html" },
+  { label: "❓ FAQ",             href: "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/faq.html" },
 ];
 
 export const Navbar = () => {

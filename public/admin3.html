@@ -595,7 +595,15 @@ async function openTrack(code){
     <div class="info-row"><span class="info-label">Cost</span><span class="info-value">${costDisplay}</span></div>
     <div class="info-row"><span class="info-label">Paid</span><span class="info-value">${o.paid_at?'✅ Yes':'❌ No'}</span></div>
     <div class="info-row"><span class="info-label">Rating</span><span class="info-value">${o.rider_rating?'⭐'.repeat(o.rider_rating):'Not rated'}</span></div>
-    <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>`;
+    <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>
+    ${o.delivery_photo?`
+    <div style="margin-top:12px">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📷 Proof of Delivery</div>
+      <img src="${o.delivery_photo}" style="width:100%;border-radius:12px;border:1px solid var(--border)" alt="Proof of delivery"/>
+      ${o.delivery_lat&&o.delivery_lng?`<div style="font-size:11px;color:var(--muted);margin-top:6px">📍 Delivered at: ${Number(o.delivery_lat).toFixed(6)}, ${Number(o.delivery_lng).toFixed(6)}</div>`:''}
+      ${o.delivery_notes?`<div style="font-size:12px;margin-top:6px;padding:8px 12px;background:var(--bg);border-radius:8px;color:var(--text)">"${o.delivery_notes}"</div>`:''}
+    </div>`:''}
+    `
 
   const riderBox=document.getElementById('rider-live-box');
   const mapFrame=document.getElementById('track-map');

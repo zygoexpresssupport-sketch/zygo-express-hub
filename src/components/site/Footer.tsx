@@ -1,47 +1,96 @@
-import { Facebook, Twitter, Music2, Mail, Phone } from "lucide-react";
-import logo from "/zygo-icon.png";
+import { Phone, MessageCircle, MapPin, Mail } from "lucide-react";
+
+const PHONE = "0202858011";
+const WA_LINK = `https://wa.me/233202858011?text=${encodeURIComponent("Hi Zygo Express, I'd like to make a delivery enquiry.")}`;
+const BOOK_URL = "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html";
 
 export const Footer = () => (
-  <footer id="contact" className="bg-secondary text-secondary-foreground pt-16 pb-8">
-    <div className="container grid md:grid-cols-4 gap-10">
-      <div className="space-y-4 md:col-span-2">
-        <div className="flex items-center gap-2 font-extrabold text-xl">
-          <img src={logo} alt="" className="h-9 w-9" width={36} height={36} />
-          Zygo<span className="text-gradient">Express</span>
+  <footer className="bg-gray-900 text-white">
+    <div className="container py-12 grid md:grid-cols-4 gap-8">
+      {/* Brand */}
+      <div className="md:col-span-1 space-y-4">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 bg-[#f97316] rounded-lg grid place-items-center font-extrabold text-sm">Z</div>
+          <span className="font-extrabold text-lg">Zygo<span className="text-[#f97316]">Express</span></span>
         </div>
-        <p className="opacity-90 max-w-sm">Last-mile delivery for businesses and people who can't afford to slow down.</p>
-        <div className="flex gap-3 pt-2">
-          <a href="https://www.tiktok.com/@zygo.express" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="h-12 w-12 rounded-full bg-black text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
-            <Music2 className="h-5 w-5" />
-          </a>
-          <a href="https://x.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" className="h-12 w-12 rounded-full bg-[#000000] text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
-            <Twitter className="h-5 w-5" />
-          </a>
-          <a href="https://www.facebook.com/ZygoExpress" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="h-12 w-12 rounded-full bg-[#1877F2] text-white hover:scale-110 grid place-items-center transition-smooth shadow-card">
-            <Facebook className="h-5 w-5" />
-          </a>
+        <p className="text-gray-400 text-sm leading-relaxed">
+          Wa's fastest delivery service. Legally registered. Real-time tracking. From GHS 13.
+        </p>
+        {/* MTN MoMo badge */}
+        <div className="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/20 rounded-xl px-3 py-2 text-xs font-bold text-yellow-400">
+          📱 MTN MoMo Accepted
         </div>
       </div>
+
+      {/* Services */}
       <div className="space-y-3">
-        <div className="font-bold">Company</div>
-        <a href="#services" className="block opacity-90 hover:opacity-100">Services</a>
-        <a href="#about" className="block opacity-90 hover:opacity-100">About</a>
-        <a href="#track" className="block opacity-90 hover:opacity-100">Track parcel</a>
-        <a href="https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html" target="_blank" rel="noopener noreferrer" className="block opacity-90 hover:opacity-100">Get a quote</a>
+        <div className="text-xs font-bold uppercase tracking-widest text-gray-500">Services</div>
+        {["Express Delivery", "Business Delivery", "Medical Delivery", "Returns & Pickups", "Partner with Us"].map(s => (
+          <a key={s} href={BOOK_URL} className="block text-sm text-gray-400 hover:text-white transition-colors">{s}</a>
+        ))}
       </div>
+
+      {/* Company */}
       <div className="space-y-3">
-        <div className="font-bold">Contact</div>
-        <a href="mailto:zygoexpresssupport@gmail.com" className="flex items-center gap-2 opacity-90 hover:opacity-100">
-          <Mail className="h-4 w-4" /> zygoexpresssupport@gmail.com
+        <div className="text-xs font-bold uppercase tracking-widest text-gray-500">Company</div>
+        {[
+          { label: "About Us",    href: "#about" },
+          { label: "Track Parcel", href: "#track" },
+          { label: "Book Delivery", href: BOOK_URL },
+          { label: "FAQ", href: "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/faq.html" },
+          { label: "Partner with Us", href: "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/partnership.html" },
+        ].map(l => (
+          <a key={l.label} href={l.href} className="block text-sm text-gray-400 hover:text-white transition-colors">{l.label}</a>
+        ))}
+      </div>
+
+      {/* Contact */}
+      <div className="space-y-4">
+        <div className="text-xs font-bold uppercase tracking-widest text-gray-500">Contact</div>
+        <a href={`tel:${PHONE}`} className="flex items-center gap-3 group">
+          <div className="h-9 w-9 bg-gray-800 rounded-xl grid place-items-center group-hover:bg-[#f97316] transition-colors flex-shrink-0">
+            <Phone className="h-4 w-4 text-gray-400 group-hover:text-white" />
+          </div>
+          <div>
+            <div className="text-xs text-gray-500">Call us</div>
+            <div className="text-sm font-bold text-white">{PHONE}</div>
+          </div>
         </a>
-        <a href="tel:+233202858011" className="flex items-center gap-2 opacity-90 hover:opacity-100">
-          <Phone className="h-4 w-4" /> +233 20 285 8011
+        <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group">
+          <div className="h-9 w-9 bg-gray-800 rounded-xl grid place-items-center group-hover:bg-green-500 transition-colors flex-shrink-0">
+            <MessageCircle className="h-4 w-4 text-gray-400 group-hover:text-white" />
+          </div>
+          <div>
+            <div className="text-xs text-gray-500">WhatsApp</div>
+            <div className="text-sm font-bold text-white">{PHONE}</div>
+          </div>
         </a>
+        <a href="mailto:zygoexpresssupport@gmail.com" className="flex items-center gap-3 group">
+          <div className="h-9 w-9 bg-gray-800 rounded-xl grid place-items-center group-hover:bg-[#f97316] transition-colors flex-shrink-0">
+            <Mail className="h-4 w-4 text-gray-400 group-hover:text-white" />
+          </div>
+          <div>
+            <div className="text-xs text-gray-500">Email</div>
+            <div className="text-sm font-bold text-white">zygoexpresssupport@gmail.com</div>
+          </div>
+        </a>
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 bg-gray-800 rounded-xl grid place-items-center flex-shrink-0">
+            <MapPin className="h-4 w-4 text-gray-400" />
+          </div>
+          <div>
+            <div className="text-xs text-gray-500">Location</div>
+            <div className="text-sm font-bold text-white">Wa, Upper West, Ghana</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div className="container mt-12 pt-6 border-t border-background/10 flex flex-col sm:flex-row justify-between gap-3 text-sm opacity-90">
-      <div>© {new Date().getFullYear()} Zygo Express. All rights reserved.</div>
-      <div>Driven to deliver.</div>
+
+    <div className="border-t border-gray-800 py-5">
+      <div className="container flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+        <span>© {new Date().getFullYear()} Zygo Express. Legally registered in Wa, Upper West Ghana.</span>
+        <span>Built with ❤️ for Wa</span>
+      </div>
     </div>
   </footer>
 );

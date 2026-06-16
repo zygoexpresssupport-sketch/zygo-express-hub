@@ -1,23 +1,23 @@
-import { Navbar }       from "@/components/site/Navbar";
-import { Hero }         from "@/components/site/Hero";
-import { Services }     from "@/components/site/Services";
-import { Tracking }     from "@/components/site/Tracking";
-import { About }        from "@/components/site/About";
-import { Testimonials } from "@/components/site/Testimonials";
-import { Quote }        from "@/components/site/Quote";
-import { QrCode }       from "@/components/site/QrCode";
-import { Footer }       from "@/components/site/Footer";
+import { Navbar }          from "@/components/site/Navbar";
+import { Hero }            from "@/components/site/Hero";
+import { PriceCalculator } from "@/components/site/PriceCalculator";
+import { Services }        from "@/components/site/Services";
+import { Tracking }        from "@/components/site/Tracking";
+import { About }           from "@/components/site/About";
+import { Testimonials }    from "@/components/site/Testimonials";
+import { Quote }           from "@/components/site/Quote";
+import { Footer }          from "@/components/site/Footer";
 
 const Index = () => (
-  <main className="min-h-screen bg-background">
+  <main className="min-h-screen bg-[#fafaf9] font-[Inter,sans-serif]">
     <Navbar />
     <Hero />
+    <PriceCalculator />
     <Services />
     <Tracking />
     <About />
     <Testimonials />
     <Quote />
-    <QrCode />
     <Footer />
   </main>
 );

@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#0f0f0f"/>
 <title>Zygo Express — Book Delivery</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--orange:#f97316;--amber:#f59e0b;--ink:#0f0f0f;--paper:#fafaf8;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
+:root{--orange:#f97316;--amber:#f59e0b;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
 
 .topbar{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--ink);}
 .logo{display:flex;align-items:center;gap:10px;}
@@ -48,7 +48,7 @@ body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;m
 .input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .input-wrap{margin-bottom:10px;position:relative;}
 .input-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block;}
-.input-field{width:100%;background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:14px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;}
+.input-field{width:100%;background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:14px 16px;font-size:15px;font-family:'Inter',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;}
 .input-field:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.1);}
 .input-field::placeholder{color:#bbb;}
 textarea.input-field{min-height:72px;resize:none;}
@@ -106,7 +106,7 @@ textarea.input-field{min-height:72px;resize:none;}
 .code-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
 .code-value{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:var(--orange);letter-spacing:4px;}
 .code-hint{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;}
-.copy-code-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'DM Sans',sans-serif;}
+.copy-code-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'Inter',sans-serif;}
 .copy-code-btn:active{opacity:0.8;}
 
 /* Summary card */
@@ -220,6 +220,20 @@ textarea.input-field{min-height:72px;resize:none;}
 
       <div class="divider"></div>
 
+      <div class="group-label">👥 Recipient Details</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <span class="input-label">Recipient Name</span>
+          <input class="input-field" type="text" id="f-rec-name" placeholder="Who receives it?"/>
+        </div>
+        <div class="input-wrap">
+          <span class="input-label">Recipient Phone</span>
+          <input class="input-field" type="tel" id="f-rec-phone" placeholder="0244 000 000"/>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
       <div class="group-label">📦 Parcel Details <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.5;font-size:10px">(optional)</span></div>
       <div class="input-wrap">
         <textarea class="input-field" id="f-details" placeholder="Size, weight, fragile items, special instructions…"></textarea>
@@ -277,7 +291,7 @@ textarea.input-field{min-height:72px;resize:none;}
       </div>
       <div class="momo-number-wrap">
         <div class="momo-label-sm">Send to this number</div>
-        <div class="momo-number">0240393582</div>
+        <div class="momo-number">0202858011</div>
         <div class="momo-name-sm">Zygo Express</div>
         <button class="momo-copy-btn" onclick="copyMomo()">Copy Number</button>
       </div>
@@ -288,7 +302,7 @@ textarea.input-field{min-height:72px;resize:none;}
       <div class="momo-steps">
         <div class="momo-step"><div class="step-num">1</div>Dial <strong>*170#</strong> on your MTN phone</div>
         <div class="momo-step"><div class="step-num">2</div>Select <strong>Transfer Money → MoMo User</strong></div>
-        <div class="momo-step"><div class="step-num">3</div>Send <strong id="momo-amount">GHS 13</strong> to <strong>0240393582</strong></div>
+        <div class="momo-step"><div class="step-num">3</div>Send <strong id="momo-amount">GHS 13</strong> to <strong>0202858011</strong></div>
         <div class="momo-step"><div class="step-num">4</div>Enter <strong id="momo-ref-step">your tracking ID</strong> as reference</div>
       </div>
       <div class="momo-note">💡 Payment confirms your booking. We'll call once verified.</div>
@@ -479,6 +493,8 @@ async function submitBooking() {
       source:        'Website',
       price:         finalPrice,
       currency:      'GHS',
+      recipient_name:  document.getElementById('f-rec-name').value.trim() || null,
+      recipient_phone: document.getElementById('f-rec-phone').value.trim() || null,
       created_at:    new Date().toISOString(),
     });
 
@@ -510,6 +526,8 @@ async function submitBooking() {
       <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
       <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice}</span></div>
+      ${document.getElementById('f-rec-name').value.trim() ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(document.getElementById('f-rec-name').value.trim())}</span></div>` : ''}
+      ${document.getElementById('f-rec-phone').value.trim() ? `<div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(document.getElementById('f-rec-phone').value.trim())}</span></div>` : ''}
     `;
 
     window.scrollTo(0, 0);
@@ -544,7 +562,7 @@ function copyCode() {
 }
 
 function copyMomo() {
-  navigator.clipboard.writeText('0240393582').catch(() => {});
+  navigator.clipboard.writeText('0202858011').catch(() => {});
   const btn = document.querySelector('.momo-copy-btn');
   btn.textContent = '✅ Copied!';
   setTimeout(() => btn.textContent = 'Copy Number', 2000);

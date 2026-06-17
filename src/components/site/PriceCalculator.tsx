@@ -1,0 +1,234 @@
+import { useState } from "react";
+
+const ZONES = [
+  { range: "0–2 km",    price: 13, zone: "Zone 1" },
+  { range: "2.1–4 km",  price: 16, zone: "Zone 2" },
+  { range: "4.1–6 km",  price: 20, zone: "Zone 3" },
+  { range: "6.1–10 km", price: 30, zone: "Zone 4" },
+];
+
+const TYPES = ["Document", "Package", "Food", "Medicine"];
+const ICONS = ["📄", "📦", "🍱", "💊"];
+
+const WA_AREAS = [
+  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Wa Market",
+  "Wa Polytechnic","Wa Hospital","Wa Bus Terminal","Airstrip","Bamahu",
+  "Charia","Zongo","Kambali","RST","Loho","Mabia","Sing","Kparimbo",
+];
+
+const BOOK_URL = "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html";
+
+interface ZoneResult {
+  price: number;
+  label: string;
+  dist: string;
+}
+
+function getZone(km: number): ZoneResult {
+  if (km <= 2.0) return { price: 13, label: "Zone 1 · 0–2 km", dist: km.toFixed(2) };
+  if (km <= 4.0) return { price: 16, label: "Zone 2 · 2.1–4 km", dist: km.toFixed(2) };
+  if (km <= 6.0) return { price: 20, label: "Zone 3 · 4.1–6 km", dist: km.toFixed(2) };
+  return { price: 30, label: "Zone 4 · 6.1–10 km", dist: km.toFixed(2) };
+}
+
+async function geocodeWa(q: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh&q="
+      + encodeURIComponent(q + ", Wa, Upper West, Ghana");
+    const r = await fetch(url, { headers: { "User-Agent": "ZygoExpress/1.0" } });
+    const d = await r.json() as Array<{ lat: string; lon: string }>;
+    if (d && d.length > 0) {
+      return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function getRoadKm(p: { lat: number; lng: number }, d: { lat: number; lng: number }): Promise<number | null> {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${p.lng},${p.lat};${d.lng},${d.lat}?overview=false`;
+    const r = await fetch(url);
+    const data = await r.json() as { code: string; routes: Array<{ distance: number }> };
+    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+      return data.routes[0].distance / 1000;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export const PriceCalculator = () => {
+  const [pickup, setPickup] = useState("");
+  const [dropoff, setDropoff] = useState("");
+  const [pkgType, setPkgType] = useState(0);
+  const [result, setResult] = useState<ZoneResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const calculate = async () => {
+    if (!pickup.trim() || !dropoff.trim()) {
+      setError("Please enter both pickup and drop-off locations.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setResult(null);
+    try {
+      const [p, d] = await Promise.all([geocodeWa(pickup), geocodeWa(dropoff)]);
+      if (p && d) {
+        const km = await getRoadKm(p, d);
+        if (km !== null) {
+          setResult(getZone(km));
+          setLoading(false);
+          return;
+        }
+      }
+      setResult({ price: 13, label: "Zone 1 (minimum — could not calculate exact route)", dist: "~" });
+    } catch {
+      setResult({ price: 13, label: "Zone 1 (minimum)", dist: "~" });
+    }
+    setLoading(false);
+  };
+
+  const bookUrl = BOOK_URL + "?pickup=" + encodeURIComponent(pickup) + "&dropoff=" + encodeURIComponent(dropoff);
+
+  return (
+    <section className="bg-white border-y border-gray-100 py-14">
+      <div className="container max-w-3xl">
+
+        <div className="text-center mb-8 space-y-2">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#f97316" }}>
+            Instant Price Calculator
+          </p>
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            How much will it cost?
+          </h2>
+          <p className="text-gray-500 text-sm">Enter your locations for an instant price estimate</p>
+        </div>
+
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 md:p-8 shadow-sm space-y-4">
+
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Pickup Location
+              </label>
+              <input
+                type="text"
+                value={pickup}
+                onChange={(e) => setPickup(e.target.value)}
+                list="pc-pickup-list"
+                placeholder="e.g. Kpaguri"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none bg-white transition-colors focus:border-orange-400"
+              />
+              <datalist id="pc-pickup-list">
+                {WA_AREAS.map((a) => (<option key={"p-" + a} value={a} />))}
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Drop-off Location
+              </label>
+              <input
+                type="text"
+                value={dropoff}
+                onChange={(e) => setDropoff(e.target.value)}
+                list="pc-dropoff-list"
+                placeholder="e.g. Jahan"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none bg-white transition-colors focus:border-orange-400"
+              />
+              <datalist id="pc-dropoff-list">
+                {WA_AREAS.map((a) => (<option key={"d-" + a} value={a} />))}
+              </datalist>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">
+              Package Type
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {TYPES.map((t, i) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setPkgType(i)}
+                  className={"px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all " + (
+                    pkgType === i
+                      ? "border-orange-400 bg-orange-50 text-orange-600"
+                      : "border-gray-200 text-gray-600 bg-white"
+                  )}
+                >
+                  {ICONS[i]} {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+
+          <button
+            type="button"
+            onClick={calculate}
+            disabled={loading}
+            className="w-full py-4 text-white font-bold text-base rounded-xl transition-all disabled:opacity-50"
+            style={{ background: loading ? "#fb923c" : "#f97316" }}
+          >
+            {loading ? "Calculating route…" : "Calculate Price"}
+          </button>
+
+          {result && (
+            <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold text-orange-600 uppercase tracking-wide mb-1">
+                  Estimated Cost
+                </p>
+                <p className="text-3xl font-extrabold" style={{ color: "#f97316" }}>
+                  GHS {result.price}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
+                  {result.label}
+                  {result.dist !== "~" ? " · " + result.dist + " km road distance" : ""}
+                </p>
+              </div>
+              <a
+                href={bookUrl}
+                className="flex-shrink-0 text-white font-bold px-4 py-3 rounded-xl text-sm"
+                style={{ background: "#f97316" }}
+              >
+                Book Now →
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6 overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ background: "#fff7ed" }}>
+                <th className="text-left p-3 font-bold text-gray-700">Zone</th>
+                <th className="text-left p-3 font-bold text-gray-700">Distance</th>
+                <th className="text-left p-3 font-bold text-gray-700">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ZONES.map((z, i) => (
+                <tr key={z.zone} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="p-3 font-medium text-gray-800">{z.zone}</td>
+                  <td className="p-3 text-gray-600">{z.range}</td>
+                  <td className="p-3 font-bold" style={{ color: "#f97316" }}>GHS {z.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+  );
+};

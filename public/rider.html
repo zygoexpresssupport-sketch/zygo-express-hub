@@ -343,17 +343,22 @@
       <div class="camera-wrap" id="camera-wrap">
         <div class="camera-placeholder" id="cam-placeholder">
           <span>📷</span>
-          <p>Take a photo of the delivered parcel at the drop-off point</p>
+          <p>Take a clear photo showing the parcel at the drop-off location</p>
         </div>
-        <div class="photo-preview" id="photo-preview" style="display:none">
-          <img id="preview-img" src="" alt="Delivery photo"/>
+        <div id="photo-preview" style="display:none;position:relative;">
+          <img id="preview-img" src="" alt="Delivery photo" style="width:100%;display:block;"/>
           <div class="photo-check">✓</div>
         </div>
       </div>
       <div class="camera-controls">
-        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="onPhotoSelected(this)"/>
-        <button class="cam-btn cam-btn-open" id="cam-open-btn" onclick="document.getElementById('camera-input').click()">📷 Take Photo</button>
-        <button class="cam-btn cam-btn-retake" id="cam-retake-btn" onclick="retakePhoto()" style="display:none">↺ Retake Photo</button>
+        <!-- Hidden file inputs — one for camera, one for gallery fallback -->
+        <input type="file" id="camera-input-live"    accept="image/*" capture="environment" style="display:none" onchange="onPhotoSelected(this)"/>
+        <input type="file" id="camera-input-gallery" accept="image/*"                       style="display:none" onchange="onPhotoSelected(this)"/>
+        <div id="cam-open-row" style="display:flex;gap:8px;width:100%">
+          <button class="cam-btn cam-btn-open" style="flex:2" onclick="document.getElementById('camera-input-live').click()">📷 Take Photo</button>
+          <button class="cam-btn cam-btn-retake" style="flex:1;font-size:12px" onclick="document.getElementById('camera-input-gallery').click()">🖼 Gallery</button>
+        </div>
+        <button class="cam-btn cam-btn-retake" id="cam-retake-btn" onclick="retakePhoto()" style="display:none;width:100%">↺ Retake Photo</button>
       </div>
     </div>
 
@@ -678,9 +683,11 @@ function openPOD(code) {
   document.getElementById('cam-placeholder').style.display = 'flex';
   document.getElementById('pod-video').style.display = 'none';
   document.getElementById('pod-canvas').style.display = 'none';
-  document.getElementById('cam-open-btn').style.display = 'block';
+  document.getElementById('cam-open-row').style.display = 'flex';
   document.getElementById('cam-retake-btn').style.display = 'none';
-  const ci = document.getElementById('camera-input'); if(ci) ci.value='';
+  ['camera-input-live','camera-input-gallery'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
   document.getElementById('gps-dot').className = 'gps-status-dot';
   document.getElementById('gps-label-pod').textContent = 'Tap to capture GPS coordinates';
   document.getElementById('gps-coords-pod').textContent = 'Not captured yet';
@@ -697,25 +704,39 @@ function closePOD() {
 }
 
 function onPhotoSelected(input) {
-  const file = input.files[0];
+  const file = input.files && input.files[0];
   if (!file) return;
-  // Compress image before saving
   const reader = new FileReader();
-  reader.onload = (ev) => {
+  reader.onload = function(ev) {
     const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      // Max 1280px width to keep file size manageable
-      const MAX = 1280;
-      let w = img.width, h = img.height;
-      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      podPhotoData = canvas.toDataURL('image/jpeg', 0.75);
+    img.onload = function() {
+      try {
+        const canvas = document.createElement('canvas');
+        const MAX = 1080;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        podPhotoData = canvas.toDataURL('image/jpeg', 0.72);
+      } catch(e) {
+        // If canvas fails, use raw data URL
+        podPhotoData = ev.target.result;
+      }
+      showPhotoPreview(podPhotoData);
+      checkPODReady();
+    };
+    img.onerror = function() {
+      // Direct fallback
+      podPhotoData = ev.target.result;
       showPhotoPreview(podPhotoData);
       checkPODReady();
     };
     img.src = ev.target.result;
+  };
+  reader.onerror = function() {
+    showToast('Could not read photo. Try again.', 'error');
   };
   reader.readAsDataURL(file);
 }
@@ -724,7 +745,7 @@ function showPhotoPreview(dataUrl) {
   document.getElementById('preview-img').src = dataUrl;
   document.getElementById('photo-preview').style.display = 'block';
   document.getElementById('cam-placeholder').style.display = 'none';
-  document.getElementById('cam-open-btn').style.display = 'none';
+  document.getElementById('cam-open-row').style.display = 'none';
   document.getElementById('cam-retake-btn').style.display = 'block';
 }
 
@@ -732,9 +753,13 @@ function retakePhoto() {
   podPhotoData = null;
   document.getElementById('photo-preview').style.display = 'none';
   document.getElementById('cam-retake-btn').style.display = 'none';
-  document.getElementById('cam-open-btn').style.display = 'block';
+  document.getElementById('cam-open-row').style.display = 'flex';
   document.getElementById('cam-placeholder').style.display = 'flex';
-  document.getElementById('camera-input').value = '';
+  // Reset both inputs
+  const l = document.getElementById('camera-input-live');
+  const g = document.getElementById('camera-input-gallery');
+  if(l) l.value = '';
+  if(g) g.value = '';
   checkPODReady();
 }
 

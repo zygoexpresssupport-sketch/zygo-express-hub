@@ -672,31 +672,51 @@ function showToast(msg,type='success'){
 
 // ── PROOF OF DELIVERY ─────────────────────────────────────────────────────────
 let podCode = null, podPhotoData = null, podLat = null, podLng = null;
-let videoStream = null;
 
 function openPOD(code) {
   podCode = code;
   podPhotoData = null; podLat = null; podLng = null;
-  document.getElementById('pod-order-code').textContent = code;
-  document.getElementById('preview-img').src = '';
-  document.getElementById('photo-preview').style.display = 'none';
-  document.getElementById('cam-placeholder').style.display = 'flex';
-  document.getElementById('pod-video').style.display = 'none';
-  document.getElementById('pod-canvas').style.display = 'none';
-  document.getElementById('cam-open-row').style.display = 'flex';
-  document.getElementById('cam-retake-btn').style.display = 'none';
-  ['camera-input-live','camera-input-gallery'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.value='';
+
+  // Safe helper — only sets if element exists
+  function setEl(id, prop, val) {
+    var el = document.getElementById(id);
+    if (el) el[prop] = val;
+  }
+  function setStyle(id, prop, val) {
+    var el = document.getElementById(id);
+    if (el) el.style[prop] = val;
+  }
+  function setClass(id, cls) {
+    var el = document.getElementById(id);
+    if (el) el.className = cls;
+  }
+
+  setEl('pod-order-code', 'textContent', code);
+  setEl('preview-img', 'src', '');
+  setStyle('photo-preview', 'display', 'none');
+  setStyle('cam-placeholder', 'display', 'flex');
+  setStyle('cam-open-row', 'display', 'flex');
+  setStyle('cam-retake-btn', 'display', 'none');
+
+  // Reset file inputs safely
+  ['camera-input-live','camera-input-gallery'].forEach(function(id) {
+    var el = document.getElementById(id);
+    try { if (el) el.value = ''; } catch(e) {}
   });
-  document.getElementById('gps-dot').className = 'gps-status-dot';
-  document.getElementById('gps-label-pod').textContent = 'Tap to capture GPS coordinates';
-  document.getElementById('gps-coords-pod').textContent = 'Not captured yet';
-  document.getElementById('gps-cap-btn').className = 'gps-capture-btn';
-  document.getElementById('gps-cap-btn').textContent = '📍 Capture';
-  document.getElementById('pod-notes').value = '';
-  document.getElementById('pod-required').style.display = 'flex';
-  document.getElementById('pod-submit-btn').disabled = true;
-  document.getElementById('modal-pod').classList.add('show');
+
+  setClass('gps-dot', 'gps-status-dot');
+  setEl('gps-label-pod', 'textContent', 'Tap to capture GPS coordinates');
+  setEl('gps-coords-pod', 'textContent', 'Not captured yet');
+  setClass('gps-cap-btn', 'gps-capture-btn');
+  setEl('gps-cap-btn', 'textContent', '📍 Capture');
+  setEl('pod-notes', 'value', '');
+  setStyle('pod-required', 'display', 'flex');
+
+  var submitBtn = document.getElementById('pod-submit-btn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  var modal = document.getElementById('modal-pod');
+  if (modal) modal.classList.add('show');
 }
 
 function closePOD() {
@@ -704,40 +724,77 @@ function closePOD() {
 }
 
 function onPhotoSelected(input) {
-  const file = input.files && input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
+  // Guard: ensure files exist
+  if (!input || !input.files || !input.files[0]) {
+    showToast('No photo selected. Try again.', 'error');
+    return;
+  }
+  var file = input.files[0];
+
+  // Validate it's an image
+  if (!file.type.startsWith('image/')) {
+    showToast('Please select an image file.', 'error');
+    return;
+  }
+
+  var reader = new FileReader();
+
   reader.onload = function(ev) {
-    const img = new Image();
+    var rawData = ev.target.result;
+    if (!rawData) {
+      showToast('Could not read image. Try again.', 'error');
+      return;
+    }
+
+    // Try to compress — fall back to raw if anything fails
+    var img = new Image();
+
     img.onload = function() {
       try {
-        const canvas = document.createElement('canvas');
-        const MAX = 1080;
-        let w = img.width, h = img.height;
+        var MAX = 960;
+        var w = img.naturalWidth || img.width || 960;
+        var h = img.naturalHeight || img.height || 960;
         if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
         if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
+        if (w < 1) w = 960;
+        if (h < 1) h = 960;
+
+        var canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('No canvas context');
         ctx.drawImage(img, 0, 0, w, h);
-        podPhotoData = canvas.toDataURL('image/jpeg', 0.72);
+        var compressed = canvas.toDataURL('image/jpeg', 0.75);
+        // Sanity check — compressed should be non-empty base64
+        if (compressed && compressed.length > 100) {
+          podPhotoData = compressed;
+        } else {
+          podPhotoData = rawData;
+        }
       } catch(e) {
-        // If canvas fails, use raw data URL
-        podPhotoData = ev.target.result;
+        // Canvas failed — use raw
+        podPhotoData = rawData;
       }
       showPhotoPreview(podPhotoData);
       checkPODReady();
     };
+
     img.onerror = function() {
-      // Direct fallback
-      podPhotoData = ev.target.result;
+      // Image element failed — use raw data directly
+      podPhotoData = rawData;
       showPhotoPreview(podPhotoData);
       checkPODReady();
     };
-    img.src = ev.target.result;
+
+    // Set src AFTER defining handlers
+    img.src = rawData;
   };
+
   reader.onerror = function() {
-    showToast('Could not read photo. Try again.', 'error');
+    showToast('Could not read photo. Please try again.', 'error');
   };
+
   reader.readAsDataURL(file);
 }
 
@@ -808,10 +865,24 @@ async function submitPOD() {
   const deliveredAt = new Date().toISOString();
 
   // Save photo as base64 + coordinates to Supabase
+  // Truncate photo if too large (Supabase text limit ~1MB)
+  var photoToSave = podPhotoData;
+  if (photoToSave && photoToSave.length > 900000) {
+    // Re-compress at lower quality
+    try {
+      var img2 = new Image();
+      img2.src = podPhotoData;
+      var c2 = document.createElement('canvas');
+      c2.width = 640; c2.height = 480;
+      c2.getContext('2d').drawImage(img2, 0, 0, 640, 480);
+      photoToSave = c2.toDataURL('image/jpeg', 0.5);
+    } catch(e) { photoToSave = podPhotoData.substring(0, 900000); }
+  }
+
   const { error } = await sb.from(TABLE).update({
     status:           'delivered',
     delivered_at:     deliveredAt,
-    delivery_photo:   podPhotoData,
+    delivery_photo:   photoToSave,
     delivery_lat:     podLat,
     delivery_lng:     podLng,
     delivery_notes:   notes || null,

@@ -1,5 +1,5 @@
+cat > /mnt/user-data/outputs/PriceCalculator.tsx << 'EOF'
 import { useState } from "react";
-import { Calculator, MapPin, ArrowRight } from "lucide-react";
 
 const ZONES = [
   { range: "0–2 km",    price: 13, zone: "Zone 1" },
@@ -8,7 +8,8 @@ const ZONES = [
   { range: "6.1–10 km", price: 30, zone: "Zone 4" },
 ];
 
-const TYPES = ["Document 📄", "Package 📦", "Food 🍱", "Medicine 💊"];
+const TYPES = ["Document", "Package", "Food", "Medicine"];
+const ICONS = ["📄", "📦", "🍱", "💊"];
 
 const WA_AREAS = [
   "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Wa Market",
@@ -25,21 +26,34 @@ interface ZoneResult {
 }
 
 function getZone(km: number): ZoneResult {
-  if (km <= 2)  return { price: 13, label: "Zone 1 · 0–2 km",    dist: km.toFixed(2) };
-  if (km <= 4)  return { price: 16, label: "Zone 2 · 2.1–4 km",  dist: km.toFixed(2) };
-  if (km <= 6)  return { price: 20, label: "Zone 3 · 4.1–6 km",  dist: km.toFixed(2) };
-  return         { price: 30, label: "Zone 4 · 6.1–10 km",       dist: km.toFixed(2) };
+  if (km <= 2.0) return { price: 13, label: "Zone 1 · 0–2 km", dist: km.toFixed(2) };
+  if (km <= 4.0) return { price: 16, label: "Zone 2 · 2.1–4 km", dist: km.toFixed(2) };
+  if (km <= 6.0) return { price: 20, label: "Zone 3 · 4.1–6 km", dist: km.toFixed(2) };
+  return { price: 30, label: "Zone 4 · 6.1–10 km", dist: km.toFixed(2) };
 }
 
-async function geocode(query: string): Promise<{ lat: number; lng: number } | null> {
+async function geocodeWa(q: string): Promise<{ lat: number; lng: number } | null> {
   try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Wa, Upper West, Ghana")}&format=json&limit=1`,
-      { headers: { "User-Agent": "ZygoExpress/1.0" } }
-    );
-    const data = await res.json();
-    if (data && data.length > 0) {
-      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh&q="
+      + encodeURIComponent(q + ", Wa, Upper West, Ghana");
+    const r = await fetch(url, { headers: { "User-Agent": "ZygoExpress/1.0" } });
+    const d = await r.json() as Array<{ lat: string; lon: string }>;
+    if (d && d.length > 0) {
+      return { lat: parseFloat(d[0].lat), lng: parseFloat(d[0].lon) };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function getRoadKm(p: { lat: number; lng: number }, d: { lat: number; lng: number }): Promise<number | null> {
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${p.lng},${p.lat};${d.lng},${d.lat}?overview=false`;
+    const r = await fetch(url);
+    const data = await r.json() as { code: string; routes: Array<{ distance: number }> };
+    if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+      return data.routes[0].distance / 1000;
     }
     return null;
   } catch {
@@ -48,131 +62,156 @@ async function geocode(query: string): Promise<{ lat: number; lng: number } | nu
 }
 
 export const PriceCalculator = () => {
-  const [pickup,  setPickup]  = useState("");
+  const [pickup, setPickup] = useState("");
   const [dropoff, setDropoff] = useState("");
-  const [pkgType, setPkgType] = useState(TYPES[0]);
-  const [result,  setResult]  = useState<ZoneResult | null>(null);
+  const [pkgType, setPkgType] = useState(0);
+  const [result, setResult] = useState<ZoneResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const calculate = async () => {
-    if (!pickup.trim() || !dropoff.trim()) return;
+    if (!pickup.trim() || !dropoff.trim()) {
+      setError("Please enter both pickup and drop-off locations.");
+      return;
+    }
+    setError("");
     setLoading(true);
     setResult(null);
     try {
-      const [p, d] = await Promise.all([geocode(pickup), geocode(dropoff)]);
+      const [p, d] = await Promise.all([geocodeWa(pickup), geocodeWa(dropoff)]);
       if (p && d) {
-        const routeRes = await fetch(
-          `https://router.project-osrm.org/route/v1/driving/${p.lng},${p.lat};${d.lng},${d.lat}?overview=false`
-        );
-        const routeData = await routeRes.json();
-        if (routeData.code === "Ok" && routeData.routes && routeData.routes.length > 0) {
-          const km = routeData.routes[0].distance / 1000;
+        const km = await getRoadKm(p, d);
+        if (km !== null) {
           setResult(getZone(km));
           setLoading(false);
           return;
         }
       }
-      setResult({ price: 13, label: "Zone 1 (minimum)", dist: "~" });
+      setResult({ price: 13, label: "Zone 1 (minimum — could not calculate exact route)", dist: "~" });
     } catch {
       setResult({ price: 13, label: "Zone 1 (minimum)", dist: "~" });
     }
     setLoading(false);
   };
 
+  const bookUrl = BOOK_URL + "?pickup=" + encodeURIComponent(pickup) + "&dropoff=" + encodeURIComponent(dropoff);
+
   return (
     <section className="bg-white border-y border-gray-100 py-14">
       <div className="container max-w-3xl">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#f97316] mb-2">
-            <Calculator className="h-4 w-4" /> Instant Price Calculator
-          </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
+
+        <div className="text-center mb-8 space-y-2">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#f97316" }}>
+            Instant Price Calculator
+          </p>
+          <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
             How much will it cost?
           </h2>
-          <p className="text-gray-500 mt-2 text-sm">Enter your locations for an instant price estimate</p>
+          <p className="text-gray-500 text-sm">Enter your locations for an instant price estimate</p>
         </div>
 
-        <div className="bg-[#fafaf9] border border-gray-200 rounded-2xl p-5 md:p-8 shadow-sm">
-          <div className="grid md:grid-cols-2 gap-4 mb-4">
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-amber-400 pointer-events-none" />
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 md:p-8 shadow-sm space-y-4">
+
+          <div className="grid md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Pickup Location
+              </label>
               <input
+                type="text"
                 value={pickup}
                 onChange={(e) => setPickup(e.target.value)}
-                list="wa-pickup-list"
-                placeholder="Pickup area e.g. Kpaguri"
-                className="w-full pl-9 pr-4 py-3 border-2 border-gray-200 focus:border-[#f97316] rounded-xl text-sm outline-none bg-white transition-colors"
+                list="pc-pickup-list"
+                placeholder="e.g. Kpaguri"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none bg-white transition-colors focus:border-orange-400"
               />
-              <datalist id="wa-pickup-list">
-                {WA_AREAS.map((a) => <option key={a} value={a} />)}
+              <datalist id="pc-pickup-list">
+                {WA_AREAS.map((a) => (<option key={"p-" + a} value={a} />))}
               </datalist>
             </div>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-[#f97316] pointer-events-none" />
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">
+                Drop-off Location
+              </label>
               <input
+                type="text"
                 value={dropoff}
                 onChange={(e) => setDropoff(e.target.value)}
-                list="wa-dropoff-list"
-                placeholder="Drop-off area e.g. Jahan"
-                className="w-full pl-9 pr-4 py-3 border-2 border-gray-200 focus:border-[#f97316] rounded-xl text-sm outline-none bg-white transition-colors"
+                list="pc-dropoff-list"
+                placeholder="e.g. Jahan"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm outline-none bg-white transition-colors focus:border-orange-400"
               />
-              <datalist id="wa-dropoff-list">
-                {WA_AREAS.map((a) => <option key={a} value={a} />)}
+              <datalist id="pc-dropoff-list">
+                {WA_AREAS.map((a) => (<option key={"d-" + a} value={a} />))}
               </datalist>
             </div>
           </div>
 
-          <div className="flex gap-2 flex-wrap mb-5">
-            {TYPES.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setPkgType(t)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all ${
-                  pkgType === t
-                    ? "border-[#f97316] bg-orange-50 text-[#f97316]"
-                    : "border-gray-200 text-gray-600 bg-white hover:border-orange-200"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">
+              Package Type
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {TYPES.map((t, i) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setPkgType(i)}
+                  className={"px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all " + (
+                    pkgType === i
+                      ? "border-orange-400 bg-orange-50 text-orange-600"
+                      : "border-gray-200 text-gray-600 bg-white"
+                  )}
+                >
+                  {ICONS[i]} {t}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
 
           <button
             type="button"
             onClick={calculate}
-            disabled={!pickup.trim() || !dropoff.trim() || loading}
-            className="w-full py-4 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base rounded-xl transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+            disabled={loading}
+            className="w-full py-4 text-white font-bold text-base rounded-xl transition-all disabled:opacity-50"
+            style={{ background: loading ? "#fb923c" : "#f97316" }}
           >
-            <Calculator className="h-4 w-4" />
             {loading ? "Calculating route…" : "Calculate Price"}
           </button>
 
           {result && (
-            <div className="mt-5 bg-orange-50 border-2 border-orange-200 rounded-xl p-5 flex items-center justify-between gap-4">
+            <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-5 flex items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-bold text-orange-600 uppercase tracking-wide mb-1">Estimated Cost</div>
-                <div className="text-3xl font-extrabold text-[#f97316]">GHS {result.price}</div>
-                <div className="text-sm text-gray-500 mt-1">
+                <p className="text-xs font-bold text-orange-600 uppercase tracking-wide mb-1">
+                  Estimated Cost
+                </p>
+                <p className="text-3xl font-extrabold" style={{ color: "#f97316" }}>
+                  GHS {result.price}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">
                   {result.label}
-                  {result.dist !== "~" ? ` · ${result.dist} km road distance` : ""}
-                </div>
+                  {result.dist !== "~" ? " · " + result.dist + " km road distance" : ""}
+                </p>
               </div>
               <a
-                href={`${BOOK_URL}?pickup=${encodeURIComponent(pickup)}&dropoff=${encodeURIComponent(dropoff)}`}
-                className="flex-shrink-0 flex items-center gap-2 bg-[#f97316] text-white font-bold px-4 py-3 rounded-xl text-sm hover:bg-orange-600 transition-colors"
+                href={bookUrl}
+                className="flex-shrink-0 text-white font-bold px-4 py-3 rounded-xl text-sm"
+                style={{ background: "#f97316" }}
               >
-                Book Now <ArrowRight className="h-4 w-4" />
+                Book Now →
               </a>
             </div>
           )}
         </div>
 
-        <div className="mt-6 overflow-x-auto rounded-xl border border-gray-100">
+        <div className="mt-6 overflow-x-auto rounded-xl border border-gray-100 shadow-sm">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-orange-50">
+              <tr style={{ background: "#fff7ed" }}>
                 <th className="text-left p-3 font-bold text-gray-700">Zone</th>
                 <th className="text-left p-3 font-bold text-gray-700">Distance</th>
                 <th className="text-left p-3 font-bold text-gray-700">Price</th>
@@ -183,12 +222,13 @@ export const PriceCalculator = () => {
                 <tr key={z.zone} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                   <td className="p-3 font-medium text-gray-800">{z.zone}</td>
                   <td className="p-3 text-gray-600">{z.range}</td>
-                  <td className="p-3 font-bold text-[#f97316]">GHS {z.price}</td>
+                  <td className="p-3 font-bold" style={{ color: "#f97316" }}>GHS {z.price}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
       </div>
     </section>
   );

@@ -123,6 +123,19 @@
     .info-label{color:var(--muted);}
     .info-value{font-weight:600;text-align:right;}
     .map-frame{width:100%;height:200px;border-radius:12px;border:1px solid var(--border);margin-top:14px;}
+    /* POD styles */
+    .pod-section{margin-top:14px;border-top:1px solid var(--border);padding-top:14px;}
+    .pod-section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+    .pod-photo{width:100%;border-radius:12px;border:2px solid #22c55e;display:block;cursor:pointer;transition:opacity 0.2s;}
+    .pod-photo:hover{opacity:0.9;}
+    .pod-coords{font-size:11px;color:var(--muted);margin-top:6px;padding:8px 10px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:8px;}
+    .pod-notes-box{font-size:13px;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;color:var(--text);border:1px solid var(--border);font-style:italic;}
+    .pod-timestamp{font-size:11px;color:var(--muted);margin-top:6px;}
+    .pod-map{width:100%;height:180px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);margin-top:10px;}
+    .pod-missing{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.2);border-radius:10px;padding:12px;font-size:13px;color:#f97316;text-align:center;}
+    .confirm-delivery-btn{width:100%;padding:14px;margin-top:14px;background:linear-gradient(135deg,#22c55e,#16a34a);color:white;border:none;border-radius:10px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .confirm-delivery-btn:disabled{opacity:0.4;cursor:not-allowed;}
+    .pod-download-btn{width:100%;padding:10px;margin-top:8px;background:var(--bg);border:1px solid var(--border);border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);}
     .rider-live{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--green);font-weight:500;}
     .pulse-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0;}
 
@@ -585,24 +598,65 @@ async function openTrack(code){
   const autoCost=calcCost(o.route_distance_m);
   const costDisplay=o.price?`GHS ${Number(o.price).toFixed(2)}`:autoCost?`~GHS ${autoCost.toFixed(2)} (auto)`:'Not set';
   const distDisplay=o.route_distance_m?`${(o.route_distance_m/1000).toFixed(1)} km`:'—';
+  const isDelivered = o.status==='delivered';
+  const hasPOD = !!(o.delivery_photo);
+
+  // Build POD section
+  let podHTML = '';
+  if(isDelivered){
+    if(hasPOD){
+      podHTML = `
+        <div class="pod-section">
+          <div class="pod-section-label">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block"></span>
+            ✅ Proof of Delivery Confirmed
+          </div>
+          <img src="${o.delivery_photo}" class="pod-photo" alt="Proof of delivery"
+            onclick="window.open('${o.delivery_photo}','_blank')" title="Tap to view full size"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Tap photo to view full size</div>
+          ${o.delivered_at?`<div class="pod-timestamp">📅 Delivered: ${formatDate(o.delivered_at)}</div>`:''}
+          ${o.delivery_lat&&o.delivery_lng?`
+            <div class="pod-coords">
+              📍 Delivery coordinates: ${Number(o.delivery_lat).toFixed(6)}, ${Number(o.delivery_lng).toFixed(6)}
+              <a href="https://www.google.com/maps?q=${o.delivery_lat},${o.delivery_lng}" target="_blank"
+                style="color:var(--orange);font-weight:600;margin-left:8px;font-size:11px">View on map →</a>
+            </div>
+            <iframe src="https://maps.google.com/maps?q=${o.delivery_lat},${o.delivery_lng}&z=16&output=embed"
+              class="pod-map" frameborder="0" allowfullscreen loading="lazy"></iframe>
+          `:''}
+          ${o.delivery_notes?`<div class="pod-notes-box">💬 "${o.delivery_notes}"</div>`:''}
+          <button class="pod-download-btn" onclick="downloadPOD('${code}')">⬇️ Download Proof of Delivery</button>
+        </div>`;
+    } else {
+      podHTML = `
+        <div class="pod-section">
+          <div class="pod-section-label">📷 Proof of Delivery</div>
+          <div class="pod-missing">⚠️ No proof of delivery photo uploaded for this order.</div>
+        </div>`;
+    }
+  }
+
+  // Confirm delivery button (for admin manual override)
+  const confirmBtn = !isDelivered ? `
+    <button class="confirm-delivery-btn" onclick="adminConfirmDelivery('${code}',this)">
+      ✅ Mark as Delivered
+    </button>` : '';
+
   document.getElementById('track-info').innerHTML=`
-    <div class="info-row"><span class="info-label">Status</span><span class="info-value">${STATUS_LABELS[o.status]??o.status}</span></div>
-    <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${o.customer_name??o.name??'—'}</span></div>
-    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${o.phone??'—'}</span></div>
-    <div class="info-row"><span class="info-label">Pickup</span><span class="info-value">${o.pickup??'—'}</span></div>
-    <div class="info-row"><span class="info-label">Drop-off</span><span class="info-value">${o.dropoff??'—'}</span></div>
+    <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="font-weight:700;color:${isDelivered?'#22c55e':'var(--orange)'}">${STATUS_LABELS[o.status]??o.status}</span></div>
+    <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${sanitize(o.customer_name??o.name??'—')}</span></div>
+    <div class="info-row"><span class="info-label">Phone</span><span class="info-value"><a href="tel:${o.phone??''}" style="color:var(--orange)">${o.phone??'—'}</a></span></div>
+    ${o.recipient_name?`<div class="info-row"><span class="info-label">Recipient</span><span class="info-value">${sanitize(o.recipient_name)}</span></div>`:''}
+    ${o.recipient_phone?`<div class="info-row"><span class="info-label">Recipient Phone</span><span class="info-value"><a href="tel:${o.recipient_phone}" style="color:var(--orange)">${o.recipient_phone}</a></span></div>`:''}
+    <div class="info-row"><span class="info-label">Pickup</span><span class="info-value">${sanitize(o.pickup??'—')}</span></div>
+    <div class="info-row"><span class="info-label">Drop-off</span><span class="info-value">${sanitize(o.dropoff??'—')}</span></div>
     <div class="info-row"><span class="info-label">Distance</span><span class="info-value">${distDisplay}</span></div>
     <div class="info-row"><span class="info-label">Cost</span><span class="info-value">${costDisplay}</span></div>
     <div class="info-row"><span class="info-label">Paid</span><span class="info-value">${o.paid_at?'✅ Yes':'❌ No'}</span></div>
     <div class="info-row"><span class="info-label">Rating</span><span class="info-value">${o.rider_rating?'⭐'.repeat(o.rider_rating):'Not rated'}</span></div>
     <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>
-    ${o.delivery_photo?`
-    <div style="margin-top:12px">
-      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">📷 Proof of Delivery</div>
-      <img src="${o.delivery_photo}" style="width:100%;border-radius:12px;border:1px solid var(--border)" alt="Proof of delivery"/>
-      ${o.delivery_lat&&o.delivery_lng?`<div style="font-size:11px;color:var(--muted);margin-top:6px">📍 Delivered at: ${Number(o.delivery_lat).toFixed(6)}, ${Number(o.delivery_lng).toFixed(6)}</div>`:''}
-      ${o.delivery_notes?`<div style="font-size:12px;margin-top:6px;padding:8px 12px;background:var(--bg);border-radius:8px;color:var(--text)">"${o.delivery_notes}"</div>`:''}
-    </div>`:''}
+    ${confirmBtn}
+    ${podHTML}
     `
 
   const riderBox=document.getElementById('rider-live-box');
@@ -618,6 +672,37 @@ async function openTrack(code){
     else mapFrame.style.display='none';
   }
   document.getElementById('modal-track').classList.add('show');
+}
+
+function downloadPOD(code){
+  const o = allOrders.find(x=>x.tracking_code===code);
+  if(!o||!o.delivery_photo) return;
+  const a = document.createElement('a');
+  a.href = o.delivery_photo;
+  a.download = 'POD-' + code + '.jpg';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('Downloading proof of delivery…','success');
+}
+
+async function adminConfirmDelivery(code, btn){
+  if(!confirm('Mark order ' + code + ' as delivered?')) return;
+  btn.disabled = true;
+  btn.innerHTML = 'Saving…';
+  const {error} = await sb.from(TABLE).update({
+    status: 'delivered',
+    delivered_at: new Date().toISOString()
+  }).eq('tracking_code', code);
+  if(error){
+    showToast('Failed to confirm delivery','error');
+    btn.disabled = false;
+    btn.innerHTML = '✅ Mark as Delivered';
+    return;
+  }
+  showToast(code + ' marked as delivered','success');
+  closeTrackModal();
+  await loadAll();
 }
 
 function closeTrackModal(){document.getElementById('modal-track').classList.remove('show');document.getElementById('track-map').src='';}

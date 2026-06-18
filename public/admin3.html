@@ -139,6 +139,46 @@
     .rider-live{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--green);font-weight:500;}
     .pulse-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0;}
 
+    /* ANALYTICS */
+    .analytics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+    @media(min-width:600px){.analytics-grid{grid-template-columns:repeat(4,1fr);}}
+    .kpi-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+    .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);}
+    .kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .kpi-value{font-size:26px;font-weight:700;color:var(--text);line-height:1;}
+    .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px;}
+    .kpi-trend-up{color:#16a34a;font-weight:700;}
+    .kpi-trend-down{color:var(--red);font-weight:700;}
+    .chart-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
+    .chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+    .chart-title span{font-size:11px;color:var(--muted);font-weight:400;}
+    .bar-chart{display:flex;align-items:flex-end;gap:6px;height:120px;padding-top:8px;}
+    .bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .bar{width:100%;border-radius:4px 4px 0 0;background:var(--orange);min-height:4px;transition:height 0.5s ease;}
+    .bar-label{font-size:9px;color:var(--muted);text-align:center;white-space:nowrap;}
+    .bar-val{font-size:9px;font-weight:700;color:var(--text);}
+    .leaderboard-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+    .leaderboard-row:last-child{border-bottom:none;}
+    .lb-rank{width:24px;height:24px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted);flex-shrink:0;}
+    .lb-rank.gold{background:#fef3c7;color:#d97706;}
+    .lb-rank.silver{background:#f3f4f6;color:#6b7280;}
+    .lb-rank.bronze{background:#fff7ed;color:#c2410c;}
+    .lb-info{flex:1;}
+    .lb-name{font-size:13px;font-weight:600;}
+    .lb-meta{font-size:11px;color:var(--muted);}
+    .lb-stat{font-size:13px;font-weight:700;color:var(--orange);}
+    .zone-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+    .zone-row:last-child{border-bottom:none;}
+    .zone-bar-bg{flex:1;height:8px;background:var(--bg);border-radius:4px;overflow:hidden;}
+    .zone-bar-fill{height:100%;background:var(--orange);border-radius:4px;transition:width 0.5s ease;}
+    .zone-label{font-size:12px;font-weight:600;min-width:80px;}
+    .zone-count{font-size:12px;color:var(--muted);min-width:30px;text-align:right;}
+    .status-pie{display:flex;flex-wrap:wrap;gap:8px;}
+    .status-pill{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;background:var(--bg);font-size:12px;font-weight:600;}
+    .status-dot-sm{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .analytics-empty{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+    .refresh-analytics-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;}
+
     /* TOAST */
     .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:white;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;max-width:90vw;}
     .toast.show{transform:translateX(-50%) translateY(0);}
@@ -199,6 +239,7 @@
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button onclick="showSection('orders')" id="btn-orders" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif">📦 Orders</button>
       <button onclick="showSection('partners')" id="btn-partners" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🤝 Partners</button>
+      <button onclick="showSection('analytics')" id="btn-analytics" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">📊 Analytics</button>
     </div>
 
     <!-- Riders -->
@@ -241,6 +282,23 @@
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Analytics -->
+    <div class="section-card" id="analytics-section" style="display:none">
+      <div class="section-header">
+        <div class="section-title">📊 <span>Business Analytics</span></div>
+        <div class="section-controls">
+          <select class="date-select" id="analytics-range" onchange="loadAnalytics()">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="all">All time</option>
+          </select>
+          <button class="refresh-analytics-btn" onclick="loadAnalytics()">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="analytics-content"><div class="analytics-empty">⏳ Loading analytics…</div></div>
     </div>
 
     <!-- Requests -->
@@ -794,25 +852,37 @@ document.getElementById('modal-log-dm').addEventListener('click',e=>{
 
 // ── Partners ─────────────────────────────────────────────────────────────────────
 function showSection(section){
-  const ordersEl   = document.getElementById('orders-section');
-  const partnersEl = document.getElementById('partners-section');
-  const ridersEl   = document.getElementById('riders-section');
-  const btnOrders  = document.getElementById('btn-orders');
-  const btnPartners= document.getElementById('btn-partners');
+  const sections = ['orders','riders','partners','analytics'];
+  const btns     = ['btn-orders','btn-partners','btn-analytics'];
+
+  // Hide all sections
+  ['orders-section','riders-section','partners-section','analytics-section'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+
+  // Reset all buttons
+  btns.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif';
+  });
+
+  // Activate selected section
+  const activeStyle='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif';
 
   if(section==='partners'){
-    if(ordersEl)   ordersEl.style.display='none';
-    if(ridersEl)   ridersEl.style.display='none';
-    if(partnersEl) partnersEl.style.display='block';
-    btnOrders.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif';
-    btnPartners.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif';
+    const el=document.getElementById('partners-section'); if(el) el.style.display='block';
+    const btn=document.getElementById('btn-partners'); if(btn) btn.style.cssText=activeStyle;
     loadPartners();
+  } else if(section==='analytics'){
+    const el=document.getElementById('analytics-section'); if(el) el.style.display='block';
+    const btn=document.getElementById('btn-analytics'); if(btn) btn.style.cssText=activeStyle;
+    loadAnalytics();
   } else {
-    if(ordersEl)   ordersEl.style.display='block';
-    if(ridersEl)   ridersEl.style.display='block';
-    if(partnersEl) partnersEl.style.display='none';
-    btnOrders.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif';
-    btnPartners.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif';
+    // Default: orders + riders
+    ['orders-section','riders-section'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='block';
+    });
+    const btn=document.getElementById('btn-orders'); if(btn) btn.style.cssText=activeStyle;
   }
 }
 
@@ -868,6 +938,273 @@ function sanitize(str){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#039;');
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────────────────────
+async function loadAnalytics(){
+  const container = document.getElementById('analytics-content');
+  if(!container) return;
+  container.innerHTML = '<div class="analytics-empty">⏳ Loading analytics…</div>';
+
+  const rangeEl = document.getElementById('analytics-range');
+  const rangeDays = rangeEl ? rangeEl.value : '30';
+
+  // Calculate date range
+  let fromDate = null;
+  if(rangeDays !== 'all'){
+    const d = new Date();
+    d.setDate(d.getDate() - parseInt(rangeDays));
+    fromDate = d.toISOString();
+  }
+
+  try {
+    // Fetch all orders in range
+    let query = sb.from(TABLE).select('*').order('created_at', {ascending:true});
+    if(fromDate) query = query.gte('created_at', fromDate);
+    const {data: orders, error} = await query;
+
+    if(error || !orders){
+      container.innerHTML = '<div class="analytics-empty">❌ Failed to load analytics. Try again.</div>';
+      return;
+    }
+
+    if(orders.length === 0){
+      container.innerHTML = '<div class="analytics-empty">📭 No orders in this period yet.<br>Start delivering to see analytics.</div>';
+      return;
+    }
+
+    // ── Compute KPIs ──
+    const total        = orders.length;
+    const delivered    = orders.filter(o=>o.status==='delivered');
+    const cancelled    = orders.filter(o=>o.status==='cancelled');
+    const pending      = orders.filter(o=>o.status==='pending'||o.status==='confirmed');
+    const inProgress   = orders.filter(o=>['picked_up','in_transit','out_for_delivery'].includes(o.status));
+    const revenue      = delivered.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+    const ratings      = orders.filter(o=>o.rider_rating).map(o=>Number(o.rider_rating));
+    const avgRating    = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
+    const convRate     = total > 0 ? ((delivered.length/total)*100).toFixed(0) : 0;
+    const hasPOD       = orders.filter(o=>o.delivery_photo).length;
+
+    // ── Daily trend (last 7 days) ──
+    const days = [];
+    for(let i=6;i>=0;i--){
+      const d = new Date(); d.setDate(d.getDate()-i);
+      const label = d.toLocaleDateString('en-GB',{weekday:'short'});
+      const dateStr = d.toISOString().split('T')[0];
+      const dayOrders = orders.filter(o=>o.created_at&&o.created_at.startsWith(dateStr));
+      const dayRevenue = dayOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+      days.push({label, count:dayOrders.length, revenue:dayRevenue});
+    }
+    const maxCount = Math.max(...days.map(d=>d.count), 1);
+
+    // ── Status breakdown ──
+    const statusColors = {
+      pending:'#9ca3af', confirmed:'#f97316', picked_up:'#0ea5e9',
+      in_transit:'#3b82f6', out_for_delivery:'#8b5cf6',
+      delivered:'#22c55e', cancelled:'#ef4444'
+    };
+    const statusCounts = {};
+    orders.forEach(o=>{
+      const s = o.status||'pending';
+      statusCounts[s] = (statusCounts[s]||0)+1;
+    });
+
+    // ── Zone/location analysis ──
+    const zoneCounts = {};
+    orders.forEach(o=>{
+      const area = (o.pickup||'Unknown').split(',')[0].trim();
+      zoneCounts[area] = (zoneCounts[area]||0)+1;
+    });
+    const topZones = Object.entries(zoneCounts)
+      .sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const maxZone = Math.max(...topZones.map(z=>z[1]),1);
+
+    // ── Rider leaderboard ──
+    const riderStats = {};
+    orders.forEach(o=>{
+      if(!o.assigned_rider) return;
+      if(!riderStats[o.assigned_rider]) riderStats[o.assigned_rider]={deliveries:0,revenue:0,ratings:[]};
+      if(o.status==='delivered') riderStats[o.assigned_rider].deliveries++;
+      if(o.paid_at&&o.price) riderStats[o.assigned_rider].revenue+=Number(o.price);
+      if(o.rider_rating) riderStats[o.assigned_rider].ratings.push(Number(o.rider_rating));
+    });
+    const riderLeaderboard = Object.entries(riderStats)
+      .map(([id,s])=>({
+        id, deliveries:s.deliveries, revenue:s.revenue,
+        rating: s.ratings.length ? (s.ratings.reduce((a,b)=>a+b,0)/s.ratings.length).toFixed(1) : '—'
+      }))
+      .sort((a,b)=>b.deliveries-a.deliveries).slice(0,5);
+
+    // ── Top customers ──
+    const custCounts = {};
+    orders.forEach(o=>{
+      const key = (o.phone||o.name||'Unknown');
+      if(!custCounts[key]) custCounts[key]={name:o.name||o.customer_name||'Customer',phone:o.phone||'',count:0,spend:0};
+      custCounts[key].count++;
+      if(o.paid_at&&o.price) custCounts[key].spend+=Number(o.price);
+    });
+    const topCustomers = Object.values(custCounts)
+      .sort((a,b)=>b.count-a.count).slice(0,5);
+
+    // ── Source breakdown ──
+    const sourceCounts = {};
+    orders.forEach(o=>{ const s=o.source||'Website'; sourceCounts[s]=(sourceCounts[s]||0)+1; });
+
+    // ── Build HTML ──
+    const rankClass = i => i===0?'gold':i===1?'silver':i===2?'bronze':'';
+
+    container.innerHTML = `
+      <!-- KPI Cards -->
+      <div class="analytics-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Orders</div>
+          <div class="kpi-value">${total}</div>
+          <div class="kpi-sub">${inProgress.length} in progress</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Revenue</div>
+          <div class="kpi-value">GHS ${revenue.toFixed(0)}</div>
+          <div class="kpi-sub">From paid orders</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Delivered</div>
+          <div class="kpi-value">${delivered.length}</div>
+          <div class="kpi-sub"><span class="kpi-trend-up">${convRate}%</span> conversion</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Rating</div>
+          <div class="kpi-value">${avgRating}${avgRating!=='—'?'⭐':''}</div>
+          <div class="kpi-sub">${ratings.length} rated</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Order Value</div>
+          <div class="kpi-value">GHS ${delivered.length?( revenue/delivered.length).toFixed(0):'0'}</div>
+          <div class="kpi-sub">Per delivery</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Proof of Delivery</div>
+          <div class="kpi-value">${hasPOD}</div>
+          <div class="kpi-sub">${delivered.length?((hasPOD/delivered.length)*100).toFixed(0):0}% of delivered</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Pending</div>
+          <div class="kpi-value">${pending.length}</div>
+          <div class="kpi-sub">Awaiting action</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Cancelled</div>
+          <div class="kpi-value">${cancelled.length}</div>
+          <div class="kpi-sub">${total?((cancelled.length/total)*100).toFixed(0):0}% cancel rate</div>
+        </div>
+      </div>
+
+      <!-- 7-Day Order Trend -->
+      <div class="chart-card">
+        <div class="chart-title">📈 Orders — Last 7 Days <span>Daily count</span></div>
+        <div class="bar-chart">
+          ${days.map(d=>`
+            <div class="bar-wrap">
+              <div class="bar-val">${d.count||''}</div>
+              <div class="bar" style="height:${maxCount>0?Math.max((d.count/maxCount)*100,4):4}px;background:${d.count>0?'var(--orange)':'var(--border)'}"></div>
+              <div class="bar-label">${d.label}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- 7-Day Revenue Trend -->
+      <div class="chart-card">
+        <div class="chart-title">💰 Revenue — Last 7 Days <span>GHS paid</span></div>
+        <div class="bar-chart">
+          ${(()=>{const maxR=Math.max(...days.map(d=>d.revenue),1);return days.map(d=>`
+            <div class="bar-wrap">
+              <div class="bar-val">${d.revenue>0?d.revenue.toFixed(0):''}</div>
+              <div class="bar" style="height:${Math.max((d.revenue/maxR)*100,4)}px;background:${d.revenue>0?'#22c55e':'var(--border)'}"></div>
+              <div class="bar-label">${d.label}</div>
+            </div>`).join('');})()}
+        </div>
+      </div>
+
+      <!-- Status Breakdown + Source -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div class="chart-card" style="margin-bottom:0">
+          <div class="chart-title">📦 Order Status</div>
+          <div class="status-pie">
+            ${Object.entries(statusCounts).map(([s,c])=>`
+              <div class="status-pill">
+                <div class="status-dot-sm" style="background:${statusColors[s]||'#9ca3af'}"></div>
+                ${STATUS_LABELS[s]||s}: <strong>${c}</strong>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div class="chart-card" style="margin-bottom:0">
+          <div class="chart-title">📡 Order Sources</div>
+          <div class="status-pie">
+            ${Object.entries(sourceCounts).map(([s,c])=>`
+              <div class="status-pill">
+                <div class="status-dot-sm" style="background:var(--orange)"></div>
+                ${s}: <strong>${c}</strong>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Pickup Zones -->
+      <div class="chart-card">
+        <div class="chart-title">📍 Top Pickup Zones</div>
+        ${topZones.map(([zone,count])=>`
+          <div class="zone-row">
+            <div class="zone-label">${zone}</div>
+            <div class="zone-bar-bg"><div class="zone-bar-fill" style="width:${(count/maxZone)*100}%"></div></div>
+            <div class="zone-count">${count}</div>
+          </div>`).join('')}
+      </div>
+
+      <!-- Rider Leaderboard -->
+      ${riderLeaderboard.length ? `
+      <div class="chart-card">
+        <div class="chart-title">🏆 Rider Leaderboard</div>
+        ${riderLeaderboard.map((r,i)=>`
+          <div class="leaderboard-row">
+            <div class="lb-rank ${rankClass(i)}">${i+1}</div>
+            <div class="lb-info">
+              <div class="lb-name">${r.id}</div>
+              <div class="lb-meta">${r.rating!=='—'?'⭐'+r.rating+' · ':''} GHS ${r.revenue.toFixed(0)} earned</div>
+            </div>
+            <div class="lb-stat">${r.deliveries} deliveries</div>
+          </div>`).join('')}
+      </div>` : ''}
+
+      <!-- Top Customers -->
+      ${topCustomers.length ? `
+      <div class="chart-card">
+        <div class="chart-title">👥 Top Customers <span>By order count</span></div>
+        ${topCustomers.map((c,i)=>`
+          <div class="leaderboard-row">
+            <div class="lb-rank ${rankClass(i)}">${i+1}</div>
+            <div class="lb-info">
+              <div class="lb-name">${c.name}</div>
+              <div class="lb-meta">${c.phone} · GHS ${c.spend.toFixed(0)} spent</div>
+            </div>
+            <div class="lb-stat">${c.count} orders</div>
+          </div>`).join('')}
+      </div>` : ''}
+
+      <!-- Insights -->
+      <div class="chart-card" style="background:#fff7ed;border-color:#fed7aa">
+        <div class="chart-title" style="color:#c2410c">💡 Quick Insights</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+          ${convRate>=70?`<div style="color:#16a34a">✅ Strong conversion rate of ${convRate}% — riders are completing deliveries well.</div>`:`<div style="color:#dc2626">⚠️ Conversion rate is ${convRate}%. Follow up on ${pending.length} pending orders.</div>`}
+          ${revenue>0?`<div style="color:#16a34a">💰 GHS ${revenue.toFixed(0)} earned so far${rangeDays!=='all'?' in last '+rangeDays+' days':''}.</div>`:'<div style="color:#9ca3af">📊 No revenue recorded yet. Ensure payments are being confirmed.</div>'}
+          ${topCustomers[0]&&topCustomers[0].count>1?`<div style="color:#16a34a">🔄 ${topCustomers[0].name} has ordered ${topCustomers[0].count} times — a loyal customer worth rewarding.</div>`:'<div style="color:#9ca3af">📣 No repeat customers yet. Consider a referral discount to drive repeat orders.</div>'}
+          ${hasPOD>0?`<div style="color:#16a34a">📷 ${hasPOD} deliveries have photo proof — great for dispute resolution.</div>`:'<div style="color:#f97316">📷 No proof of delivery photos yet. Remind riders to use the POD feature.</div>'}
+          ${Object.keys(sourceCounts).length>1?`<div style="color:#16a34a">📡 Orders coming from ${Object.keys(sourceCounts).join(', ')} — good channel diversity.</div>`:'<div style="color:#f97316">📱 All orders from one channel. Share your booking link on WhatsApp and social media.</div>'}
+        </div>
+      </div>
+    `;
+  } catch(err) {
+    console.error('Analytics error:', err);
+    container.innerHTML = '<div class="analytics-empty">❌ Error loading analytics: ' + (err.message||'Unknown error') + '</div>';
+  }
 }
 
 // ── Toast ─────────────────────────────────────────────────────────────────────

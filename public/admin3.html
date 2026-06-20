@@ -139,6 +139,47 @@
     .rider-live{display:flex;align-items:center;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:13px;color:var(--green);font-weight:500;}
     .pulse-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;flex-shrink:0;}
 
+    /* NOTIFICATIONS */
+    .notif-bell{position:relative;cursor:pointer;padding:6px;border-radius:8px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;}
+    .notif-bell:hover{background:var(--bg);}
+    .notif-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:white;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:grid;place-items:center;display:none;}
+    .notif-badge.show{display:grid;}
+    .notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:var(--white);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:200;overflow:hidden;display:none;max-height:400px;overflow-y:auto;}
+    .notif-dropdown.show{display:block;}
+    .notif-header{padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:space-between;}
+    .notif-mark-read{font-size:11px;font-weight:500;color:var(--orange);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif;}
+    .notif-item{padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+    .notif-item:last-child{border-bottom:none;}
+    .notif-item:hover{background:var(--bg);}
+    .notif-item.unread{background:#fff7ed;}
+    .notif-item-title{font-size:13px;font-weight:600;color:var(--text);}
+    .notif-item-msg{font-size:12px;color:var(--muted);margin-top:2px;}
+    .notif-item-time{font-size:10px;color:var(--muted);margin-top:4px;}
+    .notif-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px;}
+
+    /* ROLE-BASED ACCESS */
+    .role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+    .role-badge.superadmin{background:#fef3c7;color:#92400e;}
+    .role-badge.dispatcher{background:#dbeafe;color:#1d4ed8;}
+    .restricted-section{display:none !important;}
+    .codes-list{display:flex;flex-direction:column;gap:10px;}
+    .code-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .code-value{font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;color:var(--text);}
+    .code-meta{font-size:11px;color:var(--muted);margin-top:4px;}
+    .code-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;}
+    .code-status.active{background:#dcfce7;color:#16a34a;}
+    .code-status.revoked{background:#fef2f2;color:var(--red);}
+    .code-status.expired{background:#f3f4f6;color:var(--muted);}
+    .code-actions{display:flex;gap:6px;}
+    .code-action-btn{padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;}
+    .gen-code-btn{width:100%;padding:14px;background:var(--orange);color:white;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:16px;font-family:'Inter',sans-serif;}
+    .new-code-banner{background:#fff7ed;border:2px solid var(--orange);border-radius:12px;padding:16px;margin-bottom:16px;display:none;text-align:center;}
+    .new-code-banner.show{display:block;}
+    .new-code-value{font-family:monospace;font-size:24px;font-weight:800;color:var(--orange);letter-spacing:3px;margin:8px 0;}
+    .new-code-copy{background:var(--text);color:white;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;}
+    .dispatcher-login-note{background:#dbeafe;border:1px solid #93c5fd;border-radius:10px;padding:12px;font-size:13px;color:#1d4ed8;margin-bottom:16px;}
+    body.is-dispatcher .rider-edit-btn{display:none !important;}
+
     /* ANALYTICS */
     .analytics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
     @media(min-width:600px){.analytics-grid{grid-template-columns:repeat(4,1fr);}}
@@ -212,12 +253,31 @@
       <div class="login-shield">🛡️</div>
       <div><div class="login-title-text">Admin Dashboard</div><div class="login-email-text">zygoexpresssupport@gmail.com</div></div>
     </div>
-    <div class="login-h1">Welcome back</div>
-    <div class="login-sub">Sign in to manage your deliveries</div>
-    <div class="field"><label>Username</label><input type="text" id="admin-user" placeholder="admin" autocomplete="off"/></div>
-    <div class="field"><label>Password</label><input type="password" id="admin-pass" placeholder="••••••••"/></div>
-    <button class="btn-login" onclick="doLogin()">Sign in</button>
-    <div class="err" id="login-err">Incorrect credentials. Please try again.</div>
+
+    <!-- Tab switcher: Superadmin vs Dispatcher -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;background:var(--bg);border-radius:10px;padding:4px">
+      <button id="tab-superadmin" onclick="switchLoginTab('superadmin')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:var(--white);color:var(--text);font-family:'Inter',sans-serif">🛡️ Superadmin</button>
+      <button id="tab-dispatcher" onclick="switchLoginTab('dispatcher')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);font-family:'Inter',sans-serif">📋 Dispatcher</button>
+    </div>
+
+    <!-- Superadmin login -->
+    <div id="login-superadmin-form">
+      <div class="login-h1">Welcome back</div>
+      <div class="login-sub">Full access to manage your business</div>
+      <div class="field"><label>Username</label><input type="text" id="admin-user" placeholder="admin" autocomplete="off"/></div>
+      <div class="field"><label>Password</label><input type="password" id="admin-pass" placeholder="••••••••"/></div>
+      <button class="btn-login" onclick="doLogin()">Sign in</button>
+      <div class="err" id="login-err">Incorrect credentials. Please try again.</div>
+    </div>
+
+    <!-- Dispatcher login -->
+    <div id="login-dispatcher-form" style="display:none">
+      <div class="login-h1">Dispatcher Access</div>
+      <div class="login-sub">Enter the access code given to you by your manager</div>
+      <div class="field"><label>Access Code</label><input type="text" id="dispatcher-code" placeholder="e.g. ZYGO-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase;letter-spacing:2px;font-family:monospace"/></div>
+      <button class="btn-login" onclick="doDispatcherLogin()">Access Dashboard</button>
+      <div class="err" id="dispatcher-err">Invalid or expired access code.</div>
+    </div>
   </div>
 </div>
 
@@ -227,8 +287,22 @@
     <div class="topbar-left">
       <div class="topbar-shield">🛡️</div>
       <div class="topbar-title">Admin Dashboard</div>
+      <span class="role-badge superadmin" id="role-badge" style="margin-left:8px">Superadmin</span>
     </div>
     <div class="topbar-right">
+      <div style="position:relative" id="notif-wrap">
+        <div class="notif-bell" onclick="toggleNotifDropdown()" title="Notifications">
+          🔔
+          <div class="notif-badge" id="notif-badge">0</div>
+        </div>
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-header">
+            Notifications
+            <button class="notif-mark-read" onclick="markAllRead()">Mark all read</button>
+          </div>
+          <div id="notif-list"><div class="notif-empty">No notifications yet</div></div>
+        </div>
+      </div>
       <span class="topbar-email">zygoexpresssupport@gmail.com</span>
       <button class="signout-btn" onclick="doLogout()">⏻ Sign out</button>
     </div>
@@ -240,6 +314,7 @@
       <button onclick="showSection('orders')" id="btn-orders" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif">📦 Orders</button>
       <button onclick="showSection('partners')" id="btn-partners" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🤝 Partners</button>
       <button onclick="showSection('analytics')" id="btn-analytics" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">📊 Analytics</button>
+      <button onclick="showSection('codes')" id="btn-codes" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🔑 Access Codes</button>
     </div>
 
     <!-- Riders -->
@@ -281,6 +356,33 @@
             <tr><td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">Loading…</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Access Codes (Superadmin only) -->
+    <div class="section-card restricted-section" id="codes-section" data-superadmin-only="true">
+      <div class="section-header">
+        <div class="section-title">🔑 <span>Dispatcher Access Codes</span></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Generate time-limited codes for dispatchers. Each code grants access to <strong>Riders</strong> and <strong>Requests</strong> sections only — dispatchers cannot view Analytics, Partners, or generate new codes. Revoke any code instantly if a dispatcher leaves.
+      </p>
+
+      <div class="new-code-banner" id="new-code-banner">
+        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">New Access Code Generated</div>
+        <div class="new-code-value" id="new-code-value">ZYGO-0000-0000</div>
+        <button class="new-code-copy" onclick="copyNewCode()">📋 Copy Code</button>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px">Share this code with your dispatcher. It will not be shown again.</div>
+      </div>
+
+      <div class="field" style="margin-bottom:10px">
+        <label>Dispatcher Name (optional)</label>
+        <input type="text" id="new-dispatcher-name" placeholder="e.g. Kofi (Dispatcher)" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:Inter,sans-serif"/>
+      </div>
+      <button class="gen-code-btn" onclick="generateDispatcherCode()">+ Generate New Access Code</button>
+
+      <div class="codes-list" id="codes-list">
+        <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading codes…</div>
       </div>
     </div>
 
@@ -413,6 +515,8 @@ function getLocalRiders(){
 function saveLocalRiders(r){localStorage.setItem('zygo_riders_admin_v2',JSON.stringify(r));}
 
 let sb, allOrders=[], liveRiders={}, editingRiderId=null;
+let currentRole='superadmin'; // 'superadmin' | 'dispatcher'
+let newGeneratedCode=null;
 
 window.addEventListener('load',async()=>{
   sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -421,8 +525,17 @@ window.addEventListener('load',async()=>{
   const _fmt=String(_now.getDate()).padStart(2,'0')+'/'+String(_now.getMonth()+1).padStart(2,'0')+'/'+_now.getFullYear();
   document.getElementById('today-option').textContent=_fmt;
   await new Promise(r=>setTimeout(r,900));
-  if(sessionStorage.getItem('zygo_admin_session')) showMain();
-  else showScreen('login');
+  const adminSession = sessionStorage.getItem('zygo_admin_session');
+  const dispatcherSession = sessionStorage.getItem('zygo_dispatcher_session');
+  if(adminSession){
+    currentRole = 'superadmin';
+    showMain();
+  } else if(dispatcherSession){
+    currentRole = 'dispatcher';
+    showMain();
+  } else {
+    showScreen('login');
+  }
 });
 
 function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
@@ -446,23 +559,296 @@ async function doLogin(){
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
 function doLogout(){
   sessionStorage.removeItem('zygo_admin_session');
+  sessionStorage.removeItem('zygo_dispatcher_session');
+  currentRole = 'superadmin';
   showScreen('login');
+}
+
+// ── NOTIFICATIONS ────────────────────────────────────────────────────────────────
+let allNotifications = [];
+
+async function loadNotifications(){
+  const {data} = await sb.from('notifications')
+    .select('*').order('created_at',{ascending:false}).limit(50);
+  if(!data) return;
+  allNotifications = data;
+  renderNotifications();
+}
+
+function renderNotifications(){
+  const list  = document.getElementById('notif-list');
+  const badge = document.getElementById('notif-badge');
+  if(!list||!badge) return;
+
+  // Dispatchers don't see partner notifications
+  const visible = currentRole==='dispatcher'
+    ? allNotifications.filter(n=>n.type!=='new_partner')
+    : allNotifications;
+
+  const unread = visible.filter(n=>!n.read).length;
+  badge.textContent = unread > 9 ? '9+' : unread;
+  badge.classList.toggle('show', unread > 0);
+
+  if(!visible.length){
+    list.innerHTML = '<div class="notif-empty">🎉 All caught up!</div>';
+    return;
+  }
+  list.innerHTML = visible.map(n => {
+    const ago = timeAgo(n.created_at);
+    const icon = {new_order:'🛵',status_change:'📦',new_partner:'🤝',payment:'💰',rider_signin:'🟢'}[n.type]||'🔔';
+    return `<div class="notif-item ${n.read?'':'unread'}" onclick="handleNotifClick('${n.id}','${n.type}','${n.reference||''}')">
+      <div class="notif-item-title">${icon} ${n.title}</div>
+      ${n.message?`<div class="notif-item-msg">${n.message}</div>`:''}
+      <div class="notif-item-time">${ago}</div>
+    </div>`;
+  }).join('');
+}
+
+function timeAgo(iso){
+  if(!iso) return '';
+  const diff = Math.floor((Date.now()-new Date(iso).getTime())/1000);
+  if(diff<60) return 'Just now';
+  if(diff<3600) return Math.floor(diff/60)+'m ago';
+  if(diff<86400) return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
+}
+
+async function handleNotifClick(id, type, reference){
+  await sb.from('notifications').update({read:true}).eq('id',id);
+  allNotifications = allNotifications.map(n=>n.id===id?{...n,read:true}:n);
+  renderNotifications();
+  toggleNotifDropdown();
+  if((type==='new_order'||type==='status_change')&&reference){
+    showSection('orders');
+    setTimeout(()=>openTrack(reference),300);
+  } else if(type==='new_partner' && currentRole!=='dispatcher'){
+    showSection('partners');
+  }
+}
+
+async function markAllRead(){
+  const ids = (currentRole==='dispatcher'
+    ? allNotifications.filter(n=>n.type!=='new_partner')
+    : allNotifications).map(n=>n.id);
+  if(!ids.length) return;
+  await sb.from('notifications').update({read:true}).in('id', ids);
+  allNotifications = allNotifications.map(n=>ids.includes(n.id)?{...n,read:true}:n);
+  renderNotifications();
+}
+
+function toggleNotifDropdown(){
+  const dd = document.getElementById('notif-dropdown');
+  if(dd) dd.classList.toggle('show');
+}
+
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('notif-wrap');
+  const dd   = document.getElementById('notif-dropdown');
+  if(wrap&&dd&&!wrap.contains(e.target)) dd.classList.remove('show');
+});
+
+async function requestPushPermission(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default'){
+    const perm = await Notification.requestPermission();
+    if(perm==='granted') showToast('Browser notifications enabled ✅','success');
+  }
+}
+
+function sendBrowserNotif(title, body, onclick){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  const n = new Notification('Zygo Express · '+title,{body});
+  if(onclick) n.onclick = onclick;
+  setTimeout(()=>n.close(),8000);
+}
+
+// ── ROLE-BASED ACCESS ───────────────────────────────────────────────────────────
+function switchLoginTab(tab){
+  document.getElementById('login-superadmin-form').style.display = tab==='superadmin' ? 'block' : 'none';
+  document.getElementById('login-dispatcher-form').style.display  = tab==='dispatcher' ? 'block' : 'none';
+  const sa=document.getElementById('tab-superadmin'), di=document.getElementById('tab-dispatcher');
+  if(tab==='superadmin'){
+    sa.style.background='var(--white)'; sa.style.color='var(--text)';
+    di.style.background='transparent'; di.style.color='var(--muted)';
+  } else {
+    di.style.background='var(--white)'; di.style.color='var(--text)';
+    sa.style.background='transparent'; sa.style.color='var(--muted)';
+  }
+}
+
+async function doDispatcherLogin(){
+  const code = document.getElementById('dispatcher-code').value.trim().toUpperCase();
+  const err  = document.getElementById('dispatcher-err');
+  err.classList.remove('show');
+
+  if(!code){ err.classList.add('show'); return; }
+
+  const {data, error} = await sb.from('dispatcher_codes')
+    .select('*').eq('code', code).eq('active', true).single();
+
+  if(error || !data){
+    err.textContent = 'Invalid access code. Please check and try again.';
+    err.classList.add('show');
+    return;
+  }
+
+  // Check expiry
+  if(data.expires_at && new Date(data.expires_at) < new Date()){
+    err.textContent = 'This access code has expired. Contact your manager.';
+    err.classList.add('show');
+    return;
+  }
+
+  // Check revoked
+  if(data.revoked_at){
+    err.textContent = 'This access code has been revoked.';
+    err.classList.add('show');
+    return;
+  }
+
+  // Valid — log update last_used_at
+  await sb.from('dispatcher_codes').update({last_used_at: new Date().toISOString()}).eq('id', data.id);
+
+  currentRole = 'dispatcher';
+  sessionStorage.setItem('zygo_dispatcher_session', btoa(code+':'+Date.now()));
+  showMain();
+}
+
+function applyRoleRestrictions(){
+  const badge = document.getElementById('role-badge');
+  if(currentRole==='dispatcher'){
+    badge.textContent = 'Dispatcher';
+    badge.className = 'role-badge dispatcher';
+    ['btn-partners','btn-analytics','btn-codes'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='none';
+    });
+    document.body.classList.add('is-dispatcher');
+  } else {
+    badge.textContent = 'Superadmin';
+    badge.className = 'role-badge superadmin';
+    ['btn-partners','btn-analytics','btn-codes'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.style.display='inline-block';
+    });
+    document.body.classList.remove('is-dispatcher');
+  }
+}
+
+function generateAccessCode(){
+  const seg = () => Math.random().toString(36).substring(2,6).toUpperCase();
+  return 'ZYGO-' + seg() + '-' + seg();
+}
+
+async function generateDispatcherCode(){
+  const name = document.getElementById('new-dispatcher-name').value.trim();
+  const code = generateAccessCode();
+
+  const {error} = await sb.from('dispatcher_codes').insert({
+    code: code,
+    dispatcher_name: name || null,
+    active: true,
+    created_at: new Date().toISOString()
+  });
+
+  if(error){ showToast('Failed to generate code','error'); return; }
+
+  newGeneratedCode = code;
+  document.getElementById('new-code-value').textContent = code;
+  document.getElementById('new-code-banner').classList.add('show');
+  document.getElementById('new-dispatcher-name').value = '';
+  showToast('Access code generated!','success');
+  loadDispatcherCodes();
+}
+
+function copyNewCode(){
+  if(!newGeneratedCode) return;
+  navigator.clipboard.writeText(newGeneratedCode).catch(()=>{});
+  showToast('Code copied to clipboard','success');
+}
+
+async function loadDispatcherCodes(){
+  const list = document.getElementById('codes-list');
+  const {data, error} = await sb.from('dispatcher_codes').select('*').order('created_at',{ascending:false});
+
+  if(error || !data || !data.length){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No access codes generated yet.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(c => {
+    let status = 'active', statusLabel = '🟢 Active';
+    if(c.revoked_at){ status='revoked'; statusLabel='🔴 Revoked'; }
+    else if(c.expires_at && new Date(c.expires_at) < new Date()){ status='expired'; statusLabel='⚪ Expired'; }
+
+    const lastUsed = c.last_used_at ? formatDate(c.last_used_at) : 'Never used';
+
+    return `<div class="code-card">
+      <div>
+        <div class="code-value">${c.code}</div>
+        <div class="code-meta">${c.dispatcher_name||'Unnamed dispatcher'} · Created ${formatDate(c.created_at)}</div>
+        <div class="code-meta">Last used: ${lastUsed}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="code-status ${status}">${statusLabel}</div>
+        ${status==='active'?`<div class="code-actions" style="margin-top:8px"><button class="code-action-btn" style="background:#fef2f2;color:var(--red)" onclick="revokeCode('${c.id}')">Revoke</button></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function revokeCode(id){
+  if(!confirm('Revoke this access code? The dispatcher will lose access immediately.')) return;
+  await sb.from('dispatcher_codes').update({active:false, revoked_at: new Date().toISOString()}).eq('id', id);
+  showToast('Access code revoked','success');
+  loadDispatcherCodes();
 }
 
 async function showMain(){
   showScreen('main');
+  applyRoleRestrictions();
   await loadAll();
-  // Real-time orders
-  sb.channel('admin-orders').on('postgres_changes',{event:'*',schema:'public',table:TABLE},()=>loadAll()).subscribe();
-  // ✅ Real-time rider sign in/out
-  sb.channel('admin-riders').on('postgres_changes',{event:'*',schema:'public',table:RIDERS_TABLE},payload=>{
-    const r=payload.new;
-    liveRiders[r.rider_id]={name:r.name,is_online:r.is_online,last_seen:r.last_seen};
-    renderRiders();
-    showToast(`${r.name} ${r.is_online?'signed in 🟢':'signed out'}`,r.is_online?'success':'');
-  }).subscribe();
-  // Load current rider statuses
+  await loadNotifications();
+  requestPushPermission();
+
+  sb.channel('admin-orders')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:TABLE},payload=>{
+      loadAll();
+      loadNotifications();
+      const o=payload.new;
+      sendBrowserNotif('New booking!',
+        (o.name||'Customer')+' · '+o.pickup+' → '+o.dropoff,
+        ()=>{showSection('orders');setTimeout(()=>openTrack(o.tracking_code),300);}
+      );
+      showToast('🛵 New order: '+o.tracking_code,'success');
+    })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:TABLE},()=>{
+      loadAll();
+      loadNotifications();
+    })
+    .subscribe();
+
+  sb.channel('admin-notifs')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications'},payload=>{
+      allNotifications=[payload.new,...allNotifications];
+      renderNotifications();
+    })
+    .subscribe();
+
+  sb.channel('admin-riders')
+    .on('postgres_changes',{event:'*',schema:'public',table:RIDERS_TABLE},payload=>{
+      const r=payload.new;
+      liveRiders[r.rider_id]={name:r.name,is_online:r.is_online,last_seen:r.last_seen};
+      renderRiders();
+      sendBrowserNotif(
+        r.name+' '+(r.is_online?'signed in':'signed out'),
+        r.is_online?'Now on duty and ready for deliveries':'Has gone offline',
+        null
+      );
+      showToast(`${r.name} ${r.is_online?'signed in 🟢':'signed out'}`,r.is_online?'success':'');
+    })
+    .subscribe();
+
   loadRiderStatuses();
+  showSection('orders');
 }
 
 async function loadRiderStatuses(){
@@ -555,6 +941,10 @@ function toggleRider(id){
 }
 
 function editRider(id){
+  if(currentRole==='dispatcher'){
+    showToast('Only superadmin can edit rider details','error');
+    return;
+  }
   const localRiders=getLocalRiders();
   const r=localRiders.find(x=>x.id===id);
   editingRiderId=id;
@@ -852,21 +1242,23 @@ document.getElementById('modal-log-dm').addEventListener('click',e=>{
 
 // ── Partners ─────────────────────────────────────────────────────────────────────
 function showSection(section){
-  const sections = ['orders','riders','partners','analytics'];
-  const btns     = ['btn-orders','btn-partners','btn-analytics'];
+  // Dispatchers can ONLY access orders + riders — hard block at function level
+  if(currentRole==='dispatcher' && (section==='partners'||section==='analytics'||section==='codes')){
+    showToast('This section is restricted for dispatchers','error');
+    section='orders';
+  }
 
-  // Hide all sections
-  ['orders-section','riders-section','partners-section','analytics-section'].forEach(id=>{
+  const btns = ['btn-orders','btn-partners','btn-analytics','btn-codes'];
+
+  ['orders-section','riders-section','partners-section','analytics-section','codes-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
 
-  // Reset all buttons
   btns.forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.style.cssText='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif';
   });
 
-  // Activate selected section
   const activeStyle='padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--orange);color:white;border:none;font-family:Inter,sans-serif';
 
   if(section==='partners'){
@@ -877,8 +1269,11 @@ function showSection(section){
     const el=document.getElementById('analytics-section'); if(el) el.style.display='block';
     const btn=document.getElementById('btn-analytics'); if(btn) btn.style.cssText=activeStyle;
     loadAnalytics();
+  } else if(section==='codes'){
+    const el=document.getElementById('codes-section'); if(el) el.style.display='block';
+    const btn=document.getElementById('btn-codes'); if(btn) btn.style.cssText=activeStyle;
+    loadDispatcherCodes();
   } else {
-    // Default: orders + riders
     ['orders-section','riders-section'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='block';
     });

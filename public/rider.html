@@ -311,16 +311,14 @@
 <!-- Rating Modal -->
 <div class="modal-overlay" id="modal-rating">
   <div class="modal">
-    <div class="modal-title">Rate this delivery</div>
-    <div class="modal-sub">How did this delivery go?</div>
-    <div class="stars-select" id="stars-select">
-      <button class="star-btn" onclick="selectStar(1)">⭐</button>
-      <button class="star-btn" onclick="selectStar(2)">⭐</button>
-      <button class="star-btn" onclick="selectStar(3)">⭐</button>
-      <button class="star-btn" onclick="selectStar(4)">⭐</button>
-      <button class="star-btn" onclick="selectStar(5)">⭐</button>
-    </div>
-    <button class="modal-btn" onclick="submitRating()">Submit Rating</button>
+    <div class="modal-title">✅ Delivery Confirmed!</div>
+    <div class="modal-sub">Send a rating link so the customer can rate their experience.</div>
+    <button class="modal-btn" style="background:#25D366" onclick="sendRatingLink()">
+      💬 Send Rating Link via WhatsApp
+    </button>
+    <button class="modal-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-top:10px" onclick="closeRatingModal()">
+      Skip for now
+    </button>
   </div>
 </div>
 
@@ -413,7 +411,7 @@ const STATUS_NEXT = {
 
 const STATUS_LABELS = {pending:"Pending",confirmed:"Confirmed",picked_up:"Picked Up",in_transit:"In Transit",out_for_delivery:"Out for Delivery",delivered:"Delivered"};
 
-let sb, currentRider, currentDelivery, gpsWatchId=null, lastLat=null, lastLng=null, gpsInterval=null, selectedStars=0;
+let sb, currentRider, currentDelivery, gpsWatchId=null, lastLat=null, lastLng=null, gpsInterval=null;
 
 window.addEventListener('load', async()=>{
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -604,19 +602,27 @@ async function advanceStatus(code,newStatus,btn){
 }
 
 // ── Rating ────────────────────────────────────────────────────────────────────
-function selectStar(n){
-  selectedStars=n;
-  document.querySelectorAll('.star-btn').forEach((b,i)=>b.classList.toggle('active',i<n));
+function sendRatingLink(){
+  if(!currentDelivery) return;
+  const code = currentDelivery.tracking_code;
+  const customerName = currentDelivery.name || 'there';
+  const customerPhone = (currentDelivery.phone||'').replace(/\s+/g,'').replace(/^0/,'233');
+  const ratingUrl = 'https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/rate.html?code=' + code;
+
+  const message = 'Hi ' + customerName + '! 🎉 Your Zygo Express delivery (' + code + ') has been completed.\n\n' +
+    'We would love your feedback — please rate your experience here:\n' + ratingUrl + '\n\n' +
+    'Thank you for choosing Zygo Express! 🙏';
+
+  const waUrl = 'https://wa.me/' + customerPhone + '?text=' + encodeURIComponent(message);
+  window.open(waUrl, '_blank');
+
+  document.getElementById('modal-rating').classList.remove('show');
+  showToast('Rating link sent to customer','success');
+  loadMetrics();
 }
 
-async function submitRating(){
-  if(!selectedStars||!currentDelivery) return;
-  await sb.from(TABLE).update({rider_rating:selectedStars}).eq('tracking_code',currentDelivery.tracking_code);
+function closeRatingModal(){
   document.getElementById('modal-rating').classList.remove('show');
-  showToast(`Rated ${selectedStars} ⭐`,'success');
-  loadMetrics();
-  selectedStars=0;
-  document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
 }
 
 // ── GPS ───────────────────────────────────────────────────────────────────────

@@ -6,11 +6,11 @@
 <meta name="theme-color" content="#f97316"/>
 <title>Partner with Zygo Express</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--orange:#f97316;--ink:#0f0f0f;--paper:#fafaf8;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
+:root{--orange:#f97316;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
 .topbar{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--ink);position:sticky;top:0;z-index:50;}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
 .logo-mark{width:34px;height:34px;background:var(--orange);border-radius:8px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:white;}
@@ -40,7 +40,7 @@ body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;m
 .form-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-.field input,.field select,.field textarea{width:100%;background:var(--paper);border:1.5px solid var(--stone);border-radius:var(--r);padding:13px 14px;font-size:15px;font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s;}
+.field input,.field select,.field textarea{width:100%;background:var(--paper);border:1.5px solid var(--stone);border-radius:var(--r);padding:13px 14px;font-size:15px;font-family:'Inter',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .submit-btn{width:100%;padding:17px;background:var(--ink);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:all 0.2s;}
@@ -55,6 +55,21 @@ body{background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif;m
 .success-sub{font-size:14px;color:var(--muted);line-height:1.6;}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
 @keyframes spin{to{transform:rotate(360deg)}}
+.otp-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.otp-overlay.show{display:flex;}
+.otp-box{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:480px;}
+.otp-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px;}
+.otp-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.otp-code-display{background:#fff7f0;border:2px solid var(--orange);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;}
+.otp-code-label{font-size:11px;color:#c2410c;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.otp-code-value{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;color:var(--orange);letter-spacing:4px;}
+.otp-wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:#25D366;color:white;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:14px;text-decoration:none;}
+.otp-verify-row{display:flex;gap:10px;}
+.otp-input{flex:1;padding:14px;border:1.5px solid var(--stone);border-radius:12px;font-size:18px;font-family:monospace;font-weight:700;text-align:center;letter-spacing:4px;outline:none;}
+.otp-input:focus{border-color:var(--orange);}
+.otp-verify-btn{padding:14px 20px;background:var(--ink);color:white;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
+.otp-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;display:none;}
+.otp-err.show{display:block;}
 </style>
 </head>
 <body>
@@ -149,7 +164,14 @@ const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-async function submitPartner(){
+let currentOTP=null, partnerVerified=false, pendingPartner=null;
+
+function generateOTP(){
+  const arr=new Uint8Array(3); crypto.getRandomValues(arr);
+  return arr.map(b=>b%10).join('').padStart(6,'0').substring(0,6);
+}
+
+function submitPartner(){
   const biz   = document.getElementById('p-biz').value.trim();
   const type  = document.getElementById('p-type').value;
   const name  = document.getElementById('p-name').value.trim();
@@ -158,30 +180,89 @@ async function submitPartner(){
   const email = document.getElementById('p-email').value.trim();
   const msg   = document.getElementById('p-msg').value.trim();
   const err   = document.getElementById('err');
-  const btn   = document.getElementById('p-btn');
 
   err.classList.remove('show');
   if(!biz){err.textContent='Please enter your business name.';err.classList.add('show');return;}
   if(!name){err.textContent='Please enter your contact name.';err.classList.add('show');return;}
   if(!phone||phone.length<7){err.textContent='Please enter a valid phone number.';err.classList.add('show');return;}
 
+  const payload = {biz,type,name,phone,loc,email,msg};
+
+  // OTP verification temporarily disabled (dormant) — submit straight through.
+  doSubmitPartner(payload);
+  return;
+
+  /* ── DORMANT: phone verification gate ──────────────────────────────────
+  if(partnerVerified){ doSubmitPartner(payload); return; }
+  pendingPartner = payload;
+  currentOTP = generateOTP();
+  sb.from('phone_verifications').insert({
+    phone, otp:currentOTP, context:'partnership',
+    expires_at: new Date(Date.now()+30*60*1000).toISOString()
+  }).then(()=>{});
+  document.getElementById('otp-code-display').textContent = currentOTP;
+  document.getElementById('otp-wa-link').href =
+    'https://wa.me/233202858011?text=' + encodeURIComponent('ZYGO PARTNER VERIFY ' + phone + ' ' + currentOTP);
+  document.getElementById('otp-input').value='';
+  document.getElementById('otp-err').classList.remove('show');
+  document.getElementById('otp-overlay').classList.add('show');
+  ────────────────────────────────────────────────────────────────────── */
+}
+
+function verifyOTP(){
+  const entered = document.getElementById('otp-input').value.trim();
+  const err = document.getElementById('otp-err');
+  if(entered.length<6){err.textContent='Enter the full 6-digit code.';err.classList.add('show');return;}
+  if(entered===currentOTP){
+    partnerVerified=true;
+    document.getElementById('otp-overlay').classList.remove('show');
+    sb.from('phone_verifications').update({verified:true,verified_at:new Date().toISOString()}).eq('otp',currentOTP).then(()=>{});
+    if(pendingPartner) doSubmitPartner(pendingPartner);
+  } else {
+    err.textContent='❌ Incorrect code. Check WhatsApp and try again.';
+    err.classList.add('show');
+  }
+}
+
+async function doSubmitPartner(p){
+  const btn = document.getElementById('p-btn');
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span>';
 
   const {error} = await sb.from('partner_requests').insert({
-    business_name: biz, business_type: type||null,
-    contact_name: name, phone, email:email||null,
-    location: loc||null, message: msg||null,
+    business_name: p.biz, business_type: p.type||null,
+    contact_name: p.name, phone: p.phone, email: p.email||null,
+    location: p.loc||null, message: p.msg||null,
     status:'pending', created_at: new Date().toISOString()
   });
 
   btn.disabled=false;
   btn.innerHTML='Apply for Partnership →';
 
-  if(error){err.textContent='Submission failed. Please try again.';err.classList.add('show');return;}
+  if(error){
+    document.getElementById('err').textContent='Submission failed. Please try again.';
+    document.getElementById('err').classList.add('show');
+    return;
+  }
   document.getElementById('form-content').style.display='none';
   document.getElementById('success-content').style.display='block';
 }
 </script>
+<div class="otp-overlay" id="otp-overlay">
+  <div class="otp-box">
+    <div class="otp-title">📱 Verify Your Number</div>
+    <div class="otp-sub">We verify all partner applications by phone. Free and takes 30 seconds.</div>
+    <div class="otp-code-display">
+      <div class="otp-code-label">Your Verification Code</div>
+      <div class="otp-code-value" id="otp-code-display">------</div>
+    </div>
+    <a id="otp-wa-link" href="#" target="_blank" class="otp-wa-btn">💬 Send Code via WhatsApp</a>
+    <div class="otp-verify-row">
+      <input class="otp-input" type="text" id="otp-input" placeholder="000000" maxlength="6" inputmode="numeric"/>
+      <button class="otp-verify-btn" onclick="verifyOTP()">Verify</button>
+    </div>
+    <div class="otp-err" id="otp-err">❌ Incorrect code. Try again.</div>
+  </div>
+</div>
 </body>
 </html>

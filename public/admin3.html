@@ -161,7 +161,7 @@
     .role-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
     .role-badge.superadmin{background:#fef3c7;color:#92400e;}
     .role-badge.dispatcher{background:#dbeafe;color:#1d4ed8;}
-    .restricted-section{display:none !important;}
+    /* .restricted-section removed — visibility now controlled purely by JS via showSection() */
     .codes-list{display:flex;flex-direction:column;gap:10px;}
     .code-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
     .code-value{font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;color:var(--text);}
@@ -360,7 +360,7 @@
     </div>
 
     <!-- Access Codes (Superadmin only) -->
-    <div class="section-card restricted-section" id="codes-section" data-superadmin-only="true">
+    <div class="section-card" id="codes-section" data-superadmin-only="true" style="display:none">
       <div class="section-header">
         <div class="section-title">🔑 <span>Dispatcher Access Codes</span></div>
       </div>

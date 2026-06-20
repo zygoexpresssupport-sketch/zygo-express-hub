@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#f97316"/>
+<title>Rate Your Delivery — Zygo Express</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--orange:#f97316;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--r:14px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.card{background:white;border-radius:24px;box-shadow:0 10px 40px rgba(0,0,0,0.08);max-width:420px;width:100%;overflow:hidden;}
+.card-header{background:var(--orange);padding:32px 24px;text-align:center;color:white;}
+.logo-mark{width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:20px;margin:0 auto 12px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;margin-bottom:6px;}
+.card-sub{font-size:13px;opacity:0.9;}
+.card-body{padding:28px 24px;}
+.order-summary{background:var(--paper);border:1px solid var(--stone);border-radius:12px;padding:14px;margin-bottom:24px;font-size:13px;color:var(--muted);}
+.order-summary strong{color:var(--ink);}
+.stars-row{display:flex;justify-content:center;gap:8px;margin-bottom:24px;}
+.star-btn{font-size:42px;background:none;border:none;cursor:pointer;opacity:0.25;transition:all 0.2s;line-height:1;}
+.star-btn.active{opacity:1;transform:scale(1.1);}
+.rating-label{text-align:center;font-size:14px;font-weight:600;color:var(--muted);margin-bottom:20px;min-height:20px;}
+.feedback-input{width:100%;border:1.5px solid var(--stone);border-radius:12px;padding:14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;min-height:80px;resize:none;margin-bottom:16px;}
+.feedback-input:focus{border-color:var(--orange);}
+.submit-btn{width:100%;padding:16px;background:var(--ink);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-weight:800;font-size:15px;cursor:pointer;}
+.submit-btn:disabled{opacity:0.4;}
+.success-state{text-align:center;padding:20px 0;}
+.success-icon{font-size:56px;margin-bottom:12px;}
+.success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:8px;}
+.success-sub{font-size:13px;color:var(--muted);line-height:1.6;}
+.error-state{text-align:center;padding:30px 0;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <div class="logo-mark">ZE</div>
+    <div class="card-title">Rate Your Delivery</div>
+    <div class="card-sub">Your feedback helps us improve</div>
+  </div>
+  <div class="card-body" id="card-body">
+    <div style="text-align:center;padding:30px;color:var(--muted)">Loading order…</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let selectedStars = 0;
+let trackingCode = null;
+
+const RATING_LABELS = {1:'Poor 😞',2:'Fair 😐',3:'Good 🙂',4:'Great 😃',5:'Excellent! 🤩'};
+
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(window.location.search);
+  trackingCode = (params.get('code')||'').toUpperCase();
+
+  if (!trackingCode) {
+    showError('No tracking code provided.');
+    return;
+  }
+
+  const { data, error } = await sb.from('quote_requests')
+    .select('tracking_code,name,pickup,dropoff,status,rider_rating')
+    .eq('tracking_code', trackingCode)
+    .single();
+
+  if (error || !data) {
+    showError('Order not found. Please check your link.');
+    return;
+  }
+
+  if (data.status !== 'delivered') {
+    showError('This order has not been delivered yet. You can rate it once delivery is complete.');
+    return;
+  }
+
+  if (data.rider_rating) {
+    showAlreadyRated(data.rider_rating);
+    return;
+  }
+
+  renderRatingForm(data);
+});
+
+function renderRatingForm(order) {
+  document.getElementById('card-body').innerHTML = `
+    <div class="order-summary">
+      Tracking ID: <strong>${order.tracking_code}</strong><br>
+      ${order.pickup||'—'} → ${order.dropoff||'—'}
+    </div>
+    <div class="stars-row" id="stars-row">
+      ${[1,2,3,4,5].map(n=>`<button class="star-btn" id="star-${n}" onclick="selectStar(${n})">⭐</button>`).join('')}
+    </div>
+    <div class="rating-label" id="rating-label">Tap a star to rate</div>
+    <textarea class="feedback-input" id="feedback-text" placeholder="Tell us more about your experience (optional)"></textarea>
+    <button class="submit-btn" id="submit-btn" onclick="submitRating()" disabled>Submit Rating</button>
+  `;
+}
+
+function selectStar(n) {
+  selectedStars = n;
+  for (let i=1;i<=5;i++) {
+    document.getElementById('star-'+i).classList.toggle('active', i<=n);
+  }
+  document.getElementById('rating-label').textContent = RATING_LABELS[n];
+  document.getElementById('submit-btn').disabled = false;
+}
+
+async function submitRating() {
+  if (!selectedStars) return;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const feedback = document.getElementById('feedback-text').value.trim();
+
+  const { error } = await sb.from('quote_requests').update({
+    rider_rating: selectedStars,
+    customer_feedback: feedback || null,
+  }).eq('tracking_code', trackingCode);
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Submit Rating';
+    alert('Something went wrong. Please try again.');
+    return;
+  }
+
+  document.getElementById('card-body').innerHTML = `
+    <div class="success-state">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Thank you!</div>
+      <div class="success-sub">Your rating helps us serve Wa better.<br>${'⭐'.repeat(selectedStars)}</div>
+    </div>
+  `;
+}
+
+function showAlreadyRated(stars) {
+  document.getElementById('card-body').innerHTML = `
+    <div class="success-state">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Already Rated</div>
+      <div class="success-sub">You rated this delivery ${'⭐'.repeat(stars)}<br>Thank you for your feedback!</div>
+    </div>
+  `;
+}
+
+function showError(msg) {
+  document.getElementById('card-body').innerHTML = `
+    <div class="error-state">
+      <div style="font-size:40px;margin-bottom:12px">🤔</div>
+      ${msg}
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

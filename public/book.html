@@ -140,6 +140,33 @@ textarea.input-field{min-height:72px;resize:none;}
 .btn-primary{display:block;width:100%;padding:16px;background:var(--orange);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;letter-spacing:-0.3px;}
 .btn-ghost{display:block;width:100%;padding:14px;background:white;border:1.5px solid var(--stone);color:var(--ink);border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;text-align:center;cursor:pointer;}
 
+/* OTP Verification */
+.otp-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.otp-overlay.show{display:flex;}
+.otp-box{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:480px;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.otp-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px;}
+.otp-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.otp-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.otp-step{display:flex;align-items:flex-start;gap:12px;background:white;border:1px solid var(--stone);border-radius:12px;padding:14px;}
+.otp-step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:white;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
+.otp-step-text{font-size:13px;line-height:1.5;color:var(--ink);}
+.otp-code-display{background:#fff7f0;border:2px solid var(--orange);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;}
+.otp-code-label{font-size:11px;color:#c2410c;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.otp-code-value{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;color:var(--orange);letter-spacing:4px;}
+.otp-wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:#25D366;color:white;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;text-decoration:none;}
+.otp-wa-btn:active{opacity:0.9;}
+.otp-manual-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
+.otp-verify-row{display:flex;gap:10px;margin-top:14px;}
+.otp-input{flex:1;padding:14px;border:1.5px solid var(--stone);border-radius:12px;font-size:18px;font-family:monospace;font-weight:700;text-align:center;letter-spacing:4px;outline:none;}
+.otp-input:focus{border-color:var(--orange);}
+.otp-verify-btn{padding:14px 20px;background:var(--ink);color:white;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;}
+.otp-verify-btn:disabled{opacity:0.5;}
+.otp-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;display:none;}
+.otp-err.show{display:block;}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;margin-left:8px;}
+
+.spinner{width:18px;height:18px;
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
@@ -313,6 +340,48 @@ textarea.input-field{min-height:72px;resize:none;}
   </div>
 </div>
 
+<!-- OTP Verification Overlay -->
+<div class="otp-overlay" id="otp-overlay">
+  <div class="otp-box">
+    <div class="otp-title">📱 Verify Your Number</div>
+    <div class="otp-sub">We need to verify your WhatsApp number before confirming your booking. This is free and takes 30 seconds.</div>
+
+    <div class="otp-code-display">
+      <div class="otp-code-label">Your Verification Code</div>
+      <div class="otp-code-value" id="otp-code-display">------</div>
+    </div>
+
+    <div class="otp-steps">
+      <div class="otp-step">
+        <div class="otp-step-num">1</div>
+        <div class="otp-step-text">Tap the button below — WhatsApp opens with your code pre-filled.</div>
+      </div>
+      <div class="otp-step">
+        <div class="otp-step-num">2</div>
+        <div class="otp-step-text">Send the message to <strong>0202858011</strong> (Zygo Express).</div>
+      </div>
+      <div class="otp-step">
+        <div class="otp-step-num">3</div>
+        <div class="otp-step-text">Enter the 6-digit code below to confirm your number.</div>
+      </div>
+    </div>
+
+    <a id="otp-wa-link" href="#" target="_blank" class="otp-wa-btn">
+      <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Send Code via WhatsApp
+    </a>
+
+    <div class="otp-verify-row">
+      <input class="otp-input" type="text" id="otp-input" placeholder="000000" maxlength="6" inputmode="numeric"/>
+      <button class="otp-verify-btn" onclick="verifyOTP()" id="otp-verify-btn">Verify →</button>
+    </div>
+    <div class="otp-err" id="otp-err">❌ Incorrect code. Please check and try again.</div>
+    <div class="otp-manual-note" style="margin-top:12px">
+      Don't have WhatsApp? Call us on <a href="tel:0202858011" style="color:var(--orange);font-weight:700">0202858011</a> to verify manually.
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
@@ -451,23 +520,20 @@ async function submitBooking() {
   const pickup  = document.getElementById('f-pickup').value.trim();
   const dropoff = document.getElementById('f-dropoff').value.trim();
   const details = document.getElementById('f-details').value.trim();
-  const btn     = document.getElementById('submit-btn');
+  const recName = document.getElementById('f-rec-name').value.trim();
+  const recPhone= document.getElementById('f-rec-phone').value.trim();
   const errBox  = document.getElementById('error-box');
 
   errBox.classList.remove('show');
 
   if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
 
-  // Ghana phone validation
   const cleanPhone = phone.replace(/[\s\-\(\)]/g,'');
   if (!/^(0[2345679]\d{8}|233[2345679]\d{8}|\+233[2345679]\d{8})$/.test(cleanPhone)) {
     showErr('Please enter a valid Ghana phone number e.g. 0244 123 456'); return;
   }
   if (!pickup)  { showErr('Please enter a pickup location.'); return; }
   if (!dropoff) { showErr('Please enter a drop-off location.'); return; }
-
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div>&nbsp;Booking…';
 
   // Snap price to valid zone
   const priceText  = document.getElementById('p-amount').textContent;
@@ -476,6 +542,26 @@ async function submitBooking() {
   const finalPrice = validPrices.includes(priceNum) ? priceNum :
     validPrices.reduce((p,c) => Math.abs(c-priceNum) < Math.abs(p-priceNum) ? c : p);
 
+  // OTP verification temporarily disabled (dormant) — proceed straight to booking.
+  // To re-enable: replace the line below with the commented-out verification block.
+  await processBooking({ name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
+  return;
+
+  /* ── DORMANT: phone verification gate ──────────────────────────────────
+  if (phoneVerified) {
+    await processBooking({ name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
+    return;
+  }
+  startPhoneVerification(phone, { name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
+  ────────────────────────────────────────────────────────────────────── */
+}
+
+async function processBooking(payload) {
+  const { name, phone, pickup, dropoff, details, recName, recPhone, finalPrice } = payload;
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>&nbsp;Booking…';
+
   const code = generateCode();
   currentCode = code;
 
@@ -483,19 +569,19 @@ async function submitBooking() {
 
   try {
     const { error } = await sb.from('quote_requests').insert({
-      tracking_code: code,
-      status:        'pending',
-      name:          name,
-      phone:         phone,
-      pickup:        pickup,
-      dropoff:       dropoff,
-      details:       details || null,
-      source:        'Website',
-      price:         finalPrice,
-      currency:      'GHS',
-      recipient_name:  document.getElementById('f-rec-name').value.trim() || null,
-      recipient_phone: document.getElementById('f-rec-phone').value.trim() || null,
-      created_at:    new Date().toISOString(),
+      tracking_code:   code,
+      status:          'pending',
+      name:            name,
+      phone:           phone,
+      pickup:          pickup,
+      dropoff:         dropoff,
+      details:         details || null,
+      source:          'Website',
+      price:           finalPrice,
+      currency:        'GHS',
+      recipient_name:  recName  || null,
+      recipient_phone: recPhone || null,
+      created_at:      new Date().toISOString(),
     });
 
     if (error) {
@@ -505,29 +591,25 @@ async function submitBooking() {
       return;
     }
 
-    // Show success screen
     document.getElementById('screen-form').style.display    = 'none';
     document.getElementById('screen-success').style.display = 'block';
 
-    // Populate tracking code everywhere
-    document.getElementById('s-code').textContent          = code;
-    document.getElementById('momo-ref-code').textContent   = code;
-    document.getElementById('momo-ref-step').textContent   = code;
-    document.getElementById('momo-amount').textContent     = `GHS ${finalPrice}`;
+    document.getElementById('s-code').textContent        = code;
+    document.getElementById('momo-ref-code').textContent = code;
+    document.getElementById('momo-ref-step').textContent = code;
+    document.getElementById('momo-amount').textContent   = `GHS ${finalPrice}`;
 
-    // Update track link with code pre-filled
     document.getElementById('track-link').href =
       `https://zygo-express-hub.lovable.app/#track?code=${code}`;
 
-    // Summary
     document.getElementById('s-summary').innerHTML = `
       <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${sx(name)}</span></div>
-      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${sx(phone)}</span></div>
+      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${sx(phone)} <span class="verified-badge">✓ Verified</span></span></div>
       <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
       <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice}</span></div>
-      ${document.getElementById('f-rec-name').value.trim() ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(document.getElementById('f-rec-name').value.trim())}</span></div>` : ''}
-      ${document.getElementById('f-rec-phone').value.trim() ? `<div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(document.getElementById('f-rec-phone').value.trim())}</span></div>` : ''}
+      ${recName ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(recName)}</span></div>` : ''}
+      ${recPhone ? `<div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(recPhone)}</span></div>` : ''}
     `;
 
     window.scrollTo(0, 0);
@@ -567,6 +649,79 @@ function copyMomo() {
   btn.textContent = '✅ Copied!';
   setTimeout(() => btn.textContent = 'Copy Number', 2000);
 }
+
+// ── OTP VERIFICATION ─────────────────────────────────────────────────────────
+let currentOTP = null;
+let phoneVerified = false;
+let pendingBookingData = null;
+
+function generateOTP(){
+  const arr = new Uint8Array(3);
+  crypto.getRandomValues(arr);
+  return arr.map(b => b % 10).join('').padStart(6,'0').substring(0,6);
+}
+
+function startPhoneVerification(phone, bookingData){
+  currentOTP = generateOTP();
+  pendingBookingData = bookingData;
+
+  // Store OTP in Supabase for admin visibility
+  sb.from('phone_verifications').insert({
+    phone: phone,
+    otp: currentOTP,
+    context: 'booking',
+    expires_at: new Date(Date.now() + 30*60*1000).toISOString()
+  }).then(()=>{});
+
+  // Show OTP code
+  document.getElementById('otp-code-display').textContent = currentOTP;
+
+  // Build WhatsApp link
+  const msg = 'ZYGO VERIFY ' + phone + ' ' + currentOTP;
+  document.getElementById('otp-wa-link').href =
+    'https://wa.me/233202858011?text=' + encodeURIComponent(msg);
+
+  // Clear input
+  document.getElementById('otp-input').value = '';
+  document.getElementById('otp-err').classList.remove('show');
+
+  // Show overlay
+  document.getElementById('otp-overlay').classList.add('show');
+}
+
+function verifyOTP(){
+  const entered = document.getElementById('otp-input').value.trim();
+  const btn     = document.getElementById('otp-verify-btn');
+  const err     = document.getElementById('otp-err');
+
+  if(entered.length < 6){ err.textContent='Please enter the full 6-digit code.'; err.classList.add('show'); return; }
+
+  if(entered === currentOTP){
+    // Correct
+    phoneVerified = true;
+    document.getElementById('otp-overlay').classList.remove('show');
+
+    // Mark verified in Supabase
+    sb.from('phone_verifications').update({
+      verified: true,
+      verified_at: new Date().toISOString()
+    }).eq('otp', currentOTP).then(()=>{});
+
+    // Proceed with actual booking
+    if(pendingBookingData) processBooking(pendingBookingData);
+  } else {
+    err.textContent = '❌ Incorrect code. Check your WhatsApp and try again.';
+    err.classList.add('show');
+    document.getElementById('otp-input').value = '';
+    document.getElementById('otp-input').focus();
+  }
+}
+
+// Allow Enter key in OTP input
+document.addEventListener('DOMContentLoaded', function(){
+  const otpInput = document.getElementById('otp-input');
+  if(otpInput) otpInput.addEventListener('keydown', function(e){ if(e.key==='Enter') verifyOTP(); });
+});
 
 function bookAnother() {
   document.getElementById('screen-form').style.display    = 'block';

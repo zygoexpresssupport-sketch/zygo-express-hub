@@ -890,7 +890,7 @@ async function submitPOD() {
     const blob = dataUrlToBlob(podPhotoData);
     const { error: uploadError } = await sb.storage
       .from('delivery-photos')
-      .upload(fileName, blob, { contentType: 'image/jpeg', upsert: true });
+      .upload(fileName, blob, { contentType: 'image/jpeg' });
 
     if (uploadError) throw uploadError;
     uploadedPath = fileName;

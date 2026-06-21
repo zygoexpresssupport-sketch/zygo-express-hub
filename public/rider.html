@@ -895,7 +895,9 @@ async function submitPOD() {
     if (uploadError) throw uploadError;
     uploadedPath = fileName;
   } catch (e) {
-    showToast('Photo upload failed — saving without photo', 'error');
+    console.error('POD upload error:', e);
+    const detail = (e && (e.message || e.error || e.statusCode)) ? (e.message || e.error || e.statusCode) : JSON.stringify(e);
+    showToast('Upload failed: ' + detail, 'error');
     uploadedPath = null;
   }
 

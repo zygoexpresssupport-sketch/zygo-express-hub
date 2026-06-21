@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#f97316"/>
 <title>Partner with Zygo Express</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--orange:#f97316;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
@@ -147,6 +148,11 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min
         <input type="text" id="p-msg" placeholder="e.g. 10–20 deliveries/week"/>
       </div>
 
+      <!-- Free bot protection -->
+      <div style="display:flex;justify-content:center;margin-bottom:14px">
+        <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY" data-callback="onTurnstileSuccess" data-theme="light"></div>
+      </div>
+
       <button class="submit-btn" id="p-btn" onclick="submitPartner()">Apply for Partnership →</button>
       <div class="submit-note">We'll contact you within 24 hours · No commitment required</div>
     </div>
@@ -165,6 +171,11 @@ const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentOTP=null, partnerVerified=false, pendingPartner=null;
+let turnstileToken = null;
+
+function onTurnstileSuccess(token){
+  turnstileToken = token;
+}
 
 function generateOTP(){
   const arr=new Uint8Array(3); crypto.getRandomValues(arr);
@@ -185,6 +196,7 @@ function submitPartner(){
   if(!biz){err.textContent='Please enter your business name.';err.classList.add('show');return;}
   if(!name){err.textContent='Please enter your contact name.';err.classList.add('show');return;}
   if(!phone||phone.length<7){err.textContent='Please enter a valid phone number.';err.classList.add('show');return;}
+  if(!turnstileToken){err.textContent='Please complete the verification check above.';err.classList.add('show');return;}
 
   const payload = {biz,type,name,phone,loc,email,msg};
 

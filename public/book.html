@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#0f0f0f"/>
 <title>Zygo Express — Book Delivery</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--orange:#f97316;--amber:#f59e0b;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
@@ -275,6 +276,10 @@ textarea.input-field{min-height:72px;resize:none;}
       <div class="trust-item"><span>💰</span>Fair Price</div>
       <div class="trust-item"><span>🛡️</span>Insured</div>
     </div>
+    <!-- Free bot protection — invisible to genuine customers in most cases -->
+    <div style="display:flex;justify-content:center;margin-bottom:14px">
+      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY" data-callback="onTurnstileSuccess" data-theme="light"></div>
+    </div>
     <button class="submit-btn" id="submit-btn" onclick="submitBooking()">Confirm Booking →</button>
     <div class="submit-note">No payment needed now · We'll contact you to confirm</div>
   </div>
@@ -387,6 +392,13 @@ const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
 const GOOGLE_MAPS_KEY = ""; // Add your Google Maps API key here if available
 let sb, currentCode = '';
+let turnstileToken = null;
+
+// Called automatically by the Turnstile widget once a visitor passes the
+// (usually invisible) bot check — enables the Confirm Booking button.
+function onTurnstileSuccess(token){
+  turnstileToken = token;
+}
 
 window.addEventListener('load', () => {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -534,6 +546,12 @@ async function submitBooking() {
   }
   if (!pickup)  { showErr('Please enter a pickup location.'); return; }
   if (!dropoff) { showErr('Please enter a drop-off location.'); return; }
+
+  // Bot protection — free Cloudflare Turnstile check before allowing submission
+  if (!turnstileToken) {
+    showErr('Please complete the verification check above before booking.');
+    return;
+  }
 
   // Snap price to valid zone
   const priceText  = document.getElementById('p-amount').textContent;

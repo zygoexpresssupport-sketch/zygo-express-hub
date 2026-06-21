@@ -525,9 +525,12 @@ window.addEventListener('load',async()=>{
   const _fmt=String(_now.getDate()).padStart(2,'0')+'/'+String(_now.getMonth()+1).padStart(2,'0')+'/'+_now.getFullYear();
   document.getElementById('today-option').textContent=_fmt;
   await new Promise(r=>setTimeout(r,900));
-  const adminSession = sessionStorage.getItem('zygo_admin_session');
+
+  // Real session check — server-verified via Supabase Auth, not a local flag
+  const { data: authData } = await sb.auth.getSession();
   const dispatcherSession = sessionStorage.getItem('zygo_dispatcher_session');
-  if(adminSession){
+
+  if(authData?.session){
     currentRole = 'superadmin';
     showMain();
   } else if(dispatcherSession){
@@ -541,24 +544,29 @@ window.addEventListener('load',async()=>{
 function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
 
 async function doLogin(){
-  const u=document.getElementById('admin-user').value.trim().toLowerCase();
-  const p=document.getElementById('admin-pass').value.trim();
-  // Secure: hash-compare credentials
-  const CREDS=[
-    {u:'emmanuel',h:'e9ad32c345fbbd17fef7e7d527063ede7e431dd0638c37851ba2bc33c4937fef'},
-    {u:'admin',   h:'e9ad32c345fbbd17fef7e7d527063ede7e431dd0638c37851ba2bc33c4937fef'}
-  ];
-  const enc=new TextEncoder();
-  const hashBuf=await crypto.subtle.digest('SHA-256',enc.encode(p));
-  const hash=Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-  const valid=CREDS.find(c=>c.u===u&&c.h===hash);
-  if(!valid){document.getElementById('login-err').classList.add('show');return;}
-  sessionStorage.setItem('zygo_admin_session',btoa(u+':'+Date.now()));
+  const email = document.getElementById('admin-user').value.trim();
+  const pass  = document.getElementById('admin-pass').value.trim();
+  const errEl = document.getElementById('login-err');
+  errEl.classList.remove('show');
+
+  if(!email || !pass){ errEl.classList.add('show'); return; }
+
+  // Real, server-verified authentication — replaces the old client-side hash check.
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+
+  if(error || !data?.session){
+    errEl.textContent = 'Incorrect credentials. Please try again.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  currentRole = 'superadmin';
   showMain();
 }
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('screen-login').classList.contains('active'))doLogin();});
-function doLogout(){
-  sessionStorage.removeItem('zygo_admin_session');
+
+async function doLogout(){
+  await sb.auth.signOut();
   sessionStorage.removeItem('zygo_dispatcher_session');
   currentRole = 'superadmin';
   showScreen('login');
@@ -596,9 +604,12 @@ function renderNotifications(){
   list.innerHTML = visible.map(n => {
     const ago = timeAgo(n.created_at);
     const icon = {new_order:'🛵',status_change:'📦',new_partner:'🤝',payment:'💰',rider_signin:'🟢'}[n.type]||'🔔';
+    // sanitize() strips HTML — closes the stored-XSS vector where a malicious
+    // customer/business name could otherwise execute script in the admin's
+    // own authenticated session via this dropdown.
     return `<div class="notif-item ${n.read?'':'unread'}" onclick="handleNotifClick('${n.id}','${n.type}','${n.reference||''}')">
-      <div class="notif-item-title">${icon} ${n.title}</div>
-      ${n.message?`<div class="notif-item-msg">${n.message}</div>`:''}
+      <div class="notif-item-title">${icon} ${sanitize(n.title)}</div>
+      ${n.message?`<div class="notif-item-msg">${sanitize(n.message)}</div>`:''}
       <div class="notif-item-time">${ago}</div>
     </div>`;
   }).join('');
@@ -683,31 +694,19 @@ async function doDispatcherLogin(){
 
   if(!code){ err.classList.add('show'); return; }
 
-  const {data, error} = await sb.from('dispatcher_codes')
-    .select('*').eq('code', code).eq('active', true).single();
+  // Verification happens via a secure RPC — the dispatcher_codes table itself
+  // is no longer directly readable by anon, so this never exposes the full
+  // code list, only a yes/no answer for the exact code submitted.
+  const {data, error} = await sb.rpc('verify_dispatcher_code', { _code: code });
 
-  if(error || !data){
-    err.textContent = 'Invalid access code. Please check and try again.';
+  if(error || !data || !data.length || !data[0].is_valid){
+    err.textContent = 'Invalid or expired access code. Please check and try again.';
     err.classList.add('show');
     return;
   }
 
-  // Check expiry
-  if(data.expires_at && new Date(data.expires_at) < new Date()){
-    err.textContent = 'This access code has expired. Contact your manager.';
-    err.classList.add('show');
-    return;
-  }
-
-  // Check revoked
-  if(data.revoked_at){
-    err.textContent = 'This access code has been revoked.';
-    err.classList.add('show');
-    return;
-  }
-
-  // Valid — log update last_used_at
-  await sb.from('dispatcher_codes').update({last_used_at: new Date().toISOString()}).eq('id', data.id);
+  // Log usage via narrow RPC — no bulk table access needed
+  await sb.rpc('mark_dispatcher_code_used', { _code: code });
 
   currentRole = 'dispatcher';
   sessionStorage.setItem('zygo_dispatcher_session', btoa(code+':'+Date.now()));
@@ -734,8 +733,12 @@ function applyRoleRestrictions(){
 }
 
 function generateAccessCode(){
-  const seg = () => Math.random().toString(36).substring(2,6).toUpperCase();
-  return 'ZYGO-' + seg() + '-' + seg();
+  // Cryptographically secure — replaces predictable Math.random()
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const seg = (start) => Array.from(bytes.slice(start, start+4), b => chars[b % chars.length]).join('');
+  return 'ZYGO-' + seg(0) + '-' + seg(4);
 }
 
 async function generateDispatcherCode(){
@@ -852,7 +855,7 @@ async function showMain(){
 }
 
 async function loadRiderStatuses(){
-  const {data}=await sb.from(RIDERS_TABLE).select('*');
+  const {data}=await sb.from('riders_public').select('*');
   if(data) data.forEach(r=>{liveRiders[r.rider_id]={name:r.name,is_online:r.is_online,last_seen:r.last_seen};});
   renderRiders();
 }
@@ -1037,6 +1040,20 @@ async function updateStatus(code,newStatus,el){
   await loadAll();
 }
 
+// ── Resolve a delivery_photo value to a viewable URL ──────────────────────────
+// Supports both legacy rows (base64 data URI, stored directly — pre-hardening)
+// and new rows (a storage object path — fetched via a short-lived signed URL
+// so raw photos are never exposed through open table reads).
+async function resolvePhotoUrl(photoValue){
+  if(!photoValue) return null;
+  if(photoValue.startsWith('data:')) return photoValue; // legacy base64 row
+  const {data, error} = await sb.storage
+    .from('delivery-photos')
+    .createSignedUrl(photoValue, 3600); // 1 hour validity
+  if(error || !data) return null;
+  return data.signedUrl;
+}
+
 // ── Track Modal ───────────────────────────────────────────────────────────────
 async function openTrack(code){
   const o=allOrders.find(x=>x.tracking_code===code);
@@ -1049,19 +1066,23 @@ async function openTrack(code){
   const isDelivered = o.status==='delivered';
   const hasPOD = !!(o.delivery_photo);
 
+  // Resolve the photo URL up front (signed URL for storage-based photos,
+  // pass-through for legacy base64 rows) before building the modal HTML.
+  const resolvedPhotoUrl = hasPOD ? await resolvePhotoUrl(o.delivery_photo) : null;
+
   // Build POD section
   let podHTML = '';
   if(isDelivered){
-    if(hasPOD){
+    if(hasPOD && resolvedPhotoUrl){
       podHTML = `
         <div class="pod-section">
           <div class="pod-section-label">
             <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block"></span>
             ✅ Proof of Delivery Confirmed
           </div>
-          <img src="${o.delivery_photo}" class="pod-photo" alt="Proof of delivery"
-            onclick="window.open('${o.delivery_photo}','_blank')" title="Tap to view full size"/>
-          <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Tap photo to view full size</div>
+          <img src="${resolvedPhotoUrl}" class="pod-photo" alt="Proof of delivery"
+            onclick="window.open('${resolvedPhotoUrl}','_blank')" title="Tap to view full size"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Tap photo to view full size · Link expires in 1 hour</div>
           ${o.delivered_at?`<div class="pod-timestamp">📅 Delivered: ${formatDate(o.delivered_at)}</div>`:''}
           ${o.delivery_lat&&o.delivery_lng?`
             <div class="pod-coords">
@@ -1072,7 +1093,7 @@ async function openTrack(code){
             <iframe src="https://maps.google.com/maps?q=${o.delivery_lat},${o.delivery_lng}&z=16&output=embed"
               class="pod-map" frameborder="0" allowfullscreen loading="lazy"></iframe>
           `:''}
-          ${o.delivery_notes?`<div class="pod-notes-box">💬 "${o.delivery_notes}"</div>`:''}
+          ${o.delivery_notes?`<div class="pod-notes-box">💬 "${sanitize(o.delivery_notes)}"</div>`:''}
           <button class="pod-download-btn" onclick="downloadPOD('${code}')">⬇️ Download Proof of Delivery</button>
         </div>`;
     } else {
@@ -1122,11 +1143,13 @@ async function openTrack(code){
   document.getElementById('modal-track').classList.add('show');
 }
 
-function downloadPOD(code){
+async function downloadPOD(code){
   const o = allOrders.find(x=>x.tracking_code===code);
   if(!o||!o.delivery_photo) return;
+  const url = await resolvePhotoUrl(o.delivery_photo);
+  if(!url){ showToast('Could not load photo','error'); return; }
   const a = document.createElement('a');
-  a.href = o.delivery_photo;
+  a.href = url;
   a.download = 'POD-' + code + '.jpg';
   document.body.appendChild(a);
   a.click();

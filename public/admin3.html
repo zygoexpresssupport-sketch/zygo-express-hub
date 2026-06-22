@@ -220,6 +220,25 @@
     .analytics-empty{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
     .refresh-analytics-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;}
 
+    /* TOP RIDERS */
+    .tr-period-btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:'Inter',sans-serif;}
+    .tr-period-btn.active{background:var(--orange);color:white;border:none;}
+    .tr-crown-card{background:linear-gradient(135deg,#fff7ed,#fef3c7);border:2px solid #fbbf24;border-radius:14px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden;}
+    .tr-crown-badge{position:absolute;top:12px;right:14px;font-size:28px;}
+    .tr-crown-label{font-size:11px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .tr-crown-name{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:10px;}
+    .tr-crown-stats{display:flex;gap:16px;flex-wrap:wrap;}
+    .tr-crown-stat{font-size:12px;color:#78350f;}
+    .tr-crown-stat strong{display:block;font-size:16px;color:var(--text);}
+    .tr-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
+    .tr-table{width:100%;border-collapse:collapse;min-width:680px;}
+    .tr-table th{background:var(--bg);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+    .tr-table td{padding:10px 12px;font-size:13px;border-top:1px solid var(--border);white-space:nowrap;}
+    .tr-rank-1{color:#d97706;font-weight:800;}
+    .tr-rank-2{color:#6b7280;font-weight:700;}
+    .tr-rank-3{color:#c2410c;font-weight:700;}
+    .tr-online-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
+
     /* TOAST */
     .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:white;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;max-width:90vw;}
     .toast.show{transform:translateX(-50%) translateY(0);}
@@ -315,6 +334,7 @@
       <button onclick="showSection('partners')" id="btn-partners" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🤝 Partners</button>
       <button onclick="showSection('analytics')" id="btn-analytics" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">📊 Analytics</button>
       <button onclick="showSection('codes')" id="btn-codes" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🔑 Access Codes</button>
+      <button onclick="showSection('topriders')" id="btn-topriders" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🏆 Top Riders</button>
     </div>
 
     <!-- Riders -->
@@ -322,11 +342,13 @@
       <div class="section-header">
         <div class="section-title">🚴 <span>Riders</span> <span class="active-count" id="active-count">0/10 active</span></div>
         <div class="section-controls">
-          <select class="date-select" id="date-select" onchange="loadAll()">
+          <select class="date-select" id="date-select" onchange="renderRiders()">
             <option value="today" id="today-option">Today</option>
             <option value="week">This week</option>
+            <option value="month">This month</option>
             <option value="all">All time</option>
           </select>
+          <span id="dispatcher-locked-label" style="display:none;font-size:12px;color:var(--muted);padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg)">📅 Today only</span>
           <button class="refresh-btn" onclick="refreshSection(this,'riders')">Refresh</button>
         </div>
       </div>
@@ -383,6 +405,22 @@
 
       <div class="codes-list" id="codes-list">
         <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading codes…</div>
+      </div>
+    </div>
+
+    <!-- Top Riders (Superadmin only) -->
+    <div class="section-card" id="topriders-section" data-superadmin-only="true" style="display:none">
+      <div class="section-header">
+        <div class="section-title">🏆 <span>Rider Performance</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="tr-period-btn active" id="tr-period-today" onclick="loadTopRiders('today')">Today</button>
+        <button class="tr-period-btn" id="tr-period-week" onclick="loadTopRiders('week')">This Week</button>
+        <button class="tr-period-btn" id="tr-period-month" onclick="loadTopRiders('month')">This Month</button>
+        <button class="tr-period-btn" id="tr-period-all" onclick="loadTopRiders('all')">All Time</button>
+      </div>
+      <div id="topriders-content">
+        <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading rider performance…</div>
       </div>
     </div>
 
@@ -468,6 +506,25 @@
       <div><div>Rider location live</div><div id="rider-coords" style="font-size:11px;opacity:0.8;margin-top:2px"></div></div>
     </div>
     <iframe id="track-map" class="map-frame" style="display:none" frameborder="0" allowfullscreen loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- Mark as Paid Modal -->
+<div class="modal-overlay" id="modal-mark-paid">
+  <div class="modal">
+    <button class="modal-close" onclick="closeMarkPaidModal()">✕</button>
+    <div class="modal-title">💰 Confirm Payment</div>
+    <div class="modal-sub">Enter the MoMo transaction reference exactly as shown in your MTN MoMo SMS confirmation.</div>
+    <div class="field" style="margin-top:14px">
+      <label>Order</label>
+      <input type="text" id="paid-modal-code" disabled style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;background:var(--bg);color:var(--muted);font-family:'Inter',sans-serif"/>
+    </div>
+    <div class="field">
+      <label>MoMo Reference / Transaction ID *</label>
+      <input type="text" id="paid-modal-reference" placeholder="e.g. 1234567890 or the tracking code used" autocomplete="off" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:'Inter',sans-serif"/>
+    </div>
+    <div class="err" id="paid-modal-err" style="display:none">This reference has already been used on another order.</div>
+    <button class="btn-login" style="margin-top:10px" id="paid-modal-submit" onclick="submitMarkPaid()">Confirm Payment</button>
   </div>
 </div>
 
@@ -718,14 +775,14 @@ function applyRoleRestrictions(){
   if(currentRole==='dispatcher'){
     badge.textContent = 'Dispatcher';
     badge.className = 'role-badge dispatcher';
-    ['btn-partners','btn-analytics','btn-codes'].forEach(id=>{
+    ['btn-partners','btn-analytics','btn-codes','btn-topriders'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='none';
     });
     document.body.classList.add('is-dispatcher');
   } else {
     badge.textContent = 'Superadmin';
     badge.className = 'role-badge superadmin';
-    ['btn-partners','btn-analytics','btn-codes'].forEach(id=>{
+    ['btn-partners','btn-analytics','btn-codes','btn-topriders'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='inline-block';
     });
     document.body.classList.remove('is-dispatcher');
@@ -883,12 +940,49 @@ function formatDate(iso){
 function calcCost(distM){if(!distM)return null;return Math.ceil((distM/1000)*RATE_PER_KM*100)/100;}
 
 // ── Riders ────────────────────────────────────────────────────────────────────
+function getPeriodStart(period){
+  const now = new Date();
+  if(period === 'today'){
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+  if(period === 'week'){
+    const d = new Date(now);
+    const day = d.getDay(); // 0=Sun
+    d.setDate(d.getDate() - day);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+  if(period === 'month'){
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+  return new Date(0); // 'all'
+}
+
 function renderRiders(){
   const localRiders=getLocalRiders();
-  // Count online from liveRiders
   const onlineCount=Object.values(liveRiders).filter(r=>r.is_online).length;
-  const delivered=allOrders.filter(o=>o.status==='delivered').length;
-  const revenue=allOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
+
+  // Dispatchers are HARD-LOCKED to today's numbers — never weekly/monthly/all-time.
+  // This is enforced here in code, not just hidden in the UI, so there's no
+  // way to bypass it from the dispatcher session.
+  const selectEl = document.getElementById('date-select');
+  const lockedLabel = document.getElementById('dispatcher-locked-label');
+  let period;
+  if(currentRole === 'dispatcher'){
+    period = 'today';
+    if(selectEl) selectEl.style.display = 'none';
+    if(lockedLabel) lockedLabel.style.display = 'inline-block';
+  } else {
+    period = selectEl ? selectEl.value : 'today';
+    if(selectEl) selectEl.style.display = 'inline-block';
+    if(lockedLabel) lockedLabel.style.display = 'none';
+  }
+
+  const periodStart = getPeriodStart(period);
+  const periodOrders = allOrders.filter(o => o.created_at && new Date(o.created_at) >= periodStart);
+
+  const delivered = periodOrders.filter(o=>o.status==='delivered').length;
+  const revenue = periodOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
 
   document.getElementById('active-count').textContent=`${onlineCount}/10 active`;
   document.getElementById('riders-active').textContent=onlineCount;
@@ -1111,6 +1205,16 @@ async function openTrack(code){
       ✅ Mark as Delivered
     </button>` : '';
 
+  // Mark as Paid button — only shown if not already paid
+  const isPaid = !!o.paid_at;
+  const markPaidBtn = !isPaid ? `
+    <button class="confirm-delivery-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);margin-top:8px" onclick="openMarkPaidModal('${code}')">
+      💰 Mark as Paid
+    </button>` : `
+    <div style="margin-top:8px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;font-size:12px;color:#16a34a">
+      ✅ Paid · Ref: <strong>${sanitize(o.payment_reference??'—')}</strong>
+    </div>`;
+
   document.getElementById('track-info').innerHTML=`
     <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="font-weight:700;color:${isDelivered?'#22c55e':'var(--orange)'}">${STATUS_LABELS[o.status]??o.status}</span></div>
     <div class="info-row"><span class="info-label">Customer</span><span class="info-value">${sanitize(o.customer_name??o.name??'—')}</span></div>
@@ -1125,6 +1229,7 @@ async function openTrack(code){
     <div class="info-row"><span class="info-label">Rating</span><span class="info-value">${o.rider_rating?'⭐'.repeat(o.rider_rating):'Not rated'}</span></div>
     <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>
     ${confirmBtn}
+    ${markPaidBtn}
     ${podHTML}
     `
 
@@ -1172,6 +1277,68 @@ async function adminConfirmDelivery(code, btn){
     return;
   }
   showToast(code + ' marked as delivered','success');
+  closeTrackModal();
+  await loadAll();
+}
+
+// ── MARK AS PAID ─────────────────────────────────────────────────────────────────
+let markPaidCode = null;
+
+function openMarkPaidModal(code){
+  markPaidCode = code;
+  document.getElementById('paid-modal-code').value = code;
+  document.getElementById('paid-modal-reference').value = '';
+  document.getElementById('paid-modal-err').style.display = 'none';
+  document.getElementById('paid-modal-submit').disabled = false;
+  document.getElementById('paid-modal-submit').textContent = 'Confirm Payment';
+  document.getElementById('modal-mark-paid').classList.add('show');
+  setTimeout(()=>document.getElementById('paid-modal-reference').focus(), 100);
+}
+
+function closeMarkPaidModal(){
+  document.getElementById('modal-mark-paid').classList.remove('show');
+  markPaidCode = null;
+}
+
+async function submitMarkPaid(){
+  const ref = document.getElementById('paid-modal-reference').value.trim();
+  const errEl = document.getElementById('paid-modal-err');
+  const btn = document.getElementById('paid-modal-submit');
+  errEl.style.display = 'none';
+
+  if(!ref){
+    errEl.textContent = 'Please enter the MoMo transaction reference.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(!markPaidCode) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Confirming…';
+
+  const { error } = await sb.from(TABLE).update({
+    paid_at: new Date().toISOString(),
+    payment_reference: ref
+  }).eq('tracking_code', markPaidCode);
+
+  if(error){
+    // The database itself blocks reused references — surface that clearly.
+    // Postgres unique-violation code is 23505; our trigger also raises a
+    // custom message containing "already been used".
+    const msg = (error.message||'').toLowerCase();
+    if(msg.includes('already been used') || error.code === '23505'){
+      errEl.textContent = '❌ This reference has already been used on another order. Each MoMo transaction can only confirm one delivery.';
+    } else {
+      errEl.textContent = '❌ Failed to confirm payment: ' + (error.message || 'Unknown error');
+    }
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Confirm Payment';
+    return;
+  }
+
+  showToast('Payment confirmed for ' + markPaidCode, 'success');
+  closeMarkPaidModal();
   closeTrackModal();
   await loadAll();
 }
@@ -1266,14 +1433,14 @@ document.getElementById('modal-log-dm').addEventListener('click',e=>{
 // ── Partners ─────────────────────────────────────────────────────────────────────
 function showSection(section){
   // Dispatchers can ONLY access orders + riders — hard block at function level
-  if(currentRole==='dispatcher' && (section==='partners'||section==='analytics'||section==='codes')){
+  if(currentRole==='dispatcher' && (section==='partners'||section==='analytics'||section==='codes'||section==='topriders')){
     showToast('This section is restricted for dispatchers','error');
     section='orders';
   }
 
-  const btns = ['btn-orders','btn-partners','btn-analytics','btn-codes'];
+  const btns = ['btn-orders','btn-partners','btn-analytics','btn-codes','btn-topriders'];
 
-  ['orders-section','riders-section','partners-section','analytics-section','codes-section'].forEach(id=>{
+  ['orders-section','riders-section','partners-section','analytics-section','codes-section','topriders-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
 
@@ -1296,6 +1463,10 @@ function showSection(section){
     const el=document.getElementById('codes-section'); if(el) el.style.display='block';
     const btn=document.getElementById('btn-codes'); if(btn) btn.style.cssText=activeStyle;
     loadDispatcherCodes();
+  } else if(section==='topriders'){
+    const el=document.getElementById('topriders-section'); if(el) el.style.display='block';
+    const btn=document.getElementById('btn-topriders'); if(btn) btn.style.cssText=activeStyle;
+    loadTopRiders('today');
   } else {
     ['orders-section','riders-section'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='block';
@@ -1359,6 +1530,95 @@ function sanitize(str){
 }
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
+// ── TOP RIDERS / PERFORMANCE ───────────────────────────────────────────────────
+async function loadTopRiders(period){
+  // Update active period button
+  ['today','week','month','all'].forEach(p=>{
+    const btn = document.getElementById('tr-period-'+p);
+    if(btn) btn.classList.toggle('active', p===period);
+  });
+
+  const container = document.getElementById('topriders-content');
+  if(!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading rider performance…</div>';
+
+  const {data, error} = await sb.rpc('get_rider_performance', { _period: period });
+
+  if(error){
+    console.error('Rider performance error:', error);
+    container.innerHTML = '<div class="analytics-empty">❌ Could not load rider performance. ' + (error.message||'') + '</div>';
+    return;
+  }
+
+  if(!data || !data.length){
+    container.innerHTML = '<div class="analytics-empty">📭 No rider data yet for this period.</div>';
+    return;
+  }
+
+  // Riders with zero deliveries AND zero revenue sink to bottom but still shown
+  const ranked = [...data].sort((a,b) => (b.deliveries - a.deliveries) || (b.revenue - a.revenue));
+  const top = ranked.find(r => r.deliveries > 0) || ranked[0];
+
+  const periodLabel = {today:'Today', week:'This Week', month:'This Month', all:'All Time'}[period];
+
+  let html = '';
+
+  // Crown card for the top performer (only if they actually have deliveries)
+  if(top && top.deliveries > 0){
+    html += `
+      <div class="tr-crown-card">
+        <div class="tr-crown-badge">👑</div>
+        <div class="tr-crown-label">Top Rider · ${periodLabel}</div>
+        <div class="tr-crown-name">${sanitize(top.rider_name||top.rider_id)}</div>
+        <div class="tr-crown-stats">
+          <div class="tr-crown-stat">Deliveries<strong>${top.deliveries}</strong></div>
+          <div class="tr-crown-stat">Revenue<strong>GHS ${Number(top.revenue).toFixed(0)}</strong></div>
+          <div class="tr-crown-stat">Avg Rating<strong>${top.avg_rating?top.avg_rating+'⭐':'—'}</strong></div>
+          <div class="tr-crown-stat">Avg Delivery Time<strong>${top.avg_delivery_minutes?top.avg_delivery_minutes+' min':'—'}</strong></div>
+          <div class="tr-crown-stat">Online Hours<strong>${Number(top.online_hours||0).toFixed(1)}h</strong></div>
+        </div>
+      </div>`;
+  } else {
+    html += `<div class="analytics-empty">No deliveries recorded yet for ${periodLabel.toLowerCase()} — rankings will appear once riders start completing deliveries.</div>`;
+  }
+
+  // Full table — every rider, every metric
+  html += `
+    <div class="tr-table-wrap">
+      <table class="tr-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Rider</th><th>Status</th><th>Deliveries</th><th>Revenue</th>
+            <th>Avg Time</th><th>Incidents</th><th>Rating</th><th>Online Hrs</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ranked.map((r,i) => {
+            const rankClass = i===0?'tr-rank-1':i===1?'tr-rank-2':i===2?'tr-rank-3':'';
+            const rankIcon = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
+            return `<tr>
+              <td class="${rankClass}">${rankIcon}</td>
+              <td style="font-weight:600">${sanitize(r.rider_name||r.rider_id)}</td>
+              <td><span class="tr-online-dot" style="background:${r.is_online?'#22c55e':'#9ca3af'}"></span>${r.is_online?'Online':'Offline'}</td>
+              <td>${r.deliveries}</td>
+              <td>GHS ${Number(r.revenue).toFixed(0)}</td>
+              <td>${r.avg_delivery_minutes?r.avg_delivery_minutes+' min':'—'}</td>
+              <td style="color:${r.incidents>0?'var(--red)':'var(--muted)'}">${r.incidents}</td>
+              <td>${r.avg_rating?r.avg_rating+' ⭐':'—'}</td>
+              <td>${Number(r.online_hours||0).toFixed(1)}h</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
+      <strong>Incidents</strong> = cancelled orders assigned to this rider in the period.
+      <strong>Online Hours</strong> tracks accumulating from when this feature was enabled — historical hours before that aren't available.
+    </div>`;
+
+  container.innerHTML = html;
+}
+
 async function loadAnalytics(){
   const container = document.getElementById('analytics-content');
   if(!container) return;

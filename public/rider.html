@@ -147,6 +147,8 @@
     /* PROOF OF DELIVERY MODAL */
     #modal-pod{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;flex-direction:column;z-index:300;overflow-y:auto;}
     #modal-pod.show{display:flex;}
+    #modal-pop{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:none;flex-direction:column;z-index:300;overflow-y:auto;}
+    #modal-pop.show{display:flex;}
     .pod-header{padding:20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
     .pod-title{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
     .pod-sub{font-size:12px;color:var(--muted);margin-top:2px;}
@@ -391,6 +393,63 @@
   </div>
 </div>
 
+<!-- PROOF OF PICKUP MODAL — mirrors Proof of Delivery exactly, independent IDs -->
+<div id="modal-pop">
+  <div class="pod-header">
+    <div class="back-btn" onclick="closePOP()">←</div>
+    <div>
+      <div class="pod-title">Proof of Pickup</div>
+      <div class="pod-sub" id="pop-order-code">Loading…</div>
+    </div>
+  </div>
+
+  <div class="pod-body">
+
+    <div class="pod-section">
+      <div class="pod-section-title">📷 Pickup Photo *</div>
+      <div class="camera-wrap" id="pop-camera-wrap">
+        <div class="camera-placeholder" id="pop-cam-placeholder">
+          <span>📷</span>
+          <p>Take a clear photo showing the parcel at the pickup location</p>
+        </div>
+        <div id="pop-photo-preview" style="display:none;position:relative;">
+          <img id="pop-preview-img" src="" alt="Pickup photo" style="width:100%;display:block;"/>
+          <div class="photo-check">✓</div>
+        </div>
+      </div>
+      <div class="camera-controls">
+        <input type="file" id="pop-camera-input-live"    accept="image/*" capture="environment" style="display:none" onchange="onPickupPhotoSelected(this)"/>
+        <input type="file" id="pop-camera-input-gallery" accept="image/*"                       style="display:none" onchange="onPickupPhotoSelected(this)"/>
+        <div id="pop-cam-open-row" style="display:flex;gap:8px;width:100%">
+          <button class="cam-btn cam-btn-open" style="flex:2" onclick="document.getElementById('pop-camera-input-live').click()">📷 Take Photo</button>
+          <button class="cam-btn cam-btn-retake" style="flex:1;font-size:12px" onclick="document.getElementById('pop-camera-input-gallery').click()">🖼 Gallery</button>
+        </div>
+        <button class="cam-btn cam-btn-retake" id="pop-cam-retake-btn" onclick="retakePickupPhoto()" style="display:none;width:100%">↺ Retake Photo</button>
+      </div>
+    </div>
+
+    <div class="pod-section">
+      <div class="pod-section-title">📍 Pickup Location *</div>
+      <div class="gps-capture-row">
+        <div class="gps-status-dot" id="pop-gps-dot"></div>
+        <div class="gps-capture-info">
+          <div class="gps-capture-label" id="pop-gps-label">Tap to capture GPS coordinates</div>
+          <div class="gps-capture-coords" id="pop-gps-coords">Not captured yet</div>
+        </div>
+        <button class="gps-capture-btn" id="pop-gps-cap-btn" onclick="capturePickupGPS()">📍 Capture</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pod-submit-wrap">
+    <div class="pod-required" id="pop-required">⚠️ Photo and GPS location are required to confirm pickup</div>
+    <button class="pod-submit-btn" id="pop-submit-btn" onclick="submitPOP()">
+      📦 Confirm Pickup
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -403,7 +462,7 @@ const RIDERS_TABLE = "riders";
 
 const STATUS_NEXT = {
   pending:         {next:"confirmed",       label:"✓ Confirm Order",      cls:"btn-next"},
-  confirmed:       {next:"picked_up",       label:"📦 Mark Picked Up",    cls:"btn-next"},
+  confirmed:       {next:"picked_up",       label:"📦 Confirm Pickup",    cls:"btn-next", pop:true},
   picked_up:       {next:"in_transit",      label:"🛵 Start Delivery",    cls:"btn-next"},
   in_transit:      {next:"out_for_delivery",label:"📍 Out for Delivery",  cls:"btn-next"},
   out_for_delivery:{next:"delivered",       label:"✅ Mark as Delivered", cls:"btn-complete", pod:true},
@@ -422,10 +481,109 @@ window.addEventListener('load', async()=>{
     showHome();
     loadDeliveries();
     loadMetrics();
+    subscribeToOrderAlerts();
   } else {
     showScreen('login');
   }
 });
+
+// ── ALERT SOUNDS — generated programmatically via Web Audio API.
+// No external audio files needed, works fully offline once the page loads.
+let audioCtx = null;
+
+function getAudioCtx(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  return audioCtx;
+}
+
+// A short, friendly two-tone "ding-dong" for new available orders
+function playNewOrderTone(){
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const now = ctx.currentTime;
+  [ {freq:880, start:0,    dur:0.18},
+    {freq:660, start:0.18, dur:0.22} ].forEach(tone=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = tone.freq;
+    gain.gain.setValueAtTime(0.25, now + tone.start);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + tone.start + tone.dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now + tone.start);
+    osc.stop(now + tone.start + tone.dur);
+  });
+  if(navigator.vibrate) navigator.vibrate([120,60,120]);
+}
+
+// A sharper, more urgent triple-beep for things needing immediate attention
+// (order reassigned/cancelled while rider is actively on it)
+function playUrgentTone(){
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const now = ctx.currentTime;
+  [0, 0.15, 0.30].forEach(start=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = 1000;
+    gain.gain.setValueAtTime(0.18, now + start);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + start + 0.12);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now + start);
+    osc.stop(now + start + 0.12);
+  });
+  if(navigator.vibrate) navigator.vibrate([100,50,100,50,100]);
+}
+
+// ── REALTIME ORDER ALERTS ────────────────────────────────────────────────────────
+let orderAlertChannel = null;
+
+function subscribeToOrderAlerts(){
+  if(orderAlertChannel) sb.removeChannel(orderAlertChannel);
+
+  orderAlertChannel = sb.channel('rider-order-alerts')
+    // New confirmed order becomes available to claim
+    .on('postgres_changes', {event:'INSERT', schema:'public', table:TABLE}, payload=>{
+      const o = payload.new;
+      if(o.status === 'confirmed' && !o.claimed_by){
+        playNewOrderTone();
+        showToast('📦 New order available: ' + o.tracking_code, 'success');
+        loadDeliveries();
+      }
+    })
+    // Existing order updated — alert if it affects this rider specifically
+    .on('postgres_changes', {event:'UPDATE', schema:'public', table:TABLE}, payload=>{
+      const o = payload.new;
+      const old = payload.old;
+
+      // A previously-unclaimed confirmed order just became claimable again
+      // (e.g. admin released it, or another rider's claim was reset)
+      if(o.status === 'confirmed' && !o.claimed_by && old.claimed_by){
+        playNewOrderTone();
+        showToast('📦 Order available again: ' + o.tracking_code, 'success');
+        loadDeliveries();
+        return;
+      }
+
+      // This rider's own active order was changed by someone else
+      // (e.g. admin cancelled it, or reassigned it away)
+      const isMine = (o.assigned_rider === currentRider?.id) || (o.claimed_by === currentRider?.id);
+      if(isMine && o.status === 'cancelled'){
+        playUrgentTone();
+        showToast('⚠️ Order cancelled: ' + o.tracking_code, 'error');
+        loadDeliveries();
+      } else if(isMine && currentDelivery && currentDelivery.tracking_code === o.tracking_code){
+        // Refresh the open detail view silently if it's currently being viewed
+        currentDelivery = o;
+        renderDetail(o);
+      }
+    })
+    .subscribe();
+}
 
 function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');}
 
@@ -463,12 +621,14 @@ async function doLogin(){
   showHome();
   loadDeliveries();
   loadMetrics();
+  subscribeToOrderAlerts();
 }
 
 document.getElementById('input-pin').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 async function doLogout(){
   stopGPS();
+  if(orderAlertChannel){ sb.removeChannel(orderAlertChannel); orderAlertChannel = null; }
   if(currentRider){
     await syncRiderStatus(currentRider.id, currentRider.name, false);
   }
@@ -512,7 +672,8 @@ async function loadMetrics(){
 async function loadDeliveries(){
   const list=document.getElementById('deliveries-list');
   list.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">⏳ Loading…</div>';
-  // Only show orders assigned to this rider OR unassigned confirmed orders
+  // Show: orders assigned to this rider, OR unassigned confirmed orders that
+  // are either unclaimed or claimed by this rider (never another rider's claim)
   const {data,error}=await sb.from(TABLE).select('*')
     .not('status','eq','delivered')
     .or(`assigned_rider.eq.${currentRider.id},and(assigned_rider.is.null,status.eq.confirmed)`)
@@ -522,17 +683,27 @@ async function loadDeliveries(){
     list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">📦</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">No active deliveries</div><div style="font-size:13px">All caught up!</div></div>`;
     return;
   }
-  list.innerHTML=data.map(d=>buildCard(d)).join('');
+  // Hide cards claimed by a DIFFERENT rider — they're not actionable for us
+  const visible = data.filter(d => !d.claimed_by || d.claimed_by === currentRider.id);
+  if(!visible.length){
+    list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">📦</div><div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px">No active deliveries</div><div style="font-size:13px">All caught up!</div></div>`;
+    return;
+  }
+  list.innerHTML=visible.map(d=>buildCard(d)).join('');
 }
 
 function buildCard(d){
   const statusClass='status-'+d.status;
   const statusLabel=STATUS_LABELS[d.status]??d.status;
   const currency=d.currency??'GHS';
+  const claimedByMe = d.claimed_by===currentRider.id;
+  const claimBadge = claimedByMe
+    ? '<span style="font-size:10px;color:var(--green);font-weight:700;margin-left:6px">● CLAIMED BY YOU</span>'
+    : (!d.claimed_by && d.status==='confirmed' ? '<span style="font-size:10px;color:var(--accent2);font-weight:700;margin-left:6px">⚡ UNCLAIMED — TAP TO CLAIM</span>' : '');
   return `
     <div class="delivery-card" onclick="openDelivery('${d.tracking_code}')">
       <div class="card-top">
-        <div class="tracking-id">${d.tracking_code}</div>
+        <div class="tracking-id">${d.tracking_code}${claimBadge}</div>
         <div class="status-badge ${statusClass}">${statusLabel}</div>
       </div>
       <div class="route-line">
@@ -570,6 +741,20 @@ function renderDetail(d){
 
 function renderActionBar(d){
   const bar=document.getElementById('action-bar');
+
+  // ── Claim gate: an unclaimed confirmed order must be claimed before any
+  // pickup action is available. This is the UI side of the atomic
+  // claim_order() RPC — the actual race-condition protection lives in the
+  // database, this just presents the right button for the right state.
+  if(d.status==='confirmed' && !d.claimed_by){
+    bar.innerHTML=`<button class="btn-action btn-next" style="background:linear-gradient(135deg,#fbbf24,#f59e0b)" onclick="claimThisOrder('${d.tracking_code}')">⚡ Claim This Order</button>`;
+    return;
+  }
+  if(d.status==='confirmed' && d.claimed_by && d.claimed_by!==currentRider.id){
+    bar.innerHTML=`<div style="text-align:center;color:var(--muted);font-size:13px;padding:16px">🔒 Claimed by another rider</div>`;
+    return;
+  }
+
   const next=STATUS_NEXT[d.status];
   if(!next){
     bar.innerHTML=`<div style="text-align:center;padding:16px">
@@ -580,9 +765,30 @@ function renderActionBar(d){
   }
   if(next.pod){
     bar.innerHTML=`<button class="btn-action ${next.cls}" onclick="openPOD('${d.tracking_code}')">${next.label}</button>`;
+  } else if(next.pop){
+    bar.innerHTML=`<button class="btn-action ${next.cls}" onclick="openPickupProof('${d.tracking_code}')">${next.label}</button>`;
   } else {
     bar.innerHTML=`<button class="btn-action ${next.cls}" onclick="advanceStatus('${d.tracking_code}','${next.next}',this)">${next.label}</button>`;
   }
+}
+
+// ── CLAIM ORDER — atomic via database RPC, no race condition possible ──────────
+async function claimThisOrder(code){
+  const {data, error} = await sb.rpc('claim_order', { _code: code, _rider_id: currentRider.id });
+
+  if(error || !data || !data.length || !data[0].success){
+    const msg = (data && data[0] && data[0].message) ? data[0].message : 'Could not claim this order';
+    showToast(msg, 'error');
+    // Someone else got it first — refresh so it disappears from this rider's list
+    await loadDeliveries();
+    showHome();
+    return;
+  }
+
+  showToast('Order claimed! It\'s yours now.', 'success');
+  if(navigator.vibrate) navigator.vibrate(80);
+  currentDelivery.claimed_by = currentRider.id;
+  renderDetail(currentDelivery);
 }
 
 async function advanceStatus(code,newStatus,btn){
@@ -930,6 +1136,207 @@ async function submitPOD() {
 
   // Show rating modal
   setTimeout(() => document.getElementById('modal-rating').classList.add('show'), 600);
+  loadMetrics();
+}
+
+// ── PROOF OF PICKUP — mirrors Proof of Delivery, fully independent state ───────
+let popCode = null, popPhotoData = null, popLat = null, popLng = null;
+
+function openPickupProof(code) {
+  popCode = code;
+  popPhotoData = null; popLat = null; popLng = null;
+
+  function setEl(id, prop, val) { const el = document.getElementById(id); if (el) el[prop] = val; }
+  function setStyle(id, prop, val) { const el = document.getElementById(id); if (el) el.style[prop] = val; }
+  function setClass(id, cls) { const el = document.getElementById(id); if (el) el.className = cls; }
+
+  setEl('pop-order-code', 'textContent', code);
+  setEl('pop-preview-img', 'src', '');
+  setStyle('pop-photo-preview', 'display', 'none');
+  setStyle('pop-cam-placeholder', 'display', 'flex');
+  setStyle('pop-cam-open-row', 'display', 'flex');
+  setStyle('pop-cam-retake-btn', 'display', 'none');
+
+  ['pop-camera-input-live','pop-camera-input-gallery'].forEach(id => {
+    const el = document.getElementById(id);
+    try { if (el) el.value = ''; } catch(e) {}
+  });
+
+  setClass('pop-gps-dot', 'gps-status-dot');
+  setEl('pop-gps-label', 'textContent', 'Tap to capture GPS coordinates');
+  setEl('pop-gps-coords', 'textContent', 'Not captured yet');
+  setClass('pop-gps-cap-btn', 'gps-capture-btn');
+  setEl('pop-gps-cap-btn', 'textContent', '📍 Capture');
+  setStyle('pop-required', 'display', 'flex');
+
+  const submitBtn = document.getElementById('pop-submit-btn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  const modal = document.getElementById('modal-pop');
+  if (modal) modal.classList.add('show');
+}
+
+function closePOP() {
+  const modal = document.getElementById('modal-pop');
+  if (modal) modal.classList.remove('show');
+}
+
+function onPickupPhotoSelected(input) {
+  if (!input || !input.files || !input.files[0]) {
+    showToast('No photo selected. Try again.', 'error');
+    return;
+  }
+  const file = input.files[0];
+  if (!file.type.startsWith('image/')) {
+    showToast('Please select an image file.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const rawData = ev.target.result;
+    if (!rawData) { showToast('Could not read image. Try again.', 'error'); return; }
+
+    const img = new Image();
+    img.onload = function() {
+      try {
+        const MAX = 960;
+        let w = img.naturalWidth || img.width || 960;
+        let h = img.naturalHeight || img.height || 960;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+        if (w < 1) w = 960; if (h < 1) h = 960;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('No canvas context');
+        ctx.drawImage(img, 0, 0, w, h);
+        const compressed = canvas.toDataURL('image/jpeg', 0.75);
+        popPhotoData = (compressed && compressed.length > 100) ? compressed : rawData;
+      } catch(e) {
+        popPhotoData = rawData;
+      }
+      showPickupPhotoPreview(popPhotoData);
+      checkPOPReady();
+    };
+    img.onerror = function() {
+      popPhotoData = rawData;
+      showPickupPhotoPreview(popPhotoData);
+      checkPOPReady();
+    };
+    img.src = rawData;
+  };
+  reader.onerror = function() {
+    showToast('Could not read photo. Please try again.', 'error');
+  };
+  reader.readAsDataURL(file);
+}
+
+function showPickupPhotoPreview(dataUrl) {
+  document.getElementById('pop-preview-img').src = dataUrl;
+  document.getElementById('pop-photo-preview').style.display = 'block';
+  document.getElementById('pop-cam-placeholder').style.display = 'none';
+  document.getElementById('pop-cam-open-row').style.display = 'none';
+  document.getElementById('pop-cam-retake-btn').style.display = 'block';
+}
+
+function retakePickupPhoto() {
+  popPhotoData = null;
+  document.getElementById('pop-photo-preview').style.display = 'none';
+  document.getElementById('pop-cam-retake-btn').style.display = 'none';
+  document.getElementById('pop-cam-open-row').style.display = 'flex';
+  document.getElementById('pop-cam-placeholder').style.display = 'flex';
+  ['pop-camera-input-live','pop-camera-input-gallery'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  checkPOPReady();
+}
+
+function capturePickupGPS() {
+  const btn = document.getElementById('pop-gps-cap-btn');
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      popLat = pos.coords.latitude;
+      popLng = pos.coords.longitude;
+      const acc = Math.round(pos.coords.accuracy);
+      document.getElementById('pop-gps-dot').className = 'gps-status-dot got';
+      document.getElementById('pop-gps-label').textContent = '✅ Location captured';
+      document.getElementById('pop-gps-coords').textContent = `${popLat.toFixed(6)}, ${popLng.toFixed(6)} · ±${acc}m`;
+      btn.className = 'gps-capture-btn got';
+      btn.textContent = '✓ Got it';
+      btn.disabled = false;
+      checkPOPReady();
+    },
+    () => {
+      document.getElementById('pop-gps-label').textContent = '⚠️ GPS unavailable — tap to retry';
+      btn.textContent = '↺ Retry';
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+  );
+}
+
+function checkPOPReady() {
+  const ready = popPhotoData && popLat && popLng;
+  document.getElementById('pop-submit-btn').disabled = !ready;
+  document.getElementById('pop-required').style.display = ready ? 'none' : 'flex';
+}
+
+async function submitPOP() {
+  if (!popPhotoData || !popLat || !popLng) return;
+  const btn = document.getElementById('pop-submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white"></div>&nbsp;Uploading photo…';
+
+  function dataUrlToBlob(dataUrl){
+    const [meta, b64] = dataUrl.split(',');
+    const mime = meta.match(/data:(.*?);/)[1];
+    const bin  = atob(b64);
+    const arr  = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
+
+  const fileName = popCode + '-pickup-' + Date.now() + '.jpg';
+  let uploadedPath = null;
+
+  try {
+    const blob = dataUrlToBlob(popPhotoData);
+    const { error: uploadError } = await sb.storage
+      .from('delivery-photos')
+      .upload(fileName, blob, { contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    uploadedPath = fileName;
+  } catch (e) {
+    console.error('Pickup photo upload error:', e);
+    showToast('Photo upload failed — saving without photo', 'error');
+    uploadedPath = null;
+  }
+
+  btn.innerHTML = '<div class="spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:white"></div>&nbsp;Confirming…';
+
+  const { error } = await sb.rpc('confirm_pickup', {
+    _code: popCode,
+    _photo_path: uploadedPath,
+    _lat: popLat,
+    _lng: popLng
+  });
+
+  if (error) {
+    showToast('Failed to confirm pickup', 'error');
+    btn.disabled = false;
+    btn.innerHTML = '📦 Confirm Pickup';
+    return;
+  }
+
+  closePOP();
+  showToast('Pickup confirmed with proof! 📦', 'success');
+
+  if (currentDelivery) { currentDelivery.status = 'picked_up'; }
+  loadDeliveries();
   loadMetrics();
 }
 

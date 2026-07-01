@@ -239,6 +239,29 @@
     .tr-rank-3{color:#c2410c;font-weight:700;}
     .tr-online-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
 
+    /* FINANCE */
+    .pnl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+    @media(min-width:600px){.pnl-grid{grid-template-columns:repeat(3,1fr);}}
+    .pnl-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden;}
+    .pnl-card.revenue::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#22c55e;}
+    .pnl-card.cost::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);}
+    .pnl-card.profit::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange);}
+    .pnl-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+    .pnl-value{font-size:24px;font-weight:700;}
+    .pnl-value.positive{color:#16a34a;}
+    .pnl-value.negative{color:var(--red);}
+    .pnl-breakdown{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6;}
+    .fin-tab-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:'Inter',sans-serif;}
+    .fin-tab-btn.active{background:var(--text);color:white;border:none;}
+    .fin-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border);}
+    .fin-table{width:100%;border-collapse:collapse;min-width:560px;}
+    .fin-table th{background:var(--bg);padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+    .fin-table td{padding:10px 12px;font-size:13px;border-top:1px solid var(--border);white-space:nowrap;}
+    .fin-total-row{font-weight:700;background:var(--bg);}
+    .fin-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .fin-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;}
+    .fin-add-btn{background:var(--orange);color:white;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+
     /* TOAST */
     .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--text);color:white;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;max-width:90vw;}
     .toast.show{transform:translateX(-50%) translateY(0);}
@@ -335,6 +358,7 @@
       <button onclick="showSection('analytics')" id="btn-analytics" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">📊 Analytics</button>
       <button onclick="showSection('codes')" id="btn-codes" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🔑 Access Codes</button>
       <button onclick="showSection('topriders')" id="btn-topriders" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">🏆 Top Riders</button>
+      <button onclick="showSection('finance')" id="btn-finance" style="padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);border:1px solid var(--border);font-family:Inter,sans-serif">💰 Finance</button>
     </div>
 
     <!-- Riders -->
@@ -422,6 +446,36 @@
       <div id="topriders-content">
         <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading rider performance…</div>
       </div>
+    </div>
+
+    <!-- Finance (Superadmin only) — the real DNA of the business -->
+    <div class="section-card" id="finance-section" data-superadmin-only="true" style="display:none">
+      <div class="section-header">
+        <div class="section-title">💰 <span>Finance & Fleet</span></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="tr-period-btn active" id="fin-period-today" onclick="loadFinance('today')">Today</button>
+        <button class="tr-period-btn" id="fin-period-week" onclick="loadFinance('week')">This Week</button>
+        <button class="tr-period-btn" id="fin-period-month" onclick="loadFinance('month')">This Month</button>
+        <button class="tr-period-btn" id="fin-period-all" onclick="loadFinance('all')">All Time</button>
+      </div>
+
+      <div id="finance-pnl">
+        <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading financial summary…</div>
+      </div>
+
+      <!-- Sub-tabs within Finance -->
+      <div style="display:flex;gap:8px;margin:20px 0 14px;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:16px">
+        <button class="fin-tab-btn active" id="fin-tab-payroll" onclick="showFinanceTab('payroll')">👥 Payroll</button>
+        <button class="fin-tab-btn" id="fin-tab-fuel" onclick="showFinanceTab('fuel')">⛽ Fuel Efficiency</button>
+        <button class="fin-tab-btn" id="fin-tab-maintenance" onclick="showFinanceTab('maintenance')">🔧 Maintenance</button>
+        <button class="fin-tab-btn" id="fin-tab-vehicles" onclick="showFinanceTab('vehicles')">🚲 Vehicles</button>
+      </div>
+
+      <div id="fin-payroll-content"></div>
+      <div id="fin-fuel-content" style="display:none"></div>
+      <div id="fin-maintenance-content" style="display:none"></div>
+      <div id="fin-vehicles-content" style="display:none"></div>
     </div>
 
     <!-- Analytics -->
@@ -640,6 +694,20 @@ async function loadNotifications(){
   renderNotifications();
 }
 
+// ── Stale-order proactive detection ─────────────────────────────────────────────
+async function checkStaleOrders(){
+  try {
+    // Server-side: finds stuck orders and inserts deduplicated alerts into
+    // the notifications table (skips if already alerted in the last hour).
+    const { error } = await sb.rpc('push_stale_order_notifications');
+    if(error){ console.error('Stale order check failed:', error); return; }
+    // Pull any fresh alerts into the bell immediately
+    await loadNotifications();
+  } catch(e) {
+    console.error('Stale order check error:', e);
+  }
+}
+
 function renderNotifications(){
   const list  = document.getElementById('notif-list');
   const badge = document.getElementById('notif-badge');
@@ -660,7 +728,7 @@ function renderNotifications(){
   }
   list.innerHTML = visible.map(n => {
     const ago = timeAgo(n.created_at);
-    const icon = {new_order:'🛵',status_change:'📦',new_partner:'🤝',payment:'💰',rider_signin:'🟢'}[n.type]||'🔔';
+    const icon = {new_order:'🛵',status_change:'📦',new_partner:'🤝',payment:'💰',rider_signin:'🟢',stale_order:'⚠️'}[n.type]||'🔔';
     // sanitize() strips HTML — closes the stored-XSS vector where a malicious
     // customer/business name could otherwise execute script in the admin's
     // own authenticated session via this dropdown.
@@ -686,7 +754,7 @@ async function handleNotifClick(id, type, reference){
   allNotifications = allNotifications.map(n=>n.id===id?{...n,read:true}:n);
   renderNotifications();
   toggleNotifDropdown();
-  if((type==='new_order'||type==='status_change')&&reference){
+  if((type==='new_order'||type==='status_change'||type==='stale_order')&&reference){
     showSection('orders');
     setTimeout(()=>openTrack(reference),300);
   } else if(type==='new_partner' && currentRole!=='dispatcher'){
@@ -765,6 +833,11 @@ async function doDispatcherLogin(){
   // Log usage via narrow RPC — no bulk table access needed
   await sb.rpc('mark_dispatcher_code_used', { _code: code });
 
+  // Log dispatcher active day — this is what feeds the pay calculation.
+  // Only one log per login session is needed (duplicates are fine since the
+  // pay function uses DISTINCT dates, not row counts).
+  await sb.rpc('log_dispatcher_login', { _code: code, _name: data[0].dispatcher_name || '' });
+
   currentRole = 'dispatcher';
   sessionStorage.setItem('zygo_dispatcher_session', btoa(code+':'+Date.now()));
   showMain();
@@ -775,14 +848,14 @@ function applyRoleRestrictions(){
   if(currentRole==='dispatcher'){
     badge.textContent = 'Dispatcher';
     badge.className = 'role-badge dispatcher';
-    ['btn-partners','btn-analytics','btn-codes','btn-topriders'].forEach(id=>{
+    ['btn-partners','btn-analytics','btn-codes','btn-topriders','btn-finance'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='none';
     });
     document.body.classList.add('is-dispatcher');
   } else {
     badge.textContent = 'Superadmin';
     badge.className = 'role-badge superadmin';
-    ['btn-partners','btn-analytics','btn-codes','btn-topriders'].forEach(id=>{
+    ['btn-partners','btn-analytics','btn-codes','btn-topriders','btn-finance'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='inline-block';
     });
     document.body.classList.remove('is-dispatcher');
@@ -908,6 +981,15 @@ async function showMain(){
     .subscribe();
 
   loadRiderStatuses();
+
+  // ── Stale-order detection — proactively surfaces stuck orders via the
+  // existing notification bell, instead of waiting for a customer to
+  // complain. Superadmin-only since the underlying RPC requires real
+  // Supabase Auth (dispatchers run on the anon key and can't reach it).
+  if(currentRole === 'superadmin'){
+    checkStaleOrders();
+    setInterval(checkStaleOrders, 5 * 60 * 1000); // re-check every 5 minutes
+  }
   showSection('orders');
 }
 
@@ -1159,10 +1241,43 @@ async function openTrack(code){
   const distDisplay=o.route_distance_m?`${(o.route_distance_m/1000).toFixed(1)} km`:'—';
   const isDelivered = o.status==='delivered';
   const hasPOD = !!(o.delivery_photo);
+  const hasPOP = !!(o.pickup_photo);
 
-  // Resolve the photo URL up front (signed URL for storage-based photos,
+  // Resolve both photo URLs up front (signed URL for storage-based photos,
   // pass-through for legacy base64 rows) before building the modal HTML.
   const resolvedPhotoUrl = hasPOD ? await resolvePhotoUrl(o.delivery_photo) : null;
+  const resolvedPickupUrl = hasPOP ? await resolvePhotoUrl(o.pickup_photo) : null;
+
+  // Build Proof of Pickup section — mirrors POD exactly, surfaces the
+  // strategic gap closed: pickup is now just as verifiable as delivery.
+  let popHTML = '';
+  if(o.status !== 'pending' && o.status !== 'confirmed'){
+    if(hasPOP && resolvedPickupUrl){
+      popHTML = `
+        <div class="pod-section">
+          <div class="pod-section-label">
+            <span style="width:8px;height:8px;border-radius:50%;background:#3b82f6;display:inline-block"></span>
+            📦 Proof of Pickup Confirmed
+          </div>
+          <img src="${resolvedPickupUrl}" class="pod-photo" alt="Proof of pickup"
+            onclick="window.open('${resolvedPickupUrl}','_blank')" title="Tap to view full size"/>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px;text-align:center">Tap photo to view full size · Link expires in 1 hour</div>
+          ${o.picked_up_at?`<div class="pod-timestamp">📅 Picked up: ${formatDate(o.picked_up_at)}</div>`:''}
+          ${o.pickup_lat_actual&&o.pickup_lng_actual?`
+            <div class="pod-coords">
+              📍 Pickup coordinates: ${Number(o.pickup_lat_actual).toFixed(6)}, ${Number(o.pickup_lng_actual).toFixed(6)}
+              <a href="https://www.google.com/maps?q=${o.pickup_lat_actual},${o.pickup_lng_actual}" target="_blank"
+                style="color:var(--orange);font-weight:600;margin-left:8px;font-size:11px">View on map →</a>
+            </div>`:''}
+        </div>`;
+    } else if(o.status !== 'pending'){
+      popHTML = `
+        <div class="pod-section">
+          <div class="pod-section-label">📦 Proof of Pickup</div>
+          <div class="pod-missing">⚠️ No proof of pickup photo recorded for this order.</div>
+        </div>`;
+    }
+  }
 
   // Build POD section
   let podHTML = '';
@@ -1228,8 +1343,10 @@ async function openTrack(code){
     <div class="info-row"><span class="info-label">Paid</span><span class="info-value">${o.paid_at?'✅ Yes':'❌ No'}</span></div>
     <div class="info-row"><span class="info-label">Rating</span><span class="info-value">${o.rider_rating?'⭐'.repeat(o.rider_rating):'Not rated'}</span></div>
     <div class="info-row"><span class="info-label">Order time</span><span class="info-value">${formatDate(o.created_at)}</span></div>
+    ${o.claimed_by?`<div class="info-row"><span class="info-label">Claimed By</span><span class="info-value">🔒 ${sanitize(o.claimed_by)}${o.claimed_at?' · '+formatDate(o.claimed_at):''}</span></div>`:''}
     ${confirmBtn}
     ${markPaidBtn}
+    ${popHTML}
     ${podHTML}
     `
 
@@ -1433,14 +1550,14 @@ document.getElementById('modal-log-dm').addEventListener('click',e=>{
 // ── Partners ─────────────────────────────────────────────────────────────────────
 function showSection(section){
   // Dispatchers can ONLY access orders + riders — hard block at function level
-  if(currentRole==='dispatcher' && (section==='partners'||section==='analytics'||section==='codes'||section==='topriders')){
+  if(currentRole==='dispatcher' && (section==='partners'||section==='analytics'||section==='codes'||section==='topriders'||section==='finance')){
     showToast('This section is restricted for dispatchers','error');
     section='orders';
   }
 
-  const btns = ['btn-orders','btn-partners','btn-analytics','btn-codes','btn-topriders'];
+  const btns = ['btn-orders','btn-partners','btn-analytics','btn-codes','btn-topriders','btn-finance'];
 
-  ['orders-section','riders-section','partners-section','analytics-section','codes-section','topriders-section'].forEach(id=>{
+  ['orders-section','riders-section','partners-section','analytics-section','codes-section','topriders-section','finance-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
 
@@ -1467,6 +1584,10 @@ function showSection(section){
     const el=document.getElementById('topriders-section'); if(el) el.style.display='block';
     const btn=document.getElementById('btn-topriders'); if(btn) btn.style.cssText=activeStyle;
     loadTopRiders('today');
+  } else if(section==='finance'){
+    const el=document.getElementById('finance-section'); if(el) el.style.display='block';
+    const btn=document.getElementById('btn-finance'); if(btn) btn.style.cssText=activeStyle;
+    loadFinance('today');
   } else {
     ['orders-section','riders-section'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.style.display='block';
@@ -1531,366 +1652,213 @@ function sanitize(str){
 
 // ── ANALYTICS ─────────────────────────────────────────────────────────────────
 // ── TOP RIDERS / PERFORMANCE ───────────────────────────────────────────────────
-async function loadTopRiders(period){
-  // Update active period button
+// ── FINANCE & FLEET ──────────────────────────────────────────────────────────────
+let financeCurrentPeriod = 'today';
+
+async function loadFinance(period){
+  financeCurrentPeriod = period;
   ['today','week','month','all'].forEach(p=>{
-    const btn = document.getElementById('tr-period-'+p);
+    const btn = document.getElementById('fin-period-'+p);
     if(btn) btn.classList.toggle('active', p===period);
   });
 
-  const container = document.getElementById('topriders-content');
-  if(!container) return;
-  container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading rider performance…</div>';
+  const pnlEl = document.getElementById('finance-pnl');
+  pnlEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading financial summary…</div>';
 
-  const {data, error} = await sb.rpc('get_rider_performance', { _period: period });
+  const { data, error } = await sb.rpc('get_financial_summary', { _period: period });
 
-  if(error){
-    console.error('Rider performance error:', error);
-    container.innerHTML = '<div class="analytics-empty">❌ Could not load rider performance. ' + (error.message||'') + '</div>';
+  if(error || !data || !data.length){
+    pnlEl.innerHTML = '<div class="analytics-empty">❌ Could not load financial summary. ' + (error?.message||'') + '</div>';
     return;
   }
 
-  if(!data || !data.length){
-    container.innerHTML = '<div class="analytics-empty">📭 No rider data yet for this period.</div>';
-    return;
-  }
-
-  // Riders with zero deliveries AND zero revenue sink to bottom but still shown
-  const ranked = [...data].sort((a,b) => (b.deliveries - a.deliveries) || (b.revenue - a.revenue));
-  const top = ranked.find(r => r.deliveries > 0) || ranked[0];
-
+  const f = data[0];
   const periodLabel = {today:'Today', week:'This Week', month:'This Month', all:'All Time'}[period];
+  const profitClass = f.net_profit >= 0 ? 'positive' : 'negative';
 
-  let html = '';
-
-  // Crown card for the top performer (only if they actually have deliveries)
-  if(top && top.deliveries > 0){
-    html += `
-      <div class="tr-crown-card">
-        <div class="tr-crown-badge">👑</div>
-        <div class="tr-crown-label">Top Rider · ${periodLabel}</div>
-        <div class="tr-crown-name">${sanitize(top.rider_name||top.rider_id)}</div>
-        <div class="tr-crown-stats">
-          <div class="tr-crown-stat">Deliveries<strong>${top.deliveries}</strong></div>
-          <div class="tr-crown-stat">Revenue<strong>GHS ${Number(top.revenue).toFixed(0)}</strong></div>
-          <div class="tr-crown-stat">Avg Rating<strong>${top.avg_rating?top.avg_rating+'⭐':'—'}</strong></div>
-          <div class="tr-crown-stat">Avg Delivery Time<strong>${top.avg_delivery_minutes?top.avg_delivery_minutes+' min':'—'}</strong></div>
-          <div class="tr-crown-stat">Online Hours<strong>${Number(top.online_hours||0).toFixed(1)}h</strong></div>
+  pnlEl.innerHTML = `
+    <div class="pnl-grid">
+      <div class="pnl-card revenue">
+        <div class="pnl-label">Revenue · ${periodLabel}</div>
+        <div class="pnl-value positive">GHS ${Number(f.revenue).toFixed(2)}</div>
+        <div class="pnl-breakdown">From confirmed paid deliveries</div>
+      </div>
+      <div class="pnl-card cost">
+        <div class="pnl-label">Total Costs</div>
+        <div class="pnl-value negative">GHS ${Number(f.total_cost).toFixed(2)}</div>
+        <div class="pnl-breakdown">
+          Riders: GHS ${Number(f.rider_pay_cost).toFixed(2)}<br>
+          Dispatchers: GHS ${Number(f.dispatcher_pay_cost).toFixed(2)}<br>
+          Fuel: GHS ${Number(f.fuel_cost).toFixed(2)}<br>
+          Maintenance: GHS ${Number(f.maintenance_cost).toFixed(2)}
         </div>
-      </div>`;
-  } else {
-    html += `<div class="analytics-empty">No deliveries recorded yet for ${periodLabel.toLowerCase()} — rankings will appear once riders start completing deliveries.</div>`;
-  }
+      </div>
+      <div class="pnl-card profit">
+        <div class="pnl-label">Net Profit</div>
+        <div class="pnl-value ${profitClass}">GHS ${Number(f.net_profit).toFixed(2)}</div>
+        <div class="pnl-breakdown">${f.revenue>0?'Margin: '+((f.net_profit/f.revenue)*100).toFixed(0)+'%':'No revenue yet'}</div>
+      </div>
+    </div>`;
 
-  // Full table — every rider, every metric
-  html += `
-    <div class="tr-table-wrap">
-      <table class="tr-table">
-        <thead>
-          <tr>
-            <th>#</th><th>Rider</th><th>Status</th><th>Deliveries</th><th>Revenue</th>
-            <th>Avg Time</th><th>Incidents</th><th>Rating</th><th>Online Hrs</th>
-          </tr>
-        </thead>
+  // Refresh whichever sub-tab is currently open
+  const activeTab = document.querySelector('.fin-tab-btn.active');
+  const tabName = activeTab ? activeTab.id.replace('fin-tab-','') : 'payroll';
+  showFinanceTab(tabName);
+}
+
+function showFinanceTab(tab){
+  ['payroll','fuel','maintenance','vehicles'].forEach(t=>{
+    const btn = document.getElementById('fin-tab-'+t);
+    const content = document.getElementById('fin-'+t+'-content');
+    if(btn) btn.classList.toggle('active', t===tab);
+    if(content) content.style.display = (t===tab) ? 'block' : 'none';
+  });
+  if(tab==='payroll') loadPayroll();
+  else if(tab==='fuel') loadFuelEfficiency();
+  else if(tab==='maintenance') loadMaintenanceSummary();
+  else if(tab==='vehicles') loadVehiclesManager();
+}
+
+// ── Payroll (riders + dispatchers, auto-calculated) ─────────────────────────────
+async function loadPayroll(){
+  const el = document.getElementById('fin-payroll-content');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading payroll…</div>';
+
+  const [ridersRes, dispatchersRes, ratesRes] = await Promise.all([
+    sb.rpc('get_all_riders_pay_summary', { _period: financeCurrentPeriod }),
+    sb.rpc('get_all_dispatchers_pay_summary', { _period: financeCurrentPeriod }),
+    sb.rpc('get_pay_rates')
+  ]);
+
+  const riders = ridersRes.data || [];
+  const dispatchers = dispatchersRes.data || [];
+  const rates = {};
+  (ratesRes.data||[]).forEach(r => rates[r.key] = r.value);
+
+  let html = `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;background:var(--bg);border-radius:8px;padding:10px 12px">
+      <strong>Pay formula:</strong> Riders: GHS ${rates.rider_base_daily||15}/active day + GHS ${rates.rider_per_delivery||2}/delivery ·
+      Dispatchers: GHS ${rates.dispatcher_base_daily||20}/active day + GHS ${rates.dispatcher_per_delivery||0.5}/delivery
+    </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">👤 Riders</div>
+    <div class="fin-table-wrap" style="margin-bottom:20px">
+      <table class="fin-table">
+        <thead><tr><th>Rider</th><th>Active Days</th><th>Deliveries</th><th>Total Pay</th></tr></thead>
         <tbody>
-          ${ranked.map((r,i) => {
-            const rankClass = i===0?'tr-rank-1':i===1?'tr-rank-2':i===2?'tr-rank-3':'';
-            const rankIcon = i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1);
-            return `<tr>
-              <td class="${rankClass}">${rankIcon}</td>
-              <td style="font-weight:600">${sanitize(r.rider_name||r.rider_id)}</td>
-              <td><span class="tr-online-dot" style="background:${r.is_online?'#22c55e':'#9ca3af'}"></span>${r.is_online?'Online':'Offline'}</td>
-              <td>${r.deliveries}</td>
-              <td>GHS ${Number(r.revenue).toFixed(0)}</td>
-              <td>${r.avg_delivery_minutes?r.avg_delivery_minutes+' min':'—'}</td>
-              <td style="color:${r.incidents>0?'var(--red)':'var(--muted)'}">${r.incidents}</td>
-              <td>${r.avg_rating?r.avg_rating+' ⭐':'—'}</td>
-              <td>${Number(r.online_hours||0).toFixed(1)}h</td>
-            </tr>`;
-          }).join('')}
+          ${riders.map(r=>`<tr>
+            <td style="font-weight:600">${sanitize(r.rider_name||r.rider_id)}</td>
+            <td>${r.active_days||0}</td>
+            <td>${r.deliveries||0}</td>
+            <td style="font-weight:700;color:var(--orange)">GHS ${Number(r.total_pay||0).toFixed(2)}</td>
+          </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No rider activity yet</td></tr>'}
+          <tr class="fin-total-row">
+            <td colspan="3">Total Rider Pay</td>
+            <td>GHS ${riders.reduce((s,r)=>s+Number(r.total_pay||0),0).toFixed(2)}</td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6">
-      <strong>Incidents</strong> = cancelled orders assigned to this rider in the period.
-      <strong>Online Hours</strong> tracks accumulating from when this feature was enabled — historical hours before that aren't available.
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">📋 Dispatchers</div>
+    <div class="fin-table-wrap">
+      <table class="fin-table">
+        <thead><tr><th>Dispatcher</th><th>Active Days</th><th>Total Pay</th></tr></thead>
+        <tbody>
+          ${dispatchers.map(d=>`<tr>
+            <td style="font-weight:600">${sanitize(d.dispatcher_name||d.dispatcher_code||'Unnamed')}</td>
+            <td>${d.active_days||0}</td>
+            <td style="font-weight:700;color:var(--orange)">GHS ${Number(d.total_pay||0).toFixed(2)}</td>
+          </tr>`).join('') || '<tr><td colspan="3" style="text-align:center;color:var(--muted)">No dispatcher activity yet</td></tr>'}
+          <tr class="fin-total-row">
+            <td colspan="2">Total Dispatcher Pay</td>
+            <td>GHS ${dispatchers.reduce((s,d)=>s+Number(d.total_pay||0),0).toFixed(2)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <button class="fin-add-btn" onclick="openPayRateEditor()">⚙️ Edit Pay Rates</button>
     </div>`;
 
-  container.innerHTML = html;
+  el.innerHTML = html;
 }
 
-async function loadAnalytics(){
-  const container = document.getElementById('analytics-content');
-  if(!container) return;
-  container.innerHTML = '<div class="analytics-empty">⏳ Loading analytics…</div>';
+function openPayRateEditor(){
+  const newRiderBase = prompt('Rider base daily pay (GHS):', '15');
+  if(newRiderBase===null) return;
+  const newRiderPer = prompt('Rider pay per delivery (GHS):', '2');
+  if(newRiderPer===null) return;
+  const newDispBase = prompt('Dispatcher base daily pay (GHS):', '20');
+  if(newDispBase===null) return;
+  const newDispPer = prompt('Dispatcher pay per delivery (GHS):', '0.5');
+  if(newDispPer===null) return;
 
-  const rangeEl = document.getElementById('analytics-range');
-  const rangeDays = rangeEl ? rangeEl.value : '30';
+  Promise.all([
+    sb.rpc('update_pay_rate', { _key:'rider_base_daily', _value: parseFloat(newRiderBase) }),
+    sb.rpc('update_pay_rate', { _key:'rider_per_delivery', _value: parseFloat(newRiderPer) }),
+    sb.rpc('update_pay_rate', { _key:'dispatcher_base_daily', _value: parseFloat(newDispBase) }),
+    sb.rpc('update_pay_rate', { _key:'dispatcher_per_delivery', _value: parseFloat(newDispPer) }),
+  ]).then(()=>{
+    showToast('Pay rates updated','success');
+    loadPayroll();
+  });
+}
 
-  // Calculate date range
-  let fromDate = null;
-  if(rangeDays !== 'all'){
-    const d = new Date();
-    d.setDate(d.getDate() - parseInt(rangeDays));
-    fromDate = d.toISOString();
+// ── Fuel efficiency comparison ───────────────────────────────────────────────────
+async function loadFuelEfficiency(){
+  const el = document.getElementById('fin-fuel-content');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading fuel data…</div>';
+
+  const { data, error } = await sb.rpc('get_fuel_efficiency_comparison');
+  if(error || !data){
+    el.innerHTML = '<div class="analytics-empty">❌ Could not load fuel data</div>';
+    return;
   }
 
-  try {
-    // Fetch all orders in range
-    let query = sb.from(TABLE).select('*').order('created_at', {ascending:true});
-    if(fromDate) query = query.gte('created_at', fromDate);
-    const {data: orders, error} = await query;
+  el.innerHTML = `
+    <div class="fin-table-wrap">
+      <table class="fin-table">
+        <thead><tr><th>Vehicle</th><th>Rider</th><th>km/Liter</th><th>Total Liters</th><th>Total Distance</th><th>Fuel Cost</th></tr></thead>
+        <tbody>
+          ${data.map(v=>`<tr>
+            <td style="font-weight:600">${sanitize(v.vehicle_name||'—')}</td>
+            <td>${sanitize(v.rider_name||'Unassigned')}</td>
+            <td style="font-weight:700;color:${v.avg_km_per_liter?'#16a34a':'var(--muted)'}">${v.avg_km_per_liter?v.avg_km_per_liter+' km/L':'—'}</td>
+            <td>${Number(v.total_liters||0).toFixed(1)} L</td>
+            <td>${Number(v.total_distance_km||0).toFixed(0)} km</td>
+            <td>GHS ${Number(v.total_fuel_cost||0).toFixed(2)}</td>
+          </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No fuel logs yet</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px">
+      Higher km/Liter = better fuel efficiency. Riders log fuel from their app each time they refuel, including odometer reading.
+    </div>`;
+}
 
-    if(error || !orders){
-      container.innerHTML = '<div class="analytics-empty">❌ Failed to load analytics. Try again.</div>';
-      return;
-    }
+// ── Maintenance summary ──────────────────────────────────────────────────────────
+async function loadMaintenanceSummary(){
+  const el = document.getElementById('fin-maintenance-content');
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading maintenance data…</div>';
 
-    if(orders.length === 0){
-      container.innerHTML = '<div class="analytics-empty">📭 No orders in this period yet.<br>Start delivering to see analytics.</div>';
-      return;
-    }
-
-    // ── Compute KPIs ──
-    const total        = orders.length;
-    const delivered    = orders.filter(o=>o.status==='delivered');
-    const cancelled    = orders.filter(o=>o.status==='cancelled');
-    const pending      = orders.filter(o=>o.status==='pending'||o.status==='confirmed');
-    const inProgress   = orders.filter(o=>['picked_up','in_transit','out_for_delivery'].includes(o.status));
-    const revenue      = delivered.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
-    const ratings      = orders.filter(o=>o.rider_rating).map(o=>Number(o.rider_rating));
-    const avgRating    = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
-    const convRate     = total > 0 ? ((delivered.length/total)*100).toFixed(0) : 0;
-    const hasPOD       = orders.filter(o=>o.delivery_photo).length;
-
-    // ── Daily trend (last 7 days) ──
-    const days = [];
-    for(let i=6;i>=0;i--){
-      const d = new Date(); d.setDate(d.getDate()-i);
-      const label = d.toLocaleDateString('en-GB',{weekday:'short'});
-      const dateStr = d.toISOString().split('T')[0];
-      const dayOrders = orders.filter(o=>o.created_at&&o.created_at.startsWith(dateStr));
-      const dayRevenue = dayOrders.filter(o=>o.paid_at&&o.price).reduce((s,o)=>s+Number(o.price),0);
-      days.push({label, count:dayOrders.length, revenue:dayRevenue});
-    }
-    const maxCount = Math.max(...days.map(d=>d.count), 1);
-
-    // ── Status breakdown ──
-    const statusColors = {
-      pending:'#9ca3af', confirmed:'#f97316', picked_up:'#0ea5e9',
-      in_transit:'#3b82f6', out_for_delivery:'#8b5cf6',
-      delivered:'#22c55e', cancelled:'#ef4444'
-    };
-    const statusCounts = {};
-    orders.forEach(o=>{
-      const s = o.status||'pending';
-      statusCounts[s] = (statusCounts[s]||0)+1;
-    });
-
-    // ── Zone/location analysis ──
-    const zoneCounts = {};
-    orders.forEach(o=>{
-      const area = (o.pickup||'Unknown').split(',')[0].trim();
-      zoneCounts[area] = (zoneCounts[area]||0)+1;
-    });
-    const topZones = Object.entries(zoneCounts)
-      .sort((a,b)=>b[1]-a[1]).slice(0,6);
-    const maxZone = Math.max(...topZones.map(z=>z[1]),1);
-
-    // ── Rider leaderboard ──
-    const riderStats = {};
-    orders.forEach(o=>{
-      if(!o.assigned_rider) return;
-      if(!riderStats[o.assigned_rider]) riderStats[o.assigned_rider]={deliveries:0,revenue:0,ratings:[]};
-      if(o.status==='delivered') riderStats[o.assigned_rider].deliveries++;
-      if(o.paid_at&&o.price) riderStats[o.assigned_rider].revenue+=Number(o.price);
-      if(o.rider_rating) riderStats[o.assigned_rider].ratings.push(Number(o.rider_rating));
-    });
-    const riderLeaderboard = Object.entries(riderStats)
-      .map(([id,s])=>({
-        id, deliveries:s.deliveries, revenue:s.revenue,
-        rating: s.ratings.length ? (s.ratings.reduce((a,b)=>a+b,0)/s.ratings.length).toFixed(1) : '—'
-      }))
-      .sort((a,b)=>b.deliveries-a.deliveries).slice(0,5);
-
-    // ── Top customers ──
-    const custCounts = {};
-    orders.forEach(o=>{
-      const key = (o.phone||o.name||'Unknown');
-      if(!custCounts[key]) custCounts[key]={name:o.name||o.customer_name||'Customer',phone:o.phone||'',count:0,spend:0};
-      custCounts[key].count++;
-      if(o.paid_at&&o.price) custCounts[key].spend+=Number(o.price);
-    });
-    const topCustomers = Object.values(custCounts)
-      .sort((a,b)=>b.count-a.count).slice(0,5);
-
-    // ── Source breakdown ──
-    const sourceCounts = {};
-    orders.forEach(o=>{ const s=o.source||'Website'; sourceCounts[s]=(sourceCounts[s]||0)+1; });
-
-    // ── Build HTML ──
-    const rankClass = i => i===0?'gold':i===1?'silver':i===2?'bronze':'';
-
-    container.innerHTML = `
-      <!-- KPI Cards -->
-      <div class="analytics-grid">
-        <div class="kpi-card">
-          <div class="kpi-label">Total Orders</div>
-          <div class="kpi-value">${total}</div>
-          <div class="kpi-sub">${inProgress.length} in progress</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Revenue</div>
-          <div class="kpi-value">GHS ${revenue.toFixed(0)}</div>
-          <div class="kpi-sub">From paid orders</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Delivered</div>
-          <div class="kpi-value">${delivered.length}</div>
-          <div class="kpi-sub"><span class="kpi-trend-up">${convRate}%</span> conversion</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Avg Rating</div>
-          <div class="kpi-value">${avgRating}${avgRating!=='—'?'⭐':''}</div>
-          <div class="kpi-sub">${ratings.length} rated</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Avg Order Value</div>
-          <div class="kpi-value">GHS ${delivered.length?( revenue/delivered.length).toFixed(0):'0'}</div>
-          <div class="kpi-sub">Per delivery</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Proof of Delivery</div>
-          <div class="kpi-value">${hasPOD}</div>
-          <div class="kpi-sub">${delivered.length?((hasPOD/delivered.length)*100).toFixed(0):0}% of delivered</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Pending</div>
-          <div class="kpi-value">${pending.length}</div>
-          <div class="kpi-sub">Awaiting action</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Cancelled</div>
-          <div class="kpi-value">${cancelled.length}</div>
-          <div class="kpi-sub">${total?((cancelled.length/total)*100).toFixed(0):0}% cancel rate</div>
-        </div>
-      </div>
-
-      <!-- 7-Day Order Trend -->
-      <div class="chart-card">
-        <div class="chart-title">📈 Orders — Last 7 Days <span>Daily count</span></div>
-        <div class="bar-chart">
-          ${days.map(d=>`
-            <div class="bar-wrap">
-              <div class="bar-val">${d.count||''}</div>
-              <div class="bar" style="height:${maxCount>0?Math.max((d.count/maxCount)*100,4):4}px;background:${d.count>0?'var(--orange)':'var(--border)'}"></div>
-              <div class="bar-label">${d.label}</div>
-            </div>`).join('')}
-        </div>
-      </div>
-
-      <!-- 7-Day Revenue Trend -->
-      <div class="chart-card">
-        <div class="chart-title">💰 Revenue — Last 7 Days <span>GHS paid</span></div>
-        <div class="bar-chart">
-          ${(()=>{const maxR=Math.max(...days.map(d=>d.revenue),1);return days.map(d=>`
-            <div class="bar-wrap">
-              <div class="bar-val">${d.revenue>0?d.revenue.toFixed(0):''}</div>
-              <div class="bar" style="height:${Math.max((d.revenue/maxR)*100,4)}px;background:${d.revenue>0?'#22c55e':'var(--border)'}"></div>
-              <div class="bar-label">${d.label}</div>
-            </div>`).join('');})()}
-        </div>
-      </div>
-
-      <!-- Status Breakdown + Source -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div class="chart-card" style="margin-bottom:0">
-          <div class="chart-title">📦 Order Status</div>
-          <div class="status-pie">
-            ${Object.entries(statusCounts).map(([s,c])=>`
-              <div class="status-pill">
-                <div class="status-dot-sm" style="background:${statusColors[s]||'#9ca3af'}"></div>
-                ${STATUS_LABELS[s]||s}: <strong>${c}</strong>
-              </div>`).join('')}
-          </div>
-        </div>
-        <div class="chart-card" style="margin-bottom:0">
-          <div class="chart-title">📡 Order Sources</div>
-          <div class="status-pie">
-            ${Object.entries(sourceCounts).map(([s,c])=>`
-              <div class="status-pill">
-                <div class="status-dot-sm" style="background:var(--orange)"></div>
-                ${s}: <strong>${c}</strong>
-              </div>`).join('')}
-          </div>
-        </div>
-      </div>
-
-      <!-- Top Pickup Zones -->
-      <div class="chart-card">
-        <div class="chart-title">📍 Top Pickup Zones</div>
-        ${topZones.map(([zone,count])=>`
-          <div class="zone-row">
-            <div class="zone-label">${zone}</div>
-            <div class="zone-bar-bg"><div class="zone-bar-fill" style="width:${(count/maxZone)*100}%"></div></div>
-            <div class="zone-count">${count}</div>
-          </div>`).join('')}
-      </div>
-
-      <!-- Rider Leaderboard -->
-      ${riderLeaderboard.length ? `
-      <div class="chart-card">
-        <div class="chart-title">🏆 Rider Leaderboard</div>
-        ${riderLeaderboard.map((r,i)=>`
-          <div class="leaderboard-row">
-            <div class="lb-rank ${rankClass(i)}">${i+1}</div>
-            <div class="lb-info">
-              <div class="lb-name">${r.id}</div>
-              <div class="lb-meta">${r.rating!=='—'?'⭐'+r.rating+' · ':''} GHS ${r.revenue.toFixed(0)} earned</div>
-            </div>
-            <div class="lb-stat">${r.deliveries} deliveries</div>
-          </div>`).join('')}
-      </div>` : ''}
-
-      <!-- Top Customers -->
-      ${topCustomers.length ? `
-      <div class="chart-card">
-        <div class="chart-title">👥 Top Customers <span>By order count</span></div>
-        ${topCustomers.map((c,i)=>`
-          <div class="leaderboard-row">
-            <div class="lb-rank ${rankClass(i)}">${i+1}</div>
-            <div class="lb-info">
-              <div class="lb-name">${c.name}</div>
-              <div class="lb-meta">${c.phone} · GHS ${c.spend.toFixed(0)} spent</div>
-            </div>
-            <div class="lb-stat">${c.count} orders</div>
-          </div>`).join('')}
-      </div>` : ''}
-
-      <!-- Insights -->
-      <div class="chart-card" style="background:#fff7ed;border-color:#fed7aa">
-        <div class="chart-title" style="color:#c2410c">💡 Quick Insights</div>
-        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-          ${convRate>=70?`<div style="color:#16a34a">✅ Strong conversion rate of ${convRate}% — riders are completing deliveries well.</div>`:`<div style="color:#dc2626">⚠️ Conversion rate is ${convRate}%. Follow up on ${pending.length} pending orders.</div>`}
-          ${revenue>0?`<div style="color:#16a34a">💰 GHS ${revenue.toFixed(0)} earned so far${rangeDays!=='all'?' in last '+rangeDays+' days':''}.</div>`:'<div style="color:#9ca3af">📊 No revenue recorded yet. Ensure payments are being confirmed.</div>'}
-          ${topCustomers[0]&&topCustomers[0].count>1?`<div style="color:#16a34a">🔄 ${topCustomers[0].name} has ordered ${topCustomers[0].count} times — a loyal customer worth rewarding.</div>`:'<div style="color:#9ca3af">📣 No repeat customers yet. Consider a referral discount to drive repeat orders.</div>'}
-          ${hasPOD>0?`<div style="color:#16a34a">📷 ${hasPOD} deliveries have photo proof — great for dispute resolution.</div>`:'<div style="color:#f97316">📷 No proof of delivery photos yet. Remind riders to use the POD feature.</div>'}
-          ${Object.keys(sourceCounts).length>1?`<div style="color:#16a34a">📡 Orders coming from ${Object.keys(sourceCounts).join(', ')} — good channel diversity.</div>`:'<div style="color:#f97316">📱 All orders from one channel. Share your booking link on WhatsApp and social media.</div>'}
-        </div>
-      </div>
-    `;
-  } catch(err) {
-    console.error('Analytics error:', err);
-    container.innerHTML = '<div class="analytics-empty">❌ Error loading analytics: ' + (err.message||'Unknown error') + '</div>';
+  const { data, error } = await sb.rpc('get_maintenance_summary');
+  if(error || !data){
+    el.innerHTML = '<div class="analytics-empty">❌ Could not load maintenance data</div>';
+    return;
   }
-}
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function showToast(msg,type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className=`toast ${type} show`;
-  setTimeout(()=>t.classList.remove('show'),3000);
-}
-</script>
-</body>
-</html>
+  el.innerHTML = `
+    <div class="fin-table-wrap">
+      <table class="fin-table">
+        <thead><tr><th>Vehicle</th><th>Rider</th><th>Logs</th><th>Total Cost</th></tr></thead>
+        <tbody>
+          ${data.map(m=>`<tr>
+            <td style="font-weight:600">${sanitize(m.vehicle_name||'—')}</td>
+            <td>${sanitize(m.rider_name||'Unassigned')}</td>
+            <td>${m.log_count||0}</td>
+            <td style="font-weight:700">GHS ${Number(m.total_cost||0).toFixed(2)}</td>
+          </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No maintenance logs yet</td></tr>'}
+        </tbody>
+      </table>

@@ -259,6 +259,22 @@
     </div>
   </div>
 
+  <!-- My Pay -->
+  <div class="metrics-card" style="background:linear-gradient(135deg,#1a1410,var(--surface));border-color:rgba(249,115,22,0.25)">
+    <div class="metrics-title">💰 My Pay — Today</div>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent)" id="my-pay-today">GHS 0</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted)" id="my-pay-breakdown">Base GHS 0 + 0 deliveries</div>
+    <button class="btn btn-ghost" style="margin-top:12px;font-size:12px;padding:10px" onclick="openEarningsScreen()">📊 View Full Earnings</button>
+  </div>
+
+  <!-- Fleet quick actions -->
+  <div style="display:flex;gap:10px;padding:0 16px;margin-bottom:16px">
+    <button class="btn btn-ghost" style="flex:1;font-size:12px" onclick="openFuelLogModal()">⛽ Log Fuel</button>
+    <button class="btn btn-ghost" style="flex:1;font-size:12px" onclick="openMaintenanceLogModal()">🔧 Log Maintenance</button>
+  </div>
+
   <div class="home-content">
     <div class="section-label">Your Deliveries</div>
     <div id="deliveries-list">
@@ -272,6 +288,27 @@
     <button class="btn btn-ghost" onclick="loadDeliveries()">↻ Refresh</button>
     <br><br>
     <button class="btn btn-danger" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- Earnings Screen -->
+<div id="screen-earnings" class="screen">
+  <div class="detail-header">
+    <div class="back-btn" onclick="showHome()">←</div>
+    <div>
+      <div class="detail-title">My Earnings</div>
+      <div class="detail-sub">Auto-calculated pay breakdown</div>
+    </div>
+  </div>
+  <div class="detail-content" style="padding-bottom:30px">
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-ghost earn-period-btn active" id="earn-period-today" style="flex:1;font-size:12px;padding:10px" onclick="loadEarnings('today')">Today</button>
+      <button class="btn btn-ghost earn-period-btn" id="earn-period-week" style="flex:1;font-size:12px;padding:10px" onclick="loadEarnings('week')">Week</button>
+      <button class="btn btn-ghost earn-period-btn" id="earn-period-month" style="flex:1;font-size:12px;padding:10px" onclick="loadEarnings('month')">Month</button>
+    </div>
+    <div id="earnings-content">
+      <div style="text-align:center;padding:30px;color:var(--muted)">Loading…</div>
+    </div>
   </div>
 </div>
 
@@ -321,6 +358,43 @@
     <button class="modal-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-top:10px" onclick="closeRatingModal()">
       Skip for now
     </button>
+  </div>
+</div>
+
+<!-- FUEL LOG MODAL -->
+<div class="modal-overlay" id="modal-fuel">
+  <div class="modal">
+    <div class="modal-title">⛽ Log Fuel</div>
+    <div class="modal-sub">Record your fuel purchase for accurate vehicle tracking.</div>
+    <div class="field"><label>Liters</label><input type="number" step="0.1" id="fuel-liters" placeholder="e.g. 3.5" inputmode="decimal"/></div>
+    <div class="field"><label>Cost (GHS)</label><input type="number" step="0.01" id="fuel-cost" placeholder="e.g. 35.00" inputmode="decimal"/></div>
+    <div class="field"><label>Odometer Reading (km)</label><input type="number" id="fuel-odometer" placeholder="e.g. 12450" inputmode="numeric"/></div>
+    <div class="field"><label>Notes (optional)</label><input type="text" id="fuel-notes" placeholder="e.g. Total filling station"/></div>
+    <button class="modal-btn" onclick="submitFuelLog()" id="fuel-submit-btn">Save Fuel Log</button>
+    <button class="modal-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-top:10px" onclick="closeFuelModal()">Cancel</button>
+  </div>
+</div>
+
+<!-- MAINTENANCE LOG MODAL -->
+<div class="modal-overlay" id="modal-maintenance">
+  <div class="modal">
+    <div class="modal-title">🔧 Log Maintenance</div>
+    <div class="modal-sub">Record repairs, servicing or part replacements.</div>
+    <div class="field">
+      <label>Type</label>
+      <select id="maint-type" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none">
+        <option value="oil_change">Oil Change</option>
+        <option value="tire">Tire</option>
+        <option value="brake">Brake</option>
+        <option value="service">General Service</option>
+        <option value="repair">Repair</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field"><label>Cost (GHS)</label><input type="number" step="0.01" id="maint-cost" placeholder="e.g. 50.00" inputmode="decimal"/></div>
+    <div class="field"><label>Description (optional)</label><input type="text" id="maint-desc" placeholder="e.g. Replaced rear brake pads"/></div>
+    <button class="modal-btn" onclick="submitMaintenanceLog()" id="maint-submit-btn">Save Maintenance Log</button>
+    <button class="modal-btn" style="background:var(--surface);border:1px solid var(--border);color:var(--text);margin-top:10px" onclick="closeMaintenanceModal()">Cancel</button>
   </div>
 </div>
 
@@ -666,6 +740,142 @@ async function loadMetrics(){
   document.getElementById('metric-revenue').textContent = `GHS ${revenue.toFixed(0)}`;
   document.getElementById('metric-rating').textContent = avgRating ?? '—';
   document.getElementById('metric-stars').textContent = avgRating ? '⭐'.repeat(Math.round(avgRating)) : '';
+
+  loadMyPayToday();
+}
+
+// ── MY PAY — auto-calculated, transparent to the rider ──────────────────────────
+async function loadMyPayToday(){
+  if(!currentRider) return;
+  const { data, error } = await sb.rpc('get_rider_pay_breakdown', { _rider_id: currentRider.id, _period: 'today' });
+  if(error || !data || !data.length) return;
+
+  const todayRow = data[data.length - 1]; // last row = today (series ends at CURRENT_DATE)
+  const total = Number(todayRow.total_pay || 0);
+  const base = Number(todayRow.base_pay || 0);
+  const deliveries = Number(todayRow.deliveries || 0);
+
+  document.getElementById('my-pay-today').textContent = `GHS ${total.toFixed(2)}`;
+  document.getElementById('my-pay-breakdown').textContent =
+    `Base GHS ${base.toFixed(2)} + ${deliveries} ${deliveries===1?'delivery':'deliveries'}`;
+}
+
+function openEarningsScreen(){
+  showScreen('earnings');
+  loadEarnings('today');
+}
+
+async function loadEarnings(period){
+  ['today','week','month'].forEach(p=>{
+    const btn = document.getElementById('earn-period-'+p);
+    if(btn) btn.classList.toggle('active', p===period);
+  });
+
+  const el = document.getElementById('earnings-content');
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)">Loading…</div>';
+
+  const { data, error } = await sb.rpc('get_rider_pay_breakdown', { _rider_id: currentRider.id, _period: period });
+
+  if(error || !data){
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted)">Could not load earnings</div>';
+    return;
+  }
+
+  const totalPay = data.reduce((s,d)=>s+Number(d.total_pay||0),0);
+  const totalDeliveries = data.reduce((s,d)=>s+Number(d.deliveries||0),0);
+  const activeDays = data.filter(d=>d.was_active).length;
+
+  let html = `
+    <div class="metrics-card" style="margin:0 0 16px">
+      <div class="metrics-title">Summary</div>
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <div class="metric-value">GHS ${totalPay.toFixed(0)}</div>
+          <div class="metric-label">Total Pay</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">${activeDays}</div>
+          <div class="metric-label">Active Days</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">${totalDeliveries}</div>
+          <div class="metric-label">Deliveries</div>
+        </div>
+      </div>
+    </div>
+    <div class="info-block">
+      <div class="info-block-title">Daily Breakdown</div>
+      ${data.slice().reverse().map(d=>`
+        <div class="info-row-d">
+          <span class="info-row-label">${new Date(d.pay_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}${!d.was_active?' (off)':''}</span>
+          <span class="info-row-value">${d.was_active?`GHS ${Number(d.total_pay).toFixed(2)} · ${d.deliveries} del.`:'—'}</span>
+        </div>`).join('')}
+    </div>`;
+
+  el.innerHTML = html;
+}
+
+// ── FUEL LOGGING ──────────────────────────────────────────────────────────────────
+function openFuelLogModal(){
+  document.getElementById('fuel-liters').value = '';
+  document.getElementById('fuel-cost').value = '';
+  document.getElementById('fuel-odometer').value = '';
+  document.getElementById('fuel-notes').value = '';
+  document.getElementById('modal-fuel').classList.add('show');
+}
+function closeFuelModal(){
+  document.getElementById('modal-fuel').classList.remove('show');
+}
+async function submitFuelLog(){
+  const liters = parseFloat(document.getElementById('fuel-liters').value);
+  const cost = parseFloat(document.getElementById('fuel-cost').value);
+  const odometer = parseFloat(document.getElementById('fuel-odometer').value) || null;
+  const notes = document.getElementById('fuel-notes').value.trim() || null;
+
+  if(!liters || !cost){ showToast('Please enter liters and cost', 'error'); return; }
+
+  const btn = document.getElementById('fuel-submit-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const { error } = await sb.rpc('log_fuel', {
+    _rider_id: currentRider.id, _liters: liters, _cost: cost, _odometer: odometer, _notes: notes
+  });
+
+  btn.disabled = false; btn.textContent = 'Save Fuel Log';
+
+  if(error){ showToast('Failed to save fuel log', 'error'); return; }
+  closeFuelModal();
+  showToast('Fuel log saved ⛽', 'success');
+}
+
+// ── MAINTENANCE LOGGING ───────────────────────────────────────────────────────────
+function openMaintenanceLogModal(){
+  document.getElementById('maint-cost').value = '';
+  document.getElementById('maint-desc').value = '';
+  document.getElementById('modal-maintenance').classList.add('show');
+}
+function closeMaintenanceModal(){
+  document.getElementById('modal-maintenance').classList.remove('show');
+}
+async function submitMaintenanceLog(){
+  const type = document.getElementById('maint-type').value;
+  const cost = parseFloat(document.getElementById('maint-cost').value);
+  const desc = document.getElementById('maint-desc').value.trim() || null;
+
+  if(!cost){ showToast('Please enter the cost', 'error'); return; }
+
+  const btn = document.getElementById('maint-submit-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const { error } = await sb.rpc('log_maintenance', {
+    _rider_id: currentRider.id, _type: type, _cost: cost, _description: desc
+  });
+
+  btn.disabled = false; btn.textContent = 'Save Maintenance Log';
+
+  if(error){ showToast('Failed to save maintenance log', 'error'); return; }
+  closeMaintenanceModal();
+  showToast('Maintenance log saved 🔧', 'success');
 }
 
 // ── Deliveries ───────────────────────────────────────────────────────────────

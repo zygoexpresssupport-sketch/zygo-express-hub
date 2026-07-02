@@ -408,27 +408,57 @@
     <!-- Access Codes (Superadmin only) -->
     <div class="section-card" id="codes-section" data-superadmin-only="true" style="display:none">
       <div class="section-header">
-        <div class="section-title">🔑 <span>Dispatcher Access Codes</span></div>
-      </div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        Generate time-limited codes for dispatchers. Each code grants access to <strong>Riders</strong> and <strong>Requests</strong> sections only — dispatchers cannot view Analytics, Partners, or generate new codes. Revoke any code instantly if a dispatcher leaves.
-      </p>
-
-      <div class="new-code-banner" id="new-code-banner">
-        <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">New Access Code Generated</div>
-        <div class="new-code-value" id="new-code-value">ZYGO-0000-0000</div>
-        <button class="new-code-copy" onclick="copyNewCode()">📋 Copy Code</button>
-        <div style="font-size:11px;color:var(--muted);margin-top:8px">Share this code with your dispatcher. It will not be shown again.</div>
+        <div class="section-title">🔑 <span>Access Codes</span></div>
       </div>
 
-      <div class="field" style="margin-bottom:10px">
-        <label>Dispatcher Name (optional)</label>
-        <input type="text" id="new-dispatcher-name" placeholder="e.g. Kofi (Dispatcher)" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:Inter,sans-serif"/>
+      <!-- Sub-tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="fin-tab-btn active" id="codes-tab-dispatcher" onclick="showCodesTab('dispatcher')">📋 Dispatcher Codes</button>
+        <button class="fin-tab-btn" id="codes-tab-rider" onclick="showCodesTab('rider')">🛵 Rider Codes</button>
       </div>
-      <button class="gen-code-btn" onclick="generateDispatcherCode()">+ Generate New Access Code</button>
 
-      <div class="codes-list" id="codes-list">
-        <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading codes…</div>
+      <!-- Dispatcher Codes -->
+      <div id="codes-dispatcher-content">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+          Generate time-limited codes for dispatchers. Grants access to <strong>Orders + Riders</strong> only. Revoke instantly if a dispatcher leaves.
+        </p>
+        <div class="new-code-banner" id="new-code-banner">
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">New Dispatcher Code Generated</div>
+          <div class="new-code-value" id="new-code-value">ZYGO-0000-0000</div>
+          <button class="new-code-copy" onclick="copyNewCode()">📋 Copy Code</button>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">Share with your dispatcher. Valid for 90 days.</div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Dispatcher Name (optional)</label>
+          <input type="text" id="new-dispatcher-name" placeholder="e.g. Kofi (Dispatcher)" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:Inter,sans-serif"/>
+        </div>
+        <button class="gen-code-btn" onclick="generateDispatcherCode()">+ Generate Dispatcher Code</button>
+        <div class="codes-list" id="codes-list">
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading codes…</div>
+        </div>
+      </div>
+
+      <!-- Rider Codes -->
+      <div id="codes-rider-content" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+          Generate time-limited login codes for riders. Riders can log in with a code <strong>or</strong> their PIN — both methods work. Revoke instantly if a rider leaves.
+        </p>
+        <div class="new-code-banner" id="new-rider-code-banner">
+          <div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">New Rider Code Generated</div>
+          <div class="new-code-value" id="new-rider-code-value">ZYGO-0000-0000</div>
+          <button class="new-code-copy" onclick="copyNewRiderCode()">📋 Copy Code</button>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px">Share with your rider. Valid for 90 days.</div>
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label>Select Rider *</label>
+          <select id="new-rider-code-rider" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:Inter,sans-serif;background:var(--white)">
+            <option value="">Select a rider…</option>
+          </select>
+        </div>
+        <button class="gen-code-btn" onclick="generateRiderCode()">+ Generate Rider Code</button>
+        <div class="codes-list" id="rider-codes-list">
+          <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading rider codes…</div>
+        </div>
       </div>
     </div>
 
@@ -935,6 +965,117 @@ async function revokeCode(id){
   loadDispatcherCodes();
 }
 
+// ── CODES TAB SWITCHER ───────────────────────────────────────────────────────
+function showCodesTab(tab){
+  const dispatcherContent = document.getElementById('codes-dispatcher-content');
+  const riderContent      = document.getElementById('codes-rider-content');
+  const btnDisp           = document.getElementById('codes-tab-dispatcher');
+  const btnRider          = document.getElementById('codes-tab-rider');
+
+  if(tab === 'rider'){
+    if(dispatcherContent) dispatcherContent.style.display = 'none';
+    if(riderContent)      riderContent.style.display      = 'block';
+    if(btnDisp)  btnDisp.classList.remove('active');
+    if(btnRider) btnRider.classList.add('active');
+    populateRiderSelect();
+    loadRiderCodes();
+  } else {
+    if(dispatcherContent) dispatcherContent.style.display = 'block';
+    if(riderContent)      riderContent.style.display      = 'none';
+    if(btnRider) btnRider.classList.remove('active');
+    if(btnDisp)  btnDisp.classList.add('active');
+    loadDispatcherCodes();
+  }
+}
+
+// Populate the rider dropdown from the live riders list
+function populateRiderSelect(){
+  const sel = document.getElementById('new-rider-code-rider');
+  if(!sel) return;
+  const localRiders = getLocalRiders();
+  sel.innerHTML = '<option value="">Select a rider…</option>' +
+    localRiders.map(r => `<option value="${r.riderId}|${r.name}">${sanitize(r.name)} (${r.riderId})</option>`).join('');
+}
+
+// ── RIDER CODE: Generate ─────────────────────────────────────────────────────
+let newGeneratedRiderCode = null;
+
+async function generateRiderCode(){
+  const sel = document.getElementById('new-rider-code-rider');
+  const val = sel ? sel.value : '';
+  if(!val){ showToast('Please select a rider first','error'); return; }
+
+  const [riderId, riderName] = val.split('|');
+  const code = generateAccessCode(); // reuses the crypto-secure code generator
+
+  const {error} = await sb.from('rider_codes').insert({
+    code, rider_id: riderId, rider_name: riderName,
+    active: true, created_at: new Date().toISOString()
+  });
+
+  if(error){ showToast('Failed to generate rider code: ' + (error.message||''),'error'); return; }
+
+  newGeneratedRiderCode = code;
+  const banner = document.getElementById('new-rider-code-banner');
+  const val2   = document.getElementById('new-rider-code-value');
+  if(banner) banner.classList.add('show');
+  if(val2)   val2.textContent = code;
+
+  showToast('Rider code generated for ' + riderName,'success');
+  loadRiderCodes();
+}
+
+function copyNewRiderCode(){
+  if(!newGeneratedRiderCode) return;
+  navigator.clipboard.writeText(newGeneratedRiderCode).catch(()=>{});
+  showToast('Rider code copied to clipboard','success');
+}
+
+// ── RIDER CODE: List ─────────────────────────────────────────────────────────
+async function loadRiderCodes(){
+  const list = document.getElementById('rider-codes-list');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading…</div>';
+
+  const {data, error} = await sb.rpc('get_all_rider_codes');
+
+  if(error || !data || !data.length){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">No rider codes yet.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(c => {
+    let status = 'active', statusLabel = '🟢 Active';
+    if(c.revoked_at){         status='revoked';  statusLabel='🔴 Revoked'; }
+    else if(c.expires_at && new Date(c.expires_at) < new Date()){
+                              status='expired';  statusLabel='⚪ Expired'; }
+    const lastUsed = c.last_used_at ? formatDate(c.last_used_at) : 'Never used';
+    return `<div class="code-card">
+      <div>
+        <div class="code-value">${sanitize(c.code)}</div>
+        <div class="code-meta">${sanitize(c.rider_name||c.rider_id)} · Created ${formatDate(c.created_at)}</div>
+        <div class="code-meta">Last used: ${lastUsed} · Expires: ${c.expires_at?formatDate(c.expires_at):'Never'}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="code-status ${status}">${statusLabel}</div>
+        ${status==='active'?`<div class="code-actions" style="margin-top:8px">
+          <button class="code-action-btn" style="background:#fef2f2;color:var(--red)" onclick="revokeRiderCode('${c.id}')">Revoke</button>
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RIDER CODE: Revoke ───────────────────────────────────────────────────────
+async function revokeRiderCode(id){
+  if(!confirm('Revoke this rider code? The rider will need a new code or must use their PIN.')) return;
+  const {error} = await sb.rpc('revoke_rider_code', { _id: id });
+  if(error){ showToast('Failed to revoke','error'); return; }
+  showToast('Rider code revoked','success');
+  loadRiderCodes();
+}
+
+// ── Also load dispatcher codes when Codes section first opens ────────────────
 async function showMain(){
   showScreen('main');
   applyRoleRestrictions();

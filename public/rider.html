@@ -217,10 +217,30 @@
     </div>
     <div class="login-title">Welcome back,<br>rider.</div>
     <div class="login-sub">Sign in to start your deliveries</div>
-    <div class="field"><label>Rider ID</label><input type="text" id="input-rider-id" placeholder="e.g. RIDER-001" autocomplete="off" autocapitalize="characters"/></div>
-    <div class="field"><label>PIN</label><input type="password" id="input-pin" placeholder="4-digit PIN" maxlength="4" inputmode="numeric"/></div>
-    <button class="btn btn-primary" onclick="doLogin()">Sign In →</button>
-    <div class="error-msg" id="login-error">Incorrect Rider ID or PIN. Try again.</div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:6px;margin-bottom:20px;background:rgba(255,255,255,0.06);border-radius:10px;padding:4px">
+      <button id="tab-code-btn" onclick="switchLoginMode('code')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:var(--accent);color:#000;font-family:'Syne',sans-serif">🔑 Access Code</button>
+      <button id="tab-pin-btn" onclick="switchLoginMode('pin')" style="flex:1;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);font-family:'Syne',sans-serif">🔢 Rider ID + PIN</button>
+    </div>
+
+    <!-- Code login -->
+    <div id="login-code-form">
+      <div class="field">
+        <label>Access Code</label>
+        <input type="text" id="input-access-code" placeholder="e.g. ZYGO-XXXX-XXXX" autocomplete="off" style="text-transform:uppercase;letter-spacing:2px;font-family:monospace"/>
+      </div>
+      <button class="btn btn-primary" onclick="doCodeLogin()">Sign In →</button>
+    </div>
+
+    <!-- PIN login -->
+    <div id="login-pin-form" style="display:none">
+      <div class="field"><label>Rider ID</label><input type="text" id="input-rider-id" placeholder="e.g. RIDER-001" autocomplete="off" autocapitalize="characters"/></div>
+      <div class="field"><label>PIN</label><input type="password" id="input-pin" placeholder="4-digit PIN" maxlength="4" inputmode="numeric"/></div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign In →</button>
+    </div>
+
+    <div class="error-msg" id="login-error">Incorrect credentials. Please try again.</div>
   </div>
 </div>
 
@@ -669,6 +689,59 @@ function showHome(){
 }
 
 // ── Login / Logout ──────────────────────────────────────────────────────────
+// ── LOGIN MODE SWITCHER ──────────────────────────────────────────────────────
+function switchLoginMode(mode){
+  const codeForm = document.getElementById('login-code-form');
+  const pinForm  = document.getElementById('login-pin-form');
+  const codeBtn  = document.getElementById('tab-code-btn');
+  const pinBtn   = document.getElementById('tab-pin-btn');
+  document.getElementById('login-error').classList.remove('show');
+
+  if(mode === 'pin'){
+    if(codeForm) codeForm.style.display = 'none';
+    if(pinForm)  pinForm.style.display  = 'block';
+    if(codeBtn){ codeBtn.style.background='transparent'; codeBtn.style.color='var(--muted)'; }
+    if(pinBtn){  pinBtn.style.background='var(--accent)'; pinBtn.style.color='#000'; }
+  } else {
+    if(codeForm) codeForm.style.display = 'block';
+    if(pinForm)  pinForm.style.display  = 'none';
+    if(pinBtn){  pinBtn.style.background='transparent'; pinBtn.style.color='var(--muted)'; }
+    if(codeBtn){ codeBtn.style.background='var(--accent)'; codeBtn.style.color='#000'; }
+  }
+}
+
+// ── CODE-BASED RIDER LOGIN ───────────────────────────────────────────────────
+async function doCodeLogin(){
+  const code = (document.getElementById('input-access-code')?.value||'').trim().toUpperCase();
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+
+  if(!code){ errEl.classList.add('show'); return; }
+
+  const {data, error} = await sb.rpc('verify_rider_code', { _code: code });
+
+  if(error || !data || !data.length || !data[0].is_valid){
+    errEl.textContent = 'Invalid or expired access code. Please check and try again.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const rider = data[0];
+  errEl.classList.remove('show');
+  currentRider = { id: rider.rider_id, name: rider.rider_name || rider.rider_id };
+  localStorage.setItem('zygo_rider_v2', JSON.stringify(currentRider));
+
+  // Mark code as used
+  await sb.rpc('mark_rider_code_used', { _code: code });
+
+  await syncRiderStatus(rider.rider_id, rider.rider_name || rider.rider_id, true);
+  document.getElementById('display-rider-name').textContent = rider.rider_name || rider.rider_id;
+  showHome();
+  loadDeliveries();
+  loadMetrics();
+  subscribeToOrderAlerts();
+}
+
 async function doLogin(){
   const riderId = document.getElementById('input-rider-id').value.trim().toUpperCase();
   const pin     = document.getElementById('input-pin').value.trim();

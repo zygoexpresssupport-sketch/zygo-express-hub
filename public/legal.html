@@ -1,0 +1,3988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legal & Compliance Manual | Zygo Express</title>
+<meta name="description" content="Zygo Express legal, governance and compliance manual — 85 policies covering customers, riders, merchants, payments, security and corporate governance in Wa, Ghana." />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href="https://www.zygoxpress.com/legal.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#f97316;
+    --orange-deep:#c2410c;
+    --cream:#fafaf9;
+    --paper:#ffffff;
+    --ink:#1c1917;
+    --muted:#78716c;
+    --line:#e7e5e4;
+    --line-strong:#d6d3d1;
+    --tint:#fff7ed;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--orange-deep);}
+  .serif{font-family:'Fraunces',Georgia,serif;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    background:rgba(250,250,249,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px;
+  }
+  .topbar .brand{
+    display:flex; align-items:baseline; gap:8px;
+    text-decoration:none; color:var(--ink);
+    flex-shrink:0;
+  }
+  .topbar .brand .mark{
+    font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--orange-deep);
+  }
+  .topbar .brand .sub{
+    font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase;
+    display:none;
+  }
+  @media(min-width:640px){ .topbar .brand .sub{display:inline;} }
+  .search-wrap{flex:1; position:relative; max-width:420px; margin-left:auto;}
+  .search-wrap input{
+    width:100%; padding:9px 14px 9px 34px; border-radius:999px;
+    border:1px solid var(--line-strong); background:var(--paper);
+    font-family:inherit; font-size:14px; color:var(--ink);
+    outline:none;
+  }
+  .search-wrap input:focus{border-color:var(--orange);}
+  .search-wrap svg{position:absolute; left:12px; top:50%; transform:translateY(-50%); opacity:.45;}
+  .menu-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:38px; height:38px; border-radius:10px; border:1px solid var(--line-strong);
+    background:var(--paper); flex-shrink:0; cursor:pointer;
+  }
+  @media(min-width:960px){ .menu-btn{display:none;} }
+
+  /* ---------- Layout ---------- */
+  .layout{display:flex; max-width:1180px; margin:0 auto;}
+  .sidebar{
+    width:270px; flex-shrink:0; padding:24px 12px 60px;
+    position:sticky; top:63px; align-self:flex-start;
+    height:calc(100vh - 63px); overflow-y:auto;
+    display:none;
+  }
+  @media(min-width:960px){ .sidebar{display:block;} }
+  .nav-link{
+    display:flex; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:8px;
+    text-decoration:none; color:var(--ink); font-size:13.5px;
+  }
+  .nav-link:hover{background:var(--tint);}
+  .nav-link.active{background:var(--tint); color:var(--orange-deep); font-weight:600;}
+  .nav-letter{
+    font-family:'Fraunces',serif; font-weight:600; color:var(--orange);
+    width:18px; text-align:center; flex-shrink:0;
+  }
+  .nav-name{flex:1; line-height:1.3;}
+  .nav-count{font-size:11px; color:var(--muted); background:var(--line); padding:1px 7px; border-radius:999px;}
+
+  .content{flex:1; min-width:0; padding:28px 16px 100px;}
+  @media(min-width:960px){ .content{padding:28px 32px 100px;} }
+
+  /* ---------- Intro ---------- */
+  .intro{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px;
+    padding:26px 22px; margin-bottom:28px;
+  }
+  .intro .eyebrow{
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--orange-deep); font-weight:600;
+  }
+  .intro h1{
+    font-family:'Fraunces',serif; font-weight:500; font-size:clamp(26px,4vw,34px);
+    margin:6px 0 10px; line-height:1.15;
+  }
+  .intro p{color:var(--muted); margin:0 0 14px; max-width:60ch;}
+  .intro .meta-row{display:flex; flex-wrap:wrap; gap:8px 18px; font-size:12.5px; color:var(--muted);}
+  .intro .meta-row b{color:var(--ink);}
+  .disclaimer{
+    margin-top:16px; padding:12px 14px; background:var(--tint); border:1px solid #fed7aa;
+    border-radius:10px; font-size:12.5px; color:#7c2d12; line-height:1.55;
+  }
+  .actions{display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 16px; border-radius:999px; font-size:13.5px; font-weight:600;
+    text-decoration:none; cursor:pointer; border:1px solid transparent;
+  }
+  .btn-primary{background:var(--orange); color:#fff;}
+  .btn-primary:hover{background:var(--orange-deep);}
+  .btn-ghost{background:var(--paper); border-color:var(--line-strong); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--orange);}
+
+  /* ---------- Section divider ---------- */
+  .section-divider{
+    display:flex; align-items:baseline; gap:12px;
+    padding:22px 0 10px; margin-top:10px;
+    border-bottom:2px solid var(--ink);
+  }
+  .section-divider .section-letter{
+    font-family:'Fraunces',serif; font-weight:600; font-size:34px; color:var(--orange);
+    line-height:1;
+  }
+  .section-divider .section-name{
+    font-family:'Fraunces',serif; font-weight:500; font-size:19px;
+  }
+  .section-divider .section-rule{flex:1;}
+  .section-divider .section-count{font-size:12px; color:var(--muted); white-space:nowrap;}
+
+  /* ---------- Policy cards ---------- */
+  .policy-list{padding:6px 0 8px;}
+  .policy{
+    border-bottom:1px solid var(--line);
+  }
+  .policy summary{
+    list-style:none; cursor:pointer;
+    display:flex; align-items:flex-start; gap:14px;
+    padding:14px 4px;
+  }
+  .policy summary::-webkit-details-marker{display:none;}
+  .policy-num{
+    font-family:'Fraunces',serif; font-weight:500; font-size:20px; color:#d6a06a;
+    width:34px; flex-shrink:0; text-align:right; padding-top:1px;
+    font-variant-numeric:tabular-nums;
+  }
+  .policy[open] .policy-num{color:var(--orange-deep);}
+  .policy-heading{flex:1; min-width:0;}
+  .policy-title{display:block; font-weight:600; font-size:14.5px;}
+  .policy-meta{display:block; font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .chev{
+    width:9px; height:9px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted);
+    transform:rotate(-45deg); margin-top:6px; flex-shrink:0; transition:transform .15s;
+  }
+  .policy[open] .chev{transform:rotate(45deg); border-color:var(--orange-deep);}
+  .policy-body{
+    padding:0 4px 20px 48px; font-size:14px; color:#3f3a37;
+  }
+  .policy-body h3{font-size:13.5px; margin:16px 0 6px; color:var(--ink);}
+  .policy-body h3:first-child{margin-top:4px;}
+  .policy-body p{margin:0 0 10px;}
+  .policy-body ul,.policy-body ol{margin:0 0 10px; padding-left:20px;}
+  .policy-body li{margin-bottom:4px;}
+  .policy-body table{
+    width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:13px;
+  }
+  .policy-body th,.policy-body td{
+    border:1px solid var(--line); padding:6px 9px; text-align:left;
+  }
+  .policy-body th{background:var(--tint); font-weight:600;}
+  .policy-body strong{color:var(--ink);}
+  .policy-body blockquote{
+    margin:10px 0; padding:8px 12px; border-left:3px solid var(--orange);
+    background:var(--tint); font-size:13px;
+  }
+  .policy-body code{background:var(--line); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+
+  .policy.hidden, .section-block.hidden{display:none;}
+
+  /* ---------- Appendices ---------- */
+  .appendices{
+    margin-top:10px; padding-top:6px;
+  }
+  .appendices h2{font-family:'Fraunces',serif; font-weight:500; font-size:20px; margin:26px 0 10px;}
+  .appendices h1{display:none;}
+  .appendices table{width:100%; border-collapse:collapse; margin:10px 0 20px; font-size:13px;}
+  .appendices th,.appendices td{border:1px solid var(--line); padding:6px 9px; text-align:left;}
+  .appendices th{background:var(--tint);}
+  .appendices blockquote{
+    margin:16px 0; padding:14px 16px; background:var(--tint); border:1px solid #fed7aa; border-radius:10px; font-size:13px;
+  }
+  .appendices p{font-size:13.5px; color:#3f3a37;}
+
+  /* ---------- Mobile drawer ---------- */
+  .drawer-backdrop{
+    position:fixed; inset:0; background:rgba(28,25,23,.4); z-index:50; display:none;
+  }
+  .drawer{
+    position:fixed; top:0; left:0; bottom:0; width:82%; max-width:320px;
+    background:var(--paper); z-index:51; padding:18px 14px;
+    transform:translateX(-100%); transition:transform .2s ease; overflow-y:auto;
+  }
+  body.drawer-open .drawer-backdrop{display:block;}
+  body.drawer-open .drawer{transform:translateX(0);}
+  .drawer-close{
+    display:flex; justify-content:flex-end; margin-bottom:10px;
+  }
+  .drawer-close button{
+    border:none; background:var(--line); width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;
+  }
+
+  .empty-state{display:none; text-align:center; padding:60px 20px; color:var(--muted);}
+  .empty-state.show{display:block;}
+
+  footer.page-footer{
+    border-top:1px solid var(--line); padding:26px 16px 60px; text-align:center;
+    color:var(--muted); font-size:12.5px;
+  }
+  footer.page-footer a{color:var(--orange-deep); text-decoration:none;}
+
+  @media print{
+    .topbar,.sidebar,.actions,.menu-btn,.drawer,.drawer-backdrop{display:none !important;}
+    .layout{display:block;}
+    .policy-body{padding-left:4px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="menu-btn" id="openDrawer" aria-label="Open policy menu">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="#1c1917" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <a class="brand" href="https://www.zygoxpress.com/">
+    <span class="mark">Zygo Express</span>
+    <span class="sub">Legal &amp; Compliance</span>
+  </a>
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#1c1917" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#1c1917" stroke-width="2" stroke-linecap="round"/></svg>
+    <input id="searchInput" type="text" placeholder="Search 85 policies&hellip;" autocomplete="off" />
+  </div>
+</div>
+
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-close"><button id="closeDrawer" aria-label="Close">&times;</button></div>
+  <a class="nav-link" href="#section-A" data-section="A"><span class="nav-letter">A</span><span class="nav-name">Corporate Governance</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-B" data-section="B"><span class="nav-letter">B</span><span class="nav-name">Customer Policies</span><span class="nav-count">15</span></a>
+<a class="nav-link" href="#section-C" data-section="C"><span class="nav-letter">C</span><span class="nav-name">Merchant Policies</span><span class="nav-count">9</span></a>
+<a class="nav-link" href="#section-D" data-section="D"><span class="nav-letter">D</span><span class="nav-name">Rider Policies</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-E" data-section="E"><span class="nav-letter">E</span><span class="nav-name">Operations</span><span class="nav-count">8</span></a>
+<a class="nav-link" href="#section-F" data-section="F"><span class="nav-letter">F</span><span class="nav-name">Payments</span><span class="nav-count">9</span></a>
+<a class="nav-link" href="#section-G" data-section="G"><span class="nav-letter">G</span><span class="nav-name">Information Security</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-H" data-section="H"><span class="nav-letter">H</span><span class="nav-name">Artificial Intelligence</span><span class="nav-count">4</span></a>
+<a class="nav-link" href="#section-I" data-section="I"><span class="nav-letter">I</span><span class="nav-name">Corporate Governance</span><span class="nav-count">10</span></a>
+</nav>
+
+<div class="layout">
+  <nav class="sidebar" aria-label="Policy sections">
+    <a class="nav-link" href="#section-A" data-section="A"><span class="nav-letter">A</span><span class="nav-name">Corporate Governance</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-B" data-section="B"><span class="nav-letter">B</span><span class="nav-name">Customer Policies</span><span class="nav-count">15</span></a>
+<a class="nav-link" href="#section-C" data-section="C"><span class="nav-letter">C</span><span class="nav-name">Merchant Policies</span><span class="nav-count">9</span></a>
+<a class="nav-link" href="#section-D" data-section="D"><span class="nav-letter">D</span><span class="nav-name">Rider Policies</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-E" data-section="E"><span class="nav-letter">E</span><span class="nav-name">Operations</span><span class="nav-count">8</span></a>
+<a class="nav-link" href="#section-F" data-section="F"><span class="nav-letter">F</span><span class="nav-name">Payments</span><span class="nav-count">9</span></a>
+<a class="nav-link" href="#section-G" data-section="G"><span class="nav-letter">G</span><span class="nav-name">Information Security</span><span class="nav-count">10</span></a>
+<a class="nav-link" href="#section-H" data-section="H"><span class="nav-letter">H</span><span class="nav-name">Artificial Intelligence</span><span class="nav-count">4</span></a>
+<a class="nav-link" href="#section-I" data-section="I"><span class="nav-letter">I</span><span class="nav-name">Corporate Governance</span><span class="nav-count">10</span></a>
+  </nav>
+
+  <main class="content">
+    <div class="intro">
+      <div class="eyebrow">Version 1.0 &middot; Effective July 2026</div>
+      <h1 class="serif">Legal, Governance &amp; Compliance Manual</h1>
+      <p>85 policies governing how Zygo Express serves customers, partners with merchants, and works with riders across Wa, Upper West Region, Ghana &mdash; from booking terms to data protection to rider safety.</p>
+      <div class="meta-row">
+        <span><b>Jurisdiction:</b> Republic of Ghana</span>
+        <span><b>Contact:</b> zygoexpresssupport@gmail.com</span>
+        <span><b>WhatsApp/Call:</b> 0202858011</span>
+      </div>
+      <div class="disclaimer">
+        <strong>&#9878; Legal note:</strong> Provisions marked with &#9878; should be reviewed by qualified Ghanaian legal counsel before formal adoption. This manual does not constitute legal advice.
+      </div>
+      <div class="actions">
+        <a class="btn btn-primary" href="https://wa.me/233202858011" target="_blank" rel="noopener">Ask a question on WhatsApp</a>
+        <button class="btn btn-ghost" onclick="window.print()">Print / Save as PDF</button>
+        <button class="btn btn-ghost" id="expandAll">Expand all</button>
+      </div>
+    </div>
+
+    <div id="policyRoot">
+      
+    <section class="section-block" id="section-A" data-section="A">
+      <div class="section-divider">
+        <span class="section-letter">A</span>
+        <span class="section-name">Corporate Governance</span>
+        <span class="section-rule"></span>
+        <span class="section-count">10 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-1" data-title="terms of use">
+          <summary>
+            <span class="policy-num">1</span>
+            <span class="policy-heading">
+              <span class="policy-title">Terms Of Use</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>1.1 Purpose</h3>
+<p>These Terms of Use govern access to and use of the Zygo Express platform, including the website (zygoxpress.com), booking system, customer tracking application, rider application, and all related digital services (collectively, "the Platform").</p>
+<h3>1.2 Legal Basis</h3>
+<p>These Terms are issued pursuant to:
+- Electronic Transactions Act, 2008 (Act 772), Sections 2, 4, and 6
+- Consumer Protection principles applicable in Ghana
+- Companies Act, 2019 (Act 992)</p>
+<h3>1.3 Definitions</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Platform</strong></td>
+<td>All digital services, applications and websites operated by Zygo Express</td>
+</tr>
+<tr>
+<td><strong>User</strong></td>
+<td>Any person who accesses or uses the Platform</td>
+</tr>
+<tr>
+<td><strong>Customer</strong></td>
+<td>A User who places a delivery order</td>
+</tr>
+<tr>
+<td><strong>Rider</strong></td>
+<td>A delivery partner registered and approved by Zygo Express</td>
+</tr>
+<tr>
+<td><strong>Dispatcher</strong></td>
+<td>A Zygo Express employee or contractor managing order flow</td>
+</tr>
+<tr>
+<td><strong>Merchant</strong></td>
+<td>A business entity onboarded to receive Zygo Express deliveries</td>
+</tr>
+<tr>
+<td><strong>Order</strong></td>
+<td>A confirmed delivery request placed through the Platform</td>
+</tr>
+<tr>
+<td><strong>GHS</strong></td>
+<td>Ghana Cedis, the lawful currency of the Republic of Ghana</td>
+</tr>
+</tbody>
+</table>
+<h3>1.4 Acceptance of Terms</h3>
+<p>By accessing the Platform, you confirm that:
+- You are at least 18 years of age
+- You have read and understood these Terms
+- You accept legal obligation to comply with these Terms
+- You have the legal capacity to enter a binding agreement</p>
+<p>If you are using the Platform on behalf of a business, you confirm authority to bind that business.</p>
+<h3>1.5 Permitted Use</h3>
+<p>You may use the Platform solely to:
+- Place and track legitimate delivery orders
+- Communicate with Zygo Express for service-related matters
+- Operate as an approved Rider or Merchant in accordance with your specific terms</p>
+<h3>1.6 Prohibited Conduct</h3>
+<p>Users must not:
+- Use the Platform for any unlawful purpose under Ghanaian law
+- Submit false or misleading delivery information
+- Impersonate another person or organisation
+- Interfere with or disrupt the Platform's technical infrastructure
+- Attempt to gain unauthorised access to any part of the Platform
+- Use the Platform to transmit malware, spam, or harmful content
+- Book deliveries for prohibited goods (see Policy 47)
+- Harass, threaten, or abuse Zygo Express staff, riders, or other users</p>
+<h3>1.7 Intellectual Property</h3>
+<p>All content, branding, logos, software, and materials on the Platform are the property of Zygo Express. Nothing in these Terms grants you any intellectual property rights. See Policy 10 (Intellectual Property Policy).</p>
+<h3>1.8 Limitation of Liability</h3>
+<p>⚖️ To the maximum extent permitted by Ghanaian law, Zygo Express's liability for service failures is limited to the value of the affected delivery order. Zygo Express is not liable for:
+- Indirect, consequential, or special losses
+- Losses arising from events beyond our reasonable control
+- Losses caused by a User's own breach of these Terms</p>
+<h3>1.9 Governing Law</h3>
+<p>These Terms are governed by the laws of the Republic of Ghana. Any dispute shall be subject to the jurisdiction of the courts of Ghana.</p>
+<h3>1.10 Amendments</h3>
+<p>Zygo Express reserves the right to amend these Terms at any time. Continued use of the Platform after notice of amendment constitutes acceptance.</p>
+<h3>1.11 Contact</h3>
+<p>Terms queries: zygoexpresssupport@gmail.com | 0202858011</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-2" data-title="privacy policy">
+          <summary>
+            <span class="policy-num">2</span>
+            <span class="policy-heading">
+              <span class="policy-title">Privacy Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>2.1 Purpose</h3>
+<p>This Privacy Policy explains how Zygo Express collects, uses, stores, protects, and shares your personal information when you use our Platform, in compliance with the Data Protection Act, 2012 (Act 843).</p>
+<h3>2.2 Legal Basis</h3>
+<ul>
+<li>Data Protection Act, 2012 (Act 843), Sections 17–22</li>
+<li>Electronic Transactions Act, 2008 (Act 772)</li>
+<li>Cybersecurity Act, 2020 (Act 1038)</li>
+</ul>
+<h3>2.3 Data Controller</h3>
+<p><strong>Zygo Express</strong> is the Data Controller for personal information collected through the Platform.
+Contact: zygoexpresssupport@gmail.com | 0202858011 | Wa, Upper West Region, Ghana</p>
+<h3>2.4 Information We Collect</h3>
+<p><strong>From Customers:</strong>
+- Full name, phone number, and email address (when provided)
+- Pickup and delivery addresses
+- Order history and tracking activity
+- Device information and browser type
+- Payment reference numbers (not full MoMo credentials)
+- Ratings and feedback submitted</p>
+<p><strong>From Riders:</strong>
+- Full name, Rider ID, and PIN credentials (stored encrypted)
+- GPS location data during active deliveries
+- Proof of pickup and delivery photos
+- Activity logs (online/offline times)
+- Performance metrics (deliveries, ratings, pay calculations)
+- Fuel and maintenance logs</p>
+<p><strong>From Merchants:</strong>
+- Business name, contact details, and location
+- Delivery volumes and history
+- Settlement records</p>
+<p><strong>Technical Data (all users):</strong>
+- IP address, browser type, and session data
+- Cookies and local storage data (see Policy 4)</p>
+<h3>2.5 How We Use Your Information</h3>
+<table>
+<thead>
+<tr>
+<th>Data</th>
+<th>Purpose</th>
+<th>Legal Basis</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Name, phone, address</td>
+<td>To complete your delivery</td>
+<td>Contract performance</td>
+</tr>
+<tr>
+<td>GPS location</td>
+<td>To track rider and confirm delivery</td>
+<td>Contract performance</td>
+</tr>
+<tr>
+<td>Delivery photos</td>
+<td>Proof of pickup and delivery</td>
+<td>Legitimate interest / contract</td>
+</tr>
+<tr>
+<td>Order history</td>
+<td>Analytics and service improvement</td>
+<td>Legitimate interest</td>
+</tr>
+<tr>
+<td>Payment references</td>
+<td>To confirm payment for orders</td>
+<td>Contract performance</td>
+</tr>
+<tr>
+<td>Ratings and feedback</td>
+<td>Service quality improvement</td>
+<td>Legitimate interest</td>
+</tr>
+</tbody>
+</table>
+<h3>2.6 Data Sharing</h3>
+<p>We share your data only with:
+- <strong>Riders:</strong> Pickup and delivery details necessary to complete your order
+- <strong>Technology providers:</strong> Supabase (database), Cloudflare (security) — under data processing agreements
+- <strong>Law enforcement:</strong> When required by valid Ghanaian legal process
+- <strong>Business transfers:</strong> In the event of a merger or acquisition, with equivalent data protection</p>
+<p>We do not sell your personal data to third parties.</p>
+<h3>2.7 Data Retention</h3>
+<table>
+<thead>
+<tr>
+<th>Data Type</th>
+<th>Retention Period</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order records</td>
+<td>7 years (GRA compliance)</td>
+</tr>
+<tr>
+<td>Delivery photos</td>
+<td>1 year</td>
+</tr>
+<tr>
+<td>GPS logs</td>
+<td>90 days</td>
+</tr>
+<tr>
+<td>Customer accounts</td>
+<td>Until deletion request + 30 days</td>
+</tr>
+<tr>
+<td>Payment records</td>
+<td>7 years</td>
+</tr>
+</tbody>
+</table>
+<h3>2.8 Your Rights Under Act 843</h3>
+<p>You have the right to:
+- <strong>Access</strong> your personal data held by us
+- <strong>Correct</strong> inaccurate personal data
+- <strong>Delete</strong> your personal data (subject to legal retention obligations)
+- <strong>Object</strong> to certain processing activities
+- <strong>Complain</strong> to the Data Protection Commission of Ghana</p>
+<p>To exercise these rights: zygoexpresssupport@gmail.com</p>
+<h3>2.9 Data Security</h3>
+<p>We implement appropriate technical and organisational measures to protect your data, including:
+- Row-level security on our database
+- Encrypted storage for credentials
+- Private storage buckets for delivery photos
+- Access controls limiting who can see personal data</p>
+<h3>2.10 Children's Privacy</h3>
+<p>Our Platform is not directed at persons under 18. We do not knowingly collect data from children. If you believe a child has provided us with personal data, contact us immediately.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-3" data-title="data protection policy">
+          <summary>
+            <span class="policy-num">3</span>
+            <span class="policy-heading">
+              <span class="policy-title">Data Protection Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>3.1 Purpose</h3>
+<p>This Policy establishes Zygo Express's internal framework for handling personal data in compliance with the Data Protection Act, 2012 (Act 843) and relevant Ghanaian data protection obligations.</p>
+<h3>3.2 Data Protection Principles</h3>
+<p>Zygo Express processes personal data in accordance with these principles:</p>
+<ol>
+<li><strong>Lawfulness:</strong> Data is collected and processed only where there is a lawful basis</li>
+<li><strong>Purpose Limitation:</strong> Data collected for one purpose is not used for incompatible purposes</li>
+<li><strong>Data Minimisation:</strong> We collect only what is necessary for the stated purpose</li>
+<li><strong>Accuracy:</strong> We take reasonable steps to keep data accurate and up to date</li>
+<li><strong>Storage Limitation:</strong> Data is retained only as long as necessary</li>
+<li><strong>Security:</strong> Appropriate measures protect data from unauthorised access or loss</li>
+<li><strong>Accountability:</strong> Zygo Express is responsible for demonstrating compliance</li>
+</ol>
+<h3>3.3 Responsibilities</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Management</strong></td>
+<td>Overall accountability for data protection compliance</td>
+</tr>
+<tr>
+<td><strong>Technology Team</strong></td>
+<td>Technical implementation of data security measures</td>
+</tr>
+<tr>
+<td><strong>Dispatchers</strong></td>
+<td>Handling customer data only on need-to-know basis</td>
+</tr>
+<tr>
+<td><strong>Riders</strong></td>
+<td>Using customer data only to complete deliveries</td>
+</tr>
+</tbody>
+</table>
+<h3>3.4 Special Category Data</h3>
+<p>Zygo Express does not intentionally collect special category data (health, religion, ethnicity, etc.). If such data is incidentally received, it will be deleted promptly.</p>
+<h3>3.5 Data Breach Response</h3>
+<p>In the event of a personal data breach, Zygo Express will:
+1. Contain the breach within 24 hours
+2. Assess the risk to affected individuals
+3. Notify the Data Protection Commission within 72 hours where required
+4. Notify affected individuals where there is high risk of harm
+5. Document the breach and response measures taken</p>
+<p>See also: Policy 65 (Incident Response Plan)</p>
+<h3>3.6 Third Party Processors</h3>
+<p>All third-party service providers who process personal data on our behalf must:
+- Be bound by appropriate data processing agreements
+- Implement equivalent security standards
+- Process data only on documented instructions from Zygo Express</p>
+<p>Current processors: Supabase (infrastructure), Cloudflare (security)</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-4" data-title="cookie policy">
+          <summary>
+            <span class="policy-num">4</span>
+            <span class="policy-heading">
+              <span class="policy-title">Cookie Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>4.1 Purpose</h3>
+<p>This Cookie Policy explains how Zygo Express uses cookies and similar technologies on the Platform.</p>
+<h3>4.2 What Are Cookies?</h3>
+<p>Cookies are small text files stored on your device when you visit a website. They help websites remember information about your visit.</p>
+<h3>4.3 Cookies We Use</h3>
+<table>
+<thead>
+<tr>
+<th>Cookie Type</th>
+<th>Purpose</th>
+<th>Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Essential</strong></td>
+<td>Platform functionality (e.g., login sessions)</td>
+<td>Session</td>
+</tr>
+<tr>
+<td><strong>Functional</strong></td>
+<td>Remembering tracking codes (localStorage)</td>
+<td>30 days</td>
+</tr>
+<tr>
+<td><strong>Security</strong></td>
+<td>Cloudflare Turnstile bot protection</td>
+<td>Session</td>
+</tr>
+<tr>
+<td><strong>Analytics</strong></td>
+<td>Anonymous usage statistics</td>
+<td>90 days</td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Local Storage</h3>
+<p>Our Platform uses browser localStorage to:
+- Remember your last 3 tracking codes for quick lookup
+- Store theme preferences
+- Remember your device type for optimised display</p>
+<h3>4.5 Managing Cookies</h3>
+<p>You can manage cookies through your browser settings. Disabling essential cookies may prevent certain features from working correctly.</p>
+<h3>4.6 Third Party Cookies</h3>
+<p>Cloudflare Turnstile (our bot protection service) may set cookies. These are governed by Cloudflare's own privacy policy.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-5" data-title="acceptable use policy">
+          <summary>
+            <span class="policy-num">5</span>
+            <span class="policy-heading">
+              <span class="policy-title">Acceptable Use Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>5.1 Purpose</h3>
+<p>This Policy defines acceptable and unacceptable conduct on the Zygo Express Platform to ensure a safe, respectful, and lawful environment for all users.</p>
+<h3>5.2 Acceptable Use</h3>
+<p>Users may:
+- Book deliveries for lawful goods and services
+- Track their parcels using their tracking ID
+- Contact Zygo Express for genuine service matters
+- Submit genuine feedback and ratings
+- Apply for partnership as a legitimate business</p>
+<h3>5.3 Unacceptable Use</h3>
+<p>Users must not:</p>
+<p><strong>Technical misuse:</strong>
+- Attempt to reverse engineer, decompile, or copy the Platform
+- Use automated tools, bots, or scrapers on the Platform without written permission
+- Attempt to bypass security controls, including bot protection
+- Probe or test the Platform's security without written authorisation</p>
+<p><strong>Content misuse:</strong>
+- Submit fake, fraudulent, or misleading booking information
+- Use false names, addresses, or phone numbers
+- Submit false complaints or ratings about riders, merchants, or Zygo Express</p>
+<p><strong>Payment misuse:</strong>
+- Attempt to manipulate delivery prices
+- Submit false payment references
+- Attempt to mark orders as paid without genuine payment</p>
+<p><strong>Conduct:</strong>
+- Harass, threaten, or abuse riders, dispatchers, or staff
+- Discriminate against any person on the basis of gender, religion, ethnicity, or disability
+- Use the Platform for any purpose that violates Ghanaian law</p>
+<h3>5.4 Consequences</h3>
+<p>Violations may result in:
+- Immediate account suspension or termination
+- Refusal of future service
+- Reporting to law enforcement where appropriate
+- Civil or criminal liability</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-6" data-title="community guidelines">
+          <summary>
+            <span class="policy-num">6</span>
+            <span class="policy-heading">
+              <span class="policy-title">Community Guidelines</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>6.1 Our Community Values</h3>
+<p>Zygo Express is built on three pillars: <strong>Trust, Speed, and Care.</strong> Our community guidelines exist to protect every person who interacts with our Platform — customers, riders, merchants, dispatchers, and staff.</p>
+<h3>6.2 For All Community Members</h3>
+<ul>
+<li><strong>Be honest.</strong> Provide accurate information in all interactions.</li>
+<li><strong>Be respectful.</strong> Treat everyone with dignity regardless of their background.</li>
+<li><strong>Be responsible.</strong> Use the Platform only for its intended purpose.</li>
+<li><strong>Be safe.</strong> Do not engage in conduct that puts yourself or others at risk.</li>
+</ul>
+<h3>6.3 For Customers</h3>
+<ul>
+<li>Book only what you genuinely intend to receive</li>
+<li>Be available at your stated pickup and delivery locations</li>
+<li>Provide complete and accurate addresses</li>
+<li>Treat your rider with respect when they arrive</li>
+</ul>
+<h3>6.4 For Riders</h3>
+<ul>
+<li>Handle every parcel with care as if it belongs to you personally</li>
+<li>Communicate clearly and promptly with customers and dispatchers</li>
+<li>Follow all traffic laws and safety requirements</li>
+<li>Report any issues immediately through the rider app</li>
+</ul>
+<h3>6.5 For Merchants</h3>
+<ul>
+<li>Ensure goods handed to riders meet our Parcel Acceptance Standards (Policy 46)</li>
+<li>Package goods appropriately for safe transport (Policy 45)</li>
+<li>Be ready for pickup at the agreed time</li>
+</ul>
+<h3>6.6 Zero Tolerance</h3>
+<p>The following conduct results in immediate removal from the Platform with no appeal:
+- Sexual harassment of any person
+- Violence or threats of violence
+- Deliberate theft or fraud
+- Transporting prohibited goods knowingly</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-7" data-title="code of conduct">
+          <summary>
+            <span class="policy-num">7</span>
+            <span class="policy-heading">
+              <span class="policy-title">Code Of Conduct</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>7.1 Purpose</h3>
+<p>This Code of Conduct applies to all Zygo Express employees, contractors, riders, and dispatchers. It sets the standard of behaviour expected of everyone who represents the Zygo Express brand.</p>
+<h3>7.2 Core Obligations</h3>
+<p><strong>Integrity:</strong> Act honestly in all dealings. Do not misrepresent facts to customers, management, or partners.</p>
+<p><strong>Professionalism:</strong> Represent Zygo Express with pride. Maintain a clean, professional appearance. Respond promptly to communications.</p>
+<p><strong>Confidentiality:</strong> Protect all customer, merchant, and company information. Do not share personal data of customers, riders, or colleagues outside the scope of your role.</p>
+<p><strong>Safety:</strong> Your safety and the safety of those around you comes first. Never take shortcuts that compromise physical safety.</p>
+<p><strong>Compliance:</strong> Follow all company policies, Ghanaian laws, and traffic regulations.</p>
+<p><strong>Conflict of Interest:</strong> Disclose any personal interest that may conflict with your duties to Zygo Express. See Policy 77.</p>
+<h3>7.3 Social Media</h3>
+<p>When using personal social media, do not:
+- Share confidential customer or company information
+- Represent personal views as those of Zygo Express
+- Post content that violates these community guidelines</p>
+<p>When sharing content about Zygo Express positively, you may tag our official accounts.</p>
+<h3>7.4 Reporting Violations</h3>
+<p>Report suspected violations to management at zygoexpresssupport@gmail.com or through the whistleblower process (Policy 76). Retaliation against good-faith reporters is prohibited.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-8" data-title="accessibility statement">
+          <summary>
+            <span class="policy-num">8</span>
+            <span class="policy-heading">
+              <span class="policy-title">Accessibility Statement</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>8.1 Our Commitment</h3>
+<p>Zygo Express is committed to making our Platform accessible to all users, including persons with disabilities, in alignment with the principles of equal access and the United Nations Convention on the Rights of Persons with Disabilities (to which Ghana is a signatory).</p>
+<h3>8.2 Current Accessibility Features</h3>
+<ul>
+<li>High contrast orange brand colour (#f97316) against light backgrounds</li>
+<li>Large tap targets on mobile interfaces</li>
+<li>Clear, plain language throughout the Platform</li>
+<li>Readable font sizes (minimum 13px on mobile)</li>
+<li>Descriptive alt text on key images</li>
+</ul>
+<h3>8.3 Limitations</h3>
+<p>Our Platform is built for mobile-first use. Some advanced analytics features may not be fully screen-reader compatible. We are working to address this in future updates.</p>
+<h3>8.4 Feedback</h3>
+<p>If you experience accessibility barriers, contact us at zygoexpresssupport@gmail.com with the subject line "Accessibility." We aim to respond within 5 working days.</p>
+<h3>8.5 Alternative Access</h3>
+<p>Customers who are unable to use the Platform digitally may place orders by calling 0202858011.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-9" data-title="copyright policy">
+          <summary>
+            <span class="policy-num">9</span>
+            <span class="policy-heading">
+              <span class="policy-title">Copyright Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>9.1 Ownership</h3>
+<p>All content on the Zygo Express Platform, including but not limited to:
+- The Zygo Express name, logo, and brand assets
+- Website design, layout, and code
+- Marketing materials and advertising content
+- Documentation and policy documents</p>
+<p>...is owned by or licensed to Zygo Express and is protected under the Copyright Act, 2005 (Act 690) of Ghana.</p>
+<h3>9.2 Permitted Use</h3>
+<p>You may:
+- Share links to our public pages
+- Reference Zygo Express for journalistic or educational purposes with attribution
+- Download documents we explicitly make available for download</p>
+<h3>9.3 Prohibited Use</h3>
+<p>You may not:
+- Copy, reproduce, or distribute our content without written permission
+- Use our logo or branding in any form without authorisation
+- Create derivative works from our Platform code or design</p>
+<h3>9.4 Reporting Infringement</h3>
+<p>To report unauthorised use of Zygo Express content: zygoexpresssupport@gmail.com</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-10" data-title="intellectual property policy">
+          <summary>
+            <span class="policy-num">10</span>
+            <span class="policy-heading">
+              <span class="policy-title">Intellectual Property Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>10.1 Company IP</h3>
+<p>All intellectual property developed by or for Zygo Express, including software, systems, databases, processes, trade secrets, and brand identity, belongs exclusively to Zygo Express.</p>
+<h3>10.2 Employee and Contractor IP</h3>
+<p>Any work product, code, design, or innovation created by an employee or contractor in the course of their engagement with Zygo Express is the property of Zygo Express, unless otherwise agreed in writing. ⚖️ This provision should be reviewed by legal counsel and reflected in all employment and contractor agreements.</p>
+<h3>10.3 Open Source</h3>
+<p>Where Zygo Express uses open-source software, it does so in compliance with the applicable licence terms.</p>
+<h3>10.4 User Content</h3>
+<p>By submitting feedback, ratings, or content through the Platform, you grant Zygo Express a non-exclusive, royalty-free licence to use that content for service improvement and marketing purposes.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-B" data-section="B">
+      <div class="section-divider">
+        <span class="section-letter">B</span>
+        <span class="section-name">Customer Policies</span>
+        <span class="section-rule"></span>
+        <span class="section-count">15 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-11" data-title="customer terms and conditions">
+          <summary>
+            <span class="policy-num">11</span>
+            <span class="policy-heading">
+              <span class="policy-title">Customer Terms And Conditions</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>11.1 Agreement</h3>
+<p>These Terms form a binding agreement between you (the Customer) and Zygo Express when you place a delivery order through our Platform.</p>
+<h3>11.2 Booking a Delivery</h3>
+<p>To place a valid order, you must:
+- Provide your full name and a valid Ghana phone number
+- Provide accurate pickup and drop-off locations within our service area (currently Wa Municipal and surrounding areas, Upper West Region, Ghana)
+- Confirm the nature and description of the goods being delivered
+- Acknowledge the delivery price before confirming</p>
+<h3>11.3 Your Responsibilities</h3>
+<p>As a Customer, you are responsible for:
+- Ensuring the goods you send comply with our Prohibited Goods Policy (Policy 19)
+- Being available at the stated pickup and drop-off locations at the time specified
+- Packaging goods appropriately to prevent damage in transit
+- Providing accurate contact details for yourself and the recipient
+- Paying for the delivery in full before or at the time specified</p>
+<h3>11.4 Tracking</h3>
+<p>Every confirmed order receives a unique tracking ID (format: ZGX-XXXXXX). You may use this to:
+- Track your order status in real time on our website
+- Reference your order in communications with us
+- Make your MoMo payment (use tracking ID as reference)</p>
+<h3>11.5 Order Confirmation</h3>
+<p>An order is confirmed when it appears in our system with status "Confirmed." Zygo Express reserves the right to decline orders that violate these Terms.</p>
+<h3>11.6 Delivery Completion</h3>
+<p>Delivery is complete when the rider:
+- Delivers the parcel to the stated drop-off address
+- Captures a proof of delivery photograph at the location
+- Records GPS coordinates confirming the delivery location</p>
+<p>The recipient's acceptance or the proof of delivery photograph constitutes delivery confirmation.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-12" data-title="delivery terms">
+          <summary>
+            <span class="policy-num">12</span>
+            <span class="policy-heading">
+              <span class="policy-title">Delivery Terms</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>12.1 Service Area</h3>
+<p>Zygo Express currently operates in Wa Municipal, Upper West Region, Ghana, and selected surrounding communities. Delivery availability depends on rider availability in your area.</p>
+<h3>12.2 Delivery Zones and Pricing</h3>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>Distance</th>
+<th>Price (GHS)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zone 1</td>
+<td>0–2 km</td>
+<td>13</td>
+</tr>
+<tr>
+<td>Zone 2</td>
+<td>2.1–4 km</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Zone 3</td>
+<td>4.1–6 km</td>
+<td>20</td>
+</tr>
+<tr>
+<td>Zone 4</td>
+<td>6.1–9 km</td>
+<td>30</td>
+</tr>
+</tbody>
+</table>
+<p>Prices are calculated automatically based on the road distance between pickup and drop-off locations. Zygo Express reserves the right to adjust pricing with notice.</p>
+<h3>12.3 Delivery Time</h3>
+<p>Zygo Express aims to complete deliveries within the following timeframes:
+- <strong>Average pickup time:</strong> 28 minutes from order confirmation
+- <strong>Average delivery time:</strong> 1–3 hours for destinations within Wa Municipal</p>
+<p>These are estimates, not guarantees. Delivery times may be affected by traffic, weather, or other circumstances beyond our control.</p>
+<h3>12.4 Same-Day Delivery</h3>
+<p>Zygo Express offers same-day delivery for orders confirmed before our operational cut-off time. Orders confirmed after the cut-off may be fulfilled the following day.</p>
+<h3>12.5 Failed Delivery</h3>
+<p>If delivery cannot be completed because:
+- The recipient is not available at the stated address
+- The address is incorrect or inaccessible
+- The recipient refuses delivery</p>
+<p>...the rider will contact the customer. If contact cannot be made within 15 minutes, the order may be returned to the pickup location. A re-delivery fee may apply.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-13" data-title="pickup terms">
+          <summary>
+            <span class="policy-num">13</span>
+            <span class="policy-heading">
+              <span class="policy-title">Pickup Terms</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>13.1 Pickup Responsibility</h3>
+<p>When a rider arrives at your stated pickup location:
+- Be ready with the parcel packaged and labelled
+- Provide any relevant handling instructions to the rider
+- The rider will photograph the parcel at pickup as proof</p>
+<h3>13.2 Pickup Window</h3>
+<p>Riders operate on their schedule based on order volume. You will receive confirmation when a rider has been assigned to your order.</p>
+<h3>13.3 Pickup Failure</h3>
+<p>If a rider arrives and cannot collect the parcel because:
+- The sender is unavailable
+- The goods are not ready
+- The goods do not comply with our policies</p>
+<p>...the order may be cancelled. Partial fees may still apply for the rider's journey.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-14" data-title="refund policy">
+          <summary>
+            <span class="policy-num">14</span>
+            <span class="policy-heading">
+              <span class="policy-title">Refund Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>14.1 Eligibility for Refunds</h3>
+<p>A full refund of the delivery fee will be issued if:
+- Your order was confirmed but never picked up due to a Zygo Express error
+- Your order was lost through a verified fault on our part (see Policy 17)
+- You were charged incorrectly for a delivery</p>
+<h3>14.2 Partial Refunds</h3>
+<p>A partial refund may be issued if:
+- Your delivery was significantly delayed beyond our stated timeframes due to our fault
+- Your order was damaged through a verified fault on our part</p>
+<h3>14.3 Non-Refundable Situations</h3>
+<p>No refund will be issued if:
+- You provided an incorrect address that caused delivery failure
+- You were unavailable to receive the delivery after attempts were made
+- The goods were prohibited and the order was accordingly cancelled
+- You cancel the order after the rider has already picked up the parcel</p>
+<h3>14.4 How to Request a Refund</h3>
+<p>Contact us within 48 hours of the delivery issue at zygoexpresssupport@gmail.com or 0202858011. Provide your tracking ID and a description of the issue.</p>
+<h3>14.5 Processing Time</h3>
+<p>Approved refunds will be processed within 3–5 working days via the same payment method used for the original transaction.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-15" data-title="cancellation policy">
+          <summary>
+            <span class="policy-num">15</span>
+            <span class="policy-heading">
+              <span class="policy-title">Cancellation Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>15.1 Customer Cancellations</h3>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Cancellation Status</th>
+<th>Fee</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order placed, not yet assigned to rider</td>
+<td>Free cancellation</td>
+<td>None</td>
+</tr>
+<tr>
+<td>Rider assigned, not yet picked up</td>
+<td>Cancellation permitted</td>
+<td>Possible partial fee</td>
+</tr>
+<tr>
+<td>Parcel already picked up by rider</td>
+<td>Cancellation not available</td>
+<td>Full fee applies</td>
+</tr>
+</tbody>
+</table>
+<h3>15.2 How to Cancel</h3>
+<p>Contact us immediately via WhatsApp on 0202858011 with your tracking ID. We will process eligible cancellations as quickly as possible.</p>
+<h3>15.3 Zygo Express Cancellations</h3>
+<p>Zygo Express may cancel your order if:
+- No rider is available in your area
+- The order contains prohibited goods
+- You provided fraudulent information
+- Payment cannot be confirmed</p>
+<p>In such cases, a full refund of any payment made will be processed.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-16" data-title="late delivery policy">
+          <summary>
+            <span class="policy-num">16</span>
+            <span class="policy-heading">
+              <span class="policy-title">Late Delivery Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>16.1 What Counts as Late</h3>
+<p>A delivery is considered late if it exceeds 3 hours from confirmed order time for destinations within Wa Municipal, or as otherwise stated at the time of booking.</p>
+<h3>16.2 Causes Beyond Our Control</h3>
+<p>Zygo Express is not liable for delays caused by:
+- Severe weather conditions
+- Road closures, protests, or accidents
+- Incorrect addresses provided by the customer
+- Recipient unavailability
+- Public holidays or large public gatherings</p>
+<h3>16.3 What We Will Do</h3>
+<p>If your delivery is genuinely late due to our operational failure, we will:
+- Communicate proactively via WhatsApp
+- Prioritise your order once the issue is resolved
+- Consider a goodwill gesture (discount on next order) at our discretion</p>
+<h3>16.4 Compensation</h3>
+<p>⚖️ Zygo Express's liability for a late delivery is limited to the delivery fee paid. Claims for business losses, consequential damages, or perishable goods losses are excluded to the extent permitted by law.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-17" data-title="lost parcel policy">
+          <summary>
+            <span class="policy-num">17</span>
+            <span class="policy-heading">
+              <span class="policy-title">Lost Parcel Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>17.1 Definition</h3>
+<p>A parcel is considered "lost" if 24 hours have passed from confirmed pickup and no proof of delivery exists and the parcel cannot be located.</p>
+<h3>17.2 Reporting</h3>
+<p>Report a suspected lost parcel within 48 hours of the expected delivery time by contacting us at zygoexpresssupport@gmail.com with your tracking ID.</p>
+<h3>17.3 Investigation</h3>
+<p>Upon receiving a lost parcel report, we will:
+1. Review GPS logs and proof of pickup photos
+2. Contact the assigned rider
+3. Review any proof of delivery records
+4. Provide a response within 3 working days</p>
+<h3>17.4 Resolution</h3>
+<p>If the parcel is confirmed lost through a Zygo Express fault:
+- A full refund of the delivery fee will be issued
+- Compensation for the declared value of the goods may be considered at our discretion ⚖️
+- Zygo Express's maximum liability is limited to GHS 500 per lost parcel unless a higher value was declared and accepted in writing before dispatch</p>
+<h3>17.5 Customer Responsibility</h3>
+<p>Customers are advised to:
+- Declare the value and nature of valuable goods at the time of booking
+- Package goods appropriately to prevent loss through breakage
+- Ensure recipients are available and informed</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-18" data-title="damaged goods policy">
+          <summary>
+            <span class="policy-num">18</span>
+            <span class="policy-heading">
+              <span class="policy-title">Damaged Goods Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>18.1 Rider Responsibility</h3>
+<p>Zygo Express riders are trained to handle parcels with care. If a parcel arrives damaged:
+- Contact us within 24 hours of delivery with your tracking ID
+- Provide photographs of the damaged goods
+- Retain the packaging for inspection if requested</p>
+<h3>18.2 Investigation</h3>
+<p>We will review proof of pickup and delivery photographs to determine the condition of the parcel at each stage of transit.</p>
+<h3>18.3 Compensation</h3>
+<p>If damage is confirmed to have occurred during transit through our fault:
+- A partial or full delivery fee refund may be issued
+- Compensation for the damaged goods may be considered at our discretion ⚖️
+- Maximum liability: GHS 300 per damaged parcel unless higher value declared in writing</p>
+<h3>18.4 Excluded Damage</h3>
+<p>Zygo Express is not liable for damage arising from:
+- Inadequate packaging by the sender
+- The inherent fragility of goods not declared as fragile
+- Prohibited goods included in the parcel
+- Normal handling wear for food and perishable items</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-19" data-title="prohibited goods policy">
+          <summary>
+            <span class="policy-num">19</span>
+            <span class="policy-heading">
+              <span class="policy-title">Prohibited Goods Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>19.1 Absolutely Prohibited</h3>
+<p>The following goods may never be transported through Zygo Express under any circumstances:</p>
+<p><strong>Weapons and Dangerous Materials:</strong>
+- Firearms, ammunition, explosives, and flammable substances
+- Biological, chemical, or radioactive materials
+- Illegal drugs and controlled substances under Ghanaian law</p>
+<p><strong>Illegal Items:</strong>
+- Stolen goods
+- Counterfeit currency or documents
+- Items subject to trade sanctions</p>
+<p><strong>Hazardous Goods:</strong>
+- Corrosive chemicals
+- Compressed gases
+- Peroxide-based materials</p>
+<h3>19.2 Conditional/Restricted Goods</h3>
+<p>The following require prior declaration and approval:
+- Prescription medicines (must be lawfully prescribed)
+- Alcohol (restricted to lawful deliveries)
+- High-value goods above GHS 1,000 (require declaration)
+- Live animals (case-by-case basis only)</p>
+<h3>19.3 Consequences of Non-Compliance</h3>
+<p>If prohibited goods are discovered:
+- The delivery will be cancelled immediately
+- No refund will be issued
+- The matter will be reported to law enforcement where required
+- The customer will be permanently suspended from the Platform</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-20" data-title="customer complaint resolution policy">
+          <summary>
+            <span class="policy-num">20</span>
+            <span class="policy-heading">
+              <span class="policy-title">Customer Complaint Resolution Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>20.1 How to Complain</h3>
+<p>We want to resolve every issue quickly. To submit a complaint:
+- <strong>WhatsApp/Call:</strong> 0202858011
+- <strong>Email:</strong> zygoexpresssupport@gmail.com
+- Include your tracking ID, date of issue, and description of the problem</p>
+<h3>20.2 Response Times</h3>
+<table>
+<thead>
+<tr>
+<th>Complaint Type</th>
+<th>Response Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivery status query</td>
+<td>Within 2 hours</td>
+</tr>
+<tr>
+<td>Service complaint</td>
+<td>Within 24 hours</td>
+</tr>
+<tr>
+<td>Lost/damaged goods</td>
+<td>Within 3 working days</td>
+</tr>
+<tr>
+<td>Payment dispute</td>
+<td>Within 3 working days</td>
+</tr>
+<tr>
+<td>Formal complaint</td>
+<td>Within 5 working days</td>
+</tr>
+</tbody>
+</table>
+<h3>20.3 Escalation</h3>
+<p>If you are not satisfied with our initial response, you may escalate to management by emailing zygoexpresssupport@gmail.com with "ESCALATION" in the subject line.</p>
+<h3>20.4 External Remedies</h3>
+<p>⚖️ If your complaint remains unresolved, you may seek recourse from:
+- The Consumer Protection Agency (Ghana)
+- The Data Protection Commission (for data-related complaints)
+- The courts of Ghana</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-21" data-title="pricing policy">
+          <summary>
+            <span class="policy-num">21</span>
+            <span class="policy-heading">
+              <span class="policy-title">Pricing Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>21.1 Price Calculation</h3>
+<p>Delivery prices are calculated automatically based on:
+1. The road distance between pickup and drop-off locations (using mapping data)
+2. The applicable zone price for that distance</p>
+<h3>21.2 Price Transparency</h3>
+<p>The full delivery price is displayed to the customer before confirming an order. No additional fees are charged without prior notice.</p>
+<h3>21.3 Price Changes</h3>
+<p>Zygo Express reserves the right to adjust zone prices. Current prices are published on our booking page. Existing confirmed orders will be fulfilled at the price agreed at booking.</p>
+<h3>21.4 No Hidden Fees</h3>
+<p>Zygo Express does not charge:
+- Booking fees
+- Account fees
+- Subscription fees for standard customers</p>
+<p>Promotional prices and discounts are valid only for the stated period.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-22" data-title="payment terms">
+          <summary>
+            <span class="policy-num">22</span>
+            <span class="policy-heading">
+              <span class="policy-title">Payment Terms</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>22.1 Accepted Payment Methods</h3>
+<p>Currently accepted:
+- <strong>MTN Mobile Money (MoMo):</strong> Primary payment method. Send to 0240393582 (Zygo Express) via *170#</p>
+<p>Future methods (when available):
+- Telecel Cash
+- AirtelTigo Money
+- Card payments via Paystack</p>
+<h3>22.2 Payment Process</h3>
+<ol>
+<li>Complete your booking on the Platform</li>
+<li>Your tracking ID is generated and displayed</li>
+<li>Send payment via MTN MoMo to <strong>0240393582</strong> using your tracking ID as reference</li>
+<li>Our team confirms payment in the system</li>
+<li>Your order is activated for pickup</li>
+</ol>
+<h3>22.3 Payment Timing</h3>
+<p>Payment should be made immediately after booking confirmation. Orders remain pending until payment is confirmed. Zygo Express reserves the right to cancel unconfirmed orders after 2 hours.</p>
+<h3>22.4 Payment Security</h3>
+<ul>
+<li>Payment references must be genuine MoMo transaction IDs</li>
+<li>The same payment reference cannot be used for more than one order</li>
+<li>Zygo Express does not store your MoMo PIN or credentials</li>
+</ul>
+<h3>22.5 Receipts</h3>
+<p>A confirmation is provided within the Platform upon payment verification. For a formal receipt, contact zygoexpresssupport@gmail.com with your tracking ID.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-23" data-title="cash on delivery policy">
+          <summary>
+            <span class="policy-num">23</span>
+            <span class="policy-heading">
+              <span class="policy-title">Cash On Delivery Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>23.1 Availability</h3>
+<p>Cash on delivery (COD) is available on a case-by-case basis and must be pre-approved by Zygo Express. Standard orders require MoMo payment.</p>
+<h3>23.2 Process</h3>
+<p>Where COD is approved:
+- The rider collects the exact delivery fee in cash upon delivery
+- No change is guaranteed — exact amounts are required
+- The rider records cash collection in the rider app
+- Cash is reconciled daily by management</p>
+<h3>23.3 COD Refusals</h3>
+<p>If a customer refuses to pay cash on delivery without a valid reason, the parcel will be returned to the sender and a partial delivery fee may be charged.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-24" data-title="wallet terms (future-ready)">
+          <summary>
+            <span class="policy-num">24</span>
+            <span class="policy-heading">
+              <span class="policy-title">Wallet Terms (Future-Ready)</span>
+              <span class="policy-meta">v1.0 &middot; Effective Upon Launch of Zygo Wallet Feature</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>24.1 Status</h3>
+<p>The Zygo Wallet is not yet operational. These terms are published in advance to support planning and transparency.</p>
+<h3>24.2 Intended Features (upon launch)</h3>
+<ul>
+<li>Store delivery credits</li>
+<li>Receive refunds directly to wallet</li>
+<li>Pay for deliveries from wallet balance</li>
+<li>Transfer balance to mobile money</li>
+</ul>
+<h3>24.3 Regulatory Compliance</h3>
+<p>The Zygo Wallet will operate in compliance with Bank of Ghana guidelines for payment systems and digital financial services. ⚖️ Legal review and appropriate regulatory approvals will be obtained before launch.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-25" data-title="promotions and coupons policy">
+          <summary>
+            <span class="policy-num">25</span>
+            <span class="policy-heading">
+              <span class="policy-title">Promotions And Coupons Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>25.1 General</h3>
+<p>Promotional offers, discounts, and coupons are issued at the sole discretion of Zygo Express and are subject to the specific terms stated with each promotion.</p>
+<h3>25.2 Standard Terms (unless otherwise stated)</h3>
+<ul>
+<li>One promotion per customer per transaction</li>
+<li>Promotions cannot be combined unless explicitly stated</li>
+<li>Promotions have no cash value</li>
+<li>Zygo Express reserves the right to withdraw promotions at any time</li>
+</ul>
+<h3>25.3 Anti-Fraud</h3>
+<p>Creating fake accounts or using any other deceptive method to obtain promotions is a serious violation of these Terms and may result in permanent suspension.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-C" data-section="C">
+      <div class="section-divider">
+        <span class="section-letter">C</span>
+        <span class="section-name">Merchant Policies</span>
+        <span class="section-rule"></span>
+        <span class="section-count">9 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-26" data-title="merchant terms">
+          <summary>
+            <span class="policy-num">26</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Terms</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>26.1 Definition</h3>
+<p>A "Merchant" is any business entity (pharmacy, restaurant, retail shop, school, hospital, etc.) that has formally partnered with Zygo Express to use delivery services on a regular or volume basis.</p>
+<h3>26.2 Becoming a Merchant Partner</h3>
+<p>Merchants must:
+- Complete the Partner Application on our website
+- Pass our verification process (Policy 28)
+- Accept these Merchant Terms and all related policies
+- Provide accurate business information</p>
+<h3>26.3 Merchant Obligations</h3>
+<p>As a Merchant Partner, you agree to:
+- Ensure all goods handed to riders meet our Parcel Acceptance Standards
+- Package goods appropriately
+- Be ready for pickup at agreed times
+- Pay for deliveries at the agreed commercial rate
+- Not offer or send prohibited goods
+- Comply with all applicable Ghanaian laws in your business operations</p>
+<h3>26.4 Merchant Benefits</h3>
+<p>Approved merchants receive:
+- Priority pickup scheduling
+- Volume-based pricing consideration
+- Direct WhatsApp support line
+- Access to delivery history and reporting (when Merchant Dashboard launches)</p>
+<h3>26.5 Termination</h3>
+<p>Either party may terminate the merchant relationship with 14 days written notice. Zygo Express may terminate immediately for violations of these Terms or applicable law.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-27" data-title="merchant onboarding policy">
+          <summary>
+            <span class="policy-num">27</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Onboarding Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>27.1 Application Process</h3>
+<ol>
+<li>Submit the Partnership Application via our website or contact us directly</li>
+<li>Provide: business name, type, contact details, and approximate weekly delivery volume</li>
+<li>Our team reviews the application within 24 hours</li>
+<li>Approved partners are contacted to discuss commercial terms</li>
+<li>Merchant agreement is signed (currently via email confirmation)</li>
+<li>Merchant is activated and assigned a dedicated contact</li>
+</ol>
+<h3>27.2 Information Required</h3>
+<ul>
+<li>Business name and type</li>
+<li>Primary contact name and phone number</li>
+<li>Business location in Wa</li>
+<li>Estimated weekly deliveries</li>
+<li>Types of goods to be delivered</li>
+</ul>
+<p>No business registration number or bank account number is required at initial onboarding.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-28" data-title="merchant verification policy">
+          <summary>
+            <span class="policy-num">28</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Verification Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>28.1 Purpose</h3>
+<p>To ensure Zygo Express partners with legitimate, law-abiding businesses that will not expose the company, riders, or customers to risk.</p>
+<h3>28.2 Verification Steps</h3>
+<ul>
+<li>Confirm the business's physical existence and location in Wa</li>
+<li>Verify the contact person's identity (phone call or in-person visit)</li>
+<li>Review the nature of goods to be delivered against prohibited goods list</li>
+<li>For pharmacies: confirm appropriate licencing ⚖️</li>
+</ul>
+<h3>28.3 Ongoing Monitoring</h3>
+<p>Merchant compliance is monitored through:
+- Delivery history and complaint records
+- Customer and rider feedback
+- Periodic review of goods types being sent</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-29" data-title="settlement policy">
+          <summary>
+            <span class="policy-num">29</span>
+            <span class="policy-heading">
+              <span class="policy-title">Settlement Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>29.1 Merchant Billing</h3>
+<p>Merchant payments are currently processed on a per-delivery basis unless a credit arrangement has been agreed in writing.</p>
+<h3>29.2 Invoice Period</h3>
+<p>Merchants on credit terms receive weekly statements every Monday for the previous week's deliveries.</p>
+<h3>29.3 Payment Due Date</h3>
+<p>Payment is due within 5 working days of statement date via MTN MoMo to 0240393582.</p>
+<h3>29.4 Late Payment</h3>
+<p>Zygo Express reserves the right to suspend merchant pickup services for accounts overdue by more than 7 days.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-30" data-title="commission policy">
+          <summary>
+            <span class="policy-num">30</span>
+            <span class="policy-heading">
+              <span class="policy-title">Commission Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>30.1 Standard Pricing</h3>
+<p>Merchants are charged the standard zone-based delivery rates unless a negotiated rate has been agreed in writing.</p>
+<h3>30.2 Volume Discounts</h3>
+<p>Merchants consistently sending 20+ deliveries per week may apply for a volume discount. Discounts are applied at management discretion and are subject to ongoing performance.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-31" data-title="merchant quality standards">
+          <summary>
+            <span class="policy-num">31</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Quality Standards</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <p>Merchant partners are expected to maintain the following standards:</p>
+<ul>
+<li><strong>Packaging:</strong> All goods must be securely packaged to prevent damage in transit</li>
+<li><strong>Labelling:</strong> Include recipient name and phone number on all parcels</li>
+<li><strong>Timeliness:</strong> Be ready at agreed pickup times — repeated delays may affect merchant standing</li>
+<li><strong>Goods compliance:</strong> Never send prohibited goods through our service</li>
+<li><strong>Communication:</strong> Respond promptly to Zygo Express communications</li>
+</ul>
+<p>Failure to meet these standards will be addressed through the Merchant Suspension Policy (Policy 33).</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-32" data-title="product listing policy">
+          <summary>
+            <span class="policy-num">32</span>
+            <span class="policy-heading">
+              <span class="policy-title">Product Listing Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective When Merchant Dashboard Launches</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <p>Merchants who list products on the Zygo Express marketplace (future feature) must ensure:
+- All listed products are lawful in Ghana
+- Product descriptions are accurate and not misleading
+- Pricing is correct and inclusive of all applicable taxes
+- Stock availability is kept up to date
+- Images are genuine and represent the actual product</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-33" data-title="merchant suspension policy">
+          <summary>
+            <span class="policy-num">33</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Suspension Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>33.1 Grounds for Suspension</h3>
+<ul>
+<li>Sending prohibited goods</li>
+<li>Repeated packaging violations after warning</li>
+<li>Non-payment of outstanding fees</li>
+<li>Fraudulent activity</li>
+<li>Breach of merchant terms</li>
+</ul>
+<h3>33.2 Process</h3>
+<ol>
+<li>Warning issued (for minor violations)</li>
+<li>Formal notice of suspension with reason</li>
+<li>5-day period to respond or remedy</li>
+<li>Suspension confirmed if not resolved</li>
+</ol>
+<h3>33.3 Appeal</h3>
+<p>Merchants may appeal suspension decisions by writing to zygoexpresssupport@gmail.com within 7 days.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-34" data-title="merchant dispute resolution policy">
+          <summary>
+            <span class="policy-num">34</span>
+            <span class="policy-heading">
+              <span class="policy-title">Merchant Dispute Resolution Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>34.1 Raising a Dispute</h3>
+<p>Merchants may raise disputes regarding:
+- Billing errors
+- Delivery failures
+- Rider conduct
+- Settlement discrepancies</p>
+<p>Contact: zygoexpresssupport@gmail.com with your merchant name, relevant dates, and description.</p>
+<h3>34.2 Resolution Timeline</h3>
+<ul>
+<li>Acknowledgement: within 24 hours</li>
+<li>Investigation: within 3 working days</li>
+<li>Resolution: within 5 working days</li>
+</ul>
+<h3>34.3 Escalation</h3>
+<p>Unresolved disputes may be escalated in writing to management. If still unresolved, either party may seek mediation before formal legal proceedings. ⚖️</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-D" data-section="D">
+      <div class="section-divider">
+        <span class="section-letter">D</span>
+        <span class="section-name">Rider Policies</span>
+        <span class="section-rule"></span>
+        <span class="section-count">10 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-35" data-title="rider terms">
+          <summary>
+            <span class="policy-num">35</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Terms</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>35.1 Rider Status</h3>
+<p>⚖️ Zygo Express riders are engaged as independent delivery contractors unless a specific employment agreement states otherwise. This policy should be reviewed by qualified legal counsel to ensure compliance with the Labour Act, 2003 (Act 651).</p>
+<h3>35.2 Registration Requirements</h3>
+<p>To become an approved Zygo Express rider, you must:
+- Be at least 18 years of age
+- Hold a valid Ghana driver's licence appropriate for your vehicle type
+- Own or have lawful access to a roadworthy motorcycle or delivery vehicle
+- Provide accurate identification details
+- Pass our onboarding review</p>
+<h3>35.3 Rider Obligations</h3>
+<ul>
+<li>Sign in to the rider app at the start of each working session</li>
+<li>Accept and complete orders in a timely, professional manner</li>
+<li>Follow all rider policies in this Section D</li>
+<li>Report any incidents, accidents, or issues through the app or by calling 0202858011</li>
+<li>Maintain a proof-of-pickup photo and GPS record for every delivery</li>
+</ul>
+<h3>35.4 Pay Structure</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily active base pay</td>
+<td>GHS 15 per day signed in</td>
+</tr>
+<tr>
+<td>Per successful delivery</td>
+<td>GHS 2 per confirmed delivery</td>
+</tr>
+</tbody>
+</table>
+<p>Pay is calculated automatically by the system based on sign-in activity and confirmed deliveries. Riders can view their pay breakdown in the rider app at any time.</p>
+<h3>35.5 Pay Period</h3>
+<p>Pay is calculated weekly. Payment is made every Monday for the preceding week via MTN MoMo to the rider's registered number.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-36" data-title="rider code of conduct">
+          <summary>
+            <span class="policy-num">36</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Code Of Conduct</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>36.1 Customer Interaction</h3>
+<ul>
+<li>Greet customers respectfully</li>
+<li>Never discuss or argue about package contents</li>
+<li>Maintain professional communication at all times</li>
+<li>Never request tips or additional payment beyond the confirmed order</li>
+</ul>
+<h3>36.2 On the Road</h3>
+<ul>
+<li>Obey all traffic laws under the Road Traffic Act and relevant regulations</li>
+<li>Never use a mobile phone while operating your vehicle</li>
+<li>Wear your helmet at all times while riding</li>
+<li>Do not carry passengers while on a delivery run</li>
+</ul>
+<h3>36.3 Handling Goods</h3>
+<ul>
+<li>Handle all parcels with care</li>
+<li>Never open a parcel unless explicitly authorised to</li>
+<li>Report suspicious goods immediately — do not transport them</li>
+<li>Photograph pickup and delivery locations as required by the app</li>
+</ul>
+<h3>36.4 Use of Technology</h3>
+<ul>
+<li>Keep the rider app active during all delivery sessions</li>
+<li>Enable GPS location during active deliveries</li>
+<li>Report any app issues immediately</li>
+</ul>
+<h3>36.5 Prohibited Conduct</h3>
+<p>Riders must never:
+- Steal, open, or tamper with a customer's parcel
+- Make false delivery confirmations
+- Use the rider account of another person
+- Accept goods that appear suspicious without reporting to dispatch</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-37" data-title="rider safety policy">
+          <summary>
+            <span class="policy-num">37</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Safety Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>37.1 Your Safety is Our Priority</h3>
+<p>Zygo Express will never instruct a rider to violate traffic laws or safety standards to meet delivery timescales. Your safety comes before speed.</p>
+<h3>37.2 Required Safety Equipment</h3>
+<p>All riders must have:
+- A properly fitted helmet meeting safety standards
+- Appropriate footwear (no slippers while riding)
+- Reflective vest or Zygo Express jacket (when issued)
+- Working headlights and tail lights for night deliveries</p>
+<h3>37.3 Road Safety</h3>
+<ul>
+<li>Never ride while impaired by alcohol or medication</li>
+<li>Take rest breaks for journeys beyond your stamina</li>
+<li>Avoid riding in severe weather conditions if unsafe to do so</li>
+</ul>
+<h3>37.4 Personal Safety</h3>
+<ul>
+<li>Do not accept deliveries to locations that feel unsafe</li>
+<li>If you feel threatened by a customer or third party, remove yourself and call 0202858011 immediately</li>
+<li>Zygo Express will always support riders who withdraw from unsafe situations</li>
+</ul>
+<h3>37.5 Night Deliveries</h3>
+<p>Night deliveries (after 9:00 PM) are subject to management approval. Riders are not obligated to accept night deliveries.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-38" data-title="rider equipment policy">
+          <summary>
+            <span class="policy-num">38</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Equipment Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>38.1 Rider-Owned Equipment</h3>
+<p>Riders are responsible for maintaining their own vehicle in a roadworthy condition. Zygo Express may inspect or request proof of vehicle roadworthiness at any time.</p>
+<h3>38.2 App and Phone</h3>
+<p>Riders must maintain a smartphone capable of running the Zygo Express rider app. The app is available at our GitHub Pages URL. A stable data connection is required during active sessions.</p>
+<h3>38.3 Equipment Issued by Zygo Express</h3>
+<p>Where Zygo Express issues equipment (jacket, delivery bags, etc.), riders must:
+- Use the equipment only for Zygo Express deliveries
+- Maintain the equipment in good condition
+- Return equipment upon leaving the platform</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-39" data-title="dress code policy">
+          <summary>
+            <span class="policy-num">39</span>
+            <span class="policy-heading">
+              <span class="policy-title">Dress Code Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>39.1 Standard</h3>
+<p>Riders are expected to present themselves in a clean, professional manner that reflects the Zygo Express brand.</p>
+<h3>39.2 Requirements</h3>
+<ul>
+<li>Wear the Zygo Express jacket or vest when issued</li>
+<li>Maintain clean and appropriate clothing during deliveries</li>
+<li>Wear a helmet at all times while riding</li>
+</ul>
+<h3>39.3 Rationale</h3>
+<p>Your appearance is a customer's first impression of Zygo Express. A professional appearance builds trust.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-40" data-title="accident reporting policy">
+          <summary>
+            <span class="policy-num">40</span>
+            <span class="policy-heading">
+              <span class="policy-title">Accident Reporting Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>40.1 Immediate Actions</h3>
+<p>If you are involved in a road accident while on duty:
+1. Ensure your safety and that of others involved
+2. Call emergency services if there are injuries (Ghana National Ambulance: 193; Police: 191)
+3. Call Zygo Express immediately: 0202858011
+4. Do not move the vehicles until instructed by police
+5. Photograph the scene if safe to do so</p>
+<h3>40.2 Reporting</h3>
+<p>Submit a written accident report through the rider app or by email within 24 hours, including:
+- Date, time, and location
+- Description of what happened
+- Details of any third parties involved
+- Police report reference number (if applicable)
+- Photographs</p>
+<h3>40.3 Post-Accident</h3>
+<p>Zygo Express will:
+- Support the rider through the reporting process
+- Investigate to determine if any operational factors contributed
+- Temporarily suspend the rider from deliveries pending investigation if necessary</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-41" data-title="performance evaluation policy">
+          <summary>
+            <span class="policy-num">41</span>
+            <span class="policy-heading">
+              <span class="policy-title">Performance Evaluation Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>41.1 Performance Metrics</h3>
+<p>Rider performance is measured by:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivery completion rate</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Customer rating (1–5 stars)</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Average delivery time</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Incident/complaint count</td>
+<td>High</td>
+</tr>
+<tr>
+<td>Online availability</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<h3>41.2 Performance Benchmarks</h3>
+<ul>
+<li>Minimum acceptable customer rating: 3.5 stars (sustained average)</li>
+<li>Minimum completion rate: 85% of accepted orders</li>
+</ul>
+<h3>41.3 Performance Reviews</h3>
+<p>Riders below benchmark performance will receive:
+1. Private feedback and coaching
+2. Formal performance improvement period (2 weeks)
+3. Suspension if no improvement</p>
+<h3>41.4 Top Performer Recognition</h3>
+<p>Top-performing riders will be recognised through:
+- Featured on our Top Riders leaderboard
+- Priority order allocation
+- Rider incentive programme (Policy 42)</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-42" data-title="rider incentive policy">
+          <summary>
+            <span class="policy-num">42</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Incentive Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>42.1 Base Incentives</h3>
+<p>All riders earn:
+- GHS 15 base pay for every day they are signed in and active
+- GHS 2 for every successfully confirmed delivery</p>
+<h3>42.2 Performance Bonuses</h3>
+<p>At management discretion, additional bonuses may be awarded for:
+- Consistently achieving 5-star ratings
+- Completing 50+ deliveries in a week
+- Zero incidents in a month
+- Going above and beyond in customer service</p>
+<h3>42.3 Pay Visibility</h3>
+<p>Every rider can see their exact pay breakdown (base pay + delivery earnings) in the rider app under "My Earnings," updated daily.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-43" data-title="fuel reimbursement policy">
+          <summary>
+            <span class="policy-num">43</span>
+            <span class="policy-heading">
+              <span class="policy-title">Fuel Reimbursement Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>43.1 Current Policy</h3>
+<p>Fuel costs are currently included in the base daily pay calculation. Riders are responsible for their own fuel costs as part of their independent contractor status.</p>
+<h3>43.2 Fuel Logging</h3>
+<p>Riders are required to log all fuel purchases in the rider app (⛽ Log Fuel) including:
+- Litres purchased
+- Cost paid
+- Odometer reading</p>
+<p>This data is used for fleet efficiency monitoring and future policy review.</p>
+<h3>43.3 Policy Review</h3>
+<p>Zygo Express will review the fuel reimbursement model as the business scales and data is collected from fuel logs. ⚖️ Any formal reimbursement scheme will be reviewed by legal counsel for tax and labour implications.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-44" data-title="rider suspension policy">
+          <summary>
+            <span class="policy-num">44</span>
+            <span class="policy-heading">
+              <span class="policy-title">Rider Suspension Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>44.1 Immediate Suspension Grounds</h3>
+<p>The following result in immediate suspension pending investigation:
+- Theft of a customer's parcel
+- Confirmed false delivery records
+- Physical altercation with a customer
+- Riding under the influence of alcohol or drugs
+- Transporting prohibited goods</p>
+<h3>44.2 Standard Suspension Process</h3>
+<p>For less severe violations:
+1. Verbal warning (recorded in system)
+2. Written warning via WhatsApp/email
+3. 7-day suspension
+4. Termination if conduct continues</p>
+<h3>44.3 Appeals</h3>
+<p>Riders may appeal suspension decisions within 7 days by contacting zygoexpresssupport@gmail.com. Appeals will be reviewed by management within 5 working days.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-E" data-section="E">
+      <div class="section-divider">
+        <span class="section-letter">E</span>
+        <span class="section-name">Operations</span>
+        <span class="section-rule"></span>
+        <span class="section-count">8 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-45" data-title="packaging standards">
+          <summary>
+            <span class="policy-num">45</span>
+            <span class="policy-heading">
+              <span class="policy-title">Packaging Standards</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>45.1 Purpose</h3>
+<p>To ensure all goods transported by Zygo Express are properly packaged to prevent damage, loss, or injury during transit.</p>
+<h3>45.2 Sender Responsibility</h3>
+<p>The sender is responsible for packaging all goods before a rider arrives for pickup. Zygo Express riders are not responsible for packaging or re-packaging goods.</p>
+<h3>45.3 Minimum Standards</h3>
+<p>All parcels must:
+- Be enclosed in appropriate packaging (box, sealed bag, or wrapper)
+- Have the recipient's name and phone number written clearly on the outside
+- Be sealed securely to prevent contents from falling out
+- Be of a size and weight a single rider can safely carry on a motorcycle</p>
+<h3>45.4 Category-Specific Standards</h3>
+<table>
+<thead>
+<tr>
+<th>Goods Type</th>
+<th>Packaging Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documents</td>
+<td>Sealed envelope or folder</td>
+</tr>
+<tr>
+<td>Food and beverages</td>
+<td>Sealed containers, leak-proof bags</td>
+</tr>
+<tr>
+<td>Medicines</td>
+<td>Original packaging, sealed bag</td>
+</tr>
+<tr>
+<td>Fragile items</td>
+<td>Bubble wrap, rigid box, "FRAGILE" label</td>
+</tr>
+<tr>
+<td>Clothing/soft goods</td>
+<td>Sealed polythene bag</td>
+</tr>
+<tr>
+<td>Electronics</td>
+<td>Original box preferred; padded if not available</td>
+</tr>
+</tbody>
+</table>
+<h3>45.5 Oversized or Heavy Goods</h3>
+<p>Goods exceeding 10 kg or requiring two hands to carry require prior approval and may attract additional charges. Contact us before booking.</p>
+<h3>45.6 Perishable Goods</h3>
+<p>Perishable goods (food, fresh produce) must be packaged to remain safe for the expected delivery duration. Zygo Express is not liable for perishables that deteriorate during delivery.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-46" data-title="parcel acceptance standards">
+          <summary>
+            <span class="policy-num">46</span>
+            <span class="policy-heading">
+              <span class="policy-title">Parcel Acceptance Standards</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>46.1 Rider Authority</h3>
+<p>Riders have the authority to refuse any parcel that:
+- Does not meet packaging standards
+- Appears to contain prohibited goods
+- Is unusually heavy or oversized without prior approval
+- Has a suspicious appearance or odour</p>
+<h3>46.2 Acceptance Confirmation</h3>
+<p>Acceptance of a parcel is confirmed when the rider takes a <strong>Proof of Pickup photograph</strong> through the rider app, capturing the parcel at the sender's location with GPS coordinates recorded.</p>
+<h3>46.3 Rejection Process</h3>
+<p>If a rider rejects a parcel:
+- The rider must report the rejection reason through the rider app
+- The customer will be contacted immediately
+- The order may be cancelled if the goods cannot be made compliant</p>
+<h3>46.4 Weight and Dimension Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maximum single parcel weight</td>
+<td>10 kg</td>
+</tr>
+<tr>
+<td>Maximum parcel size (longest dimension)</td>
+<td>60 cm</td>
+</tr>
+<tr>
+<td>Multiple parcels per order</td>
+<td>Subject to prior approval</td>
+</tr>
+</tbody>
+</table>
+          </div>
+        </details>
+        <details class="policy" id="policy-47" data-title="dangerous goods policy">
+          <summary>
+            <span class="policy-num">47</span>
+            <span class="policy-heading">
+              <span class="policy-title">Dangerous Goods Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>47.1 Legal Framework</h3>
+<p>This policy is informed by the Hazardous Chemicals Act, 2013 (Act 858) and applicable Ghana Standards Authority regulations.</p>
+<h3>47.2 Definition</h3>
+<p>Dangerous goods are items that, by their nature, pose a risk to health, safety, property, or the environment during transport.</p>
+<h3>47.3 Absolutely Prohibited</h3>
+<ul>
+<li>Explosives and detonators</li>
+<li>Flammable liquids (petrol, kerosene, paint solvents above 1 litre)</li>
+<li>Compressed gases</li>
+<li>Corrosive acids and alkalis</li>
+<li>Radioactive materials</li>
+<li>Infectious biological substances</li>
+<li>Illegal drugs and precursor chemicals</li>
+<li>Weapons of any kind</li>
+</ul>
+<h3>47.4 Conditionally Accepted</h3>
+<p>The following may be accepted with prior written approval:
+- Small quantities of household chemicals (properly sealed)
+- Battery-powered devices (with battery precautions)
+- Cleaning products in original sealed containers</p>
+<h3>47.5 Rider Protection</h3>
+<p>If a rider suspects they are transporting dangerous goods:
+1. Stop safely
+2. Do not open the parcel
+3. Call Zygo Express immediately: 0202858011
+4. Contact police if there is immediate danger: 191</p>
+<p>Zygo Express will fully support any rider who takes these steps in good faith.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-48" data-title="warehouse handling standards">
+          <summary>
+            <span class="policy-num">48</span>
+            <span class="policy-heading">
+              <span class="policy-title">Warehouse Handling Standards</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>48.1 Current Operations</h3>
+<p>Zygo Express currently operates without a central warehouse. Parcels are collected directly from senders and delivered to recipients without intermediate storage.</p>
+<h3>48.2 Temporary Holding</h3>
+<p>In exceptional circumstances where a delivery cannot be completed, a parcel may be held temporarily by the assigned rider or at our operational base.</p>
+<h3>48.3 Temporary Holding Standards</h3>
+<ul>
+<li>Maximum holding period: 24 hours</li>
+<li>Parcels must be kept in a secure, dry location</li>
+<li>Perishable goods cannot be held and must be returned to the sender if delivery fails</li>
+<li>All held parcels must be logged in the system with holding reason</li>
+</ul>
+<h3>48.4 Future Warehouse Operations</h3>
+<p>When Zygo Express establishes warehouse or hub operations, this policy will be expanded to include full warehouse management standards.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-49" data-title="inventory management policy">
+          <summary>
+            <span class="policy-num">49</span>
+            <span class="policy-heading">
+              <span class="policy-title">Inventory Management Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>49.1 Scope</h3>
+<p>This policy covers the management of Zygo Express's own operational inventory, including:
+- Rider equipment (jackets, delivery bags, branded materials)
+- Packaging materials (when sold or provided)
+- Fleet assets (vehicles registered in the company's fleet system)</p>
+<h3>49.2 Asset Tracking</h3>
+<p>All Zygo Express-owned assets are logged in the system with:
+- Asset description and identifier
+- Assigned rider or staff member
+- Date of issue
+- Condition at issue</p>
+<h3>49.3 Responsibility</h3>
+<p>Riders and staff who receive Zygo Express assets are responsible for their safe keeping. Loss or damage through negligence may be subject to cost recovery. ⚖️</p>
+<h3>49.4 Vehicle Inventory</h3>
+<p>All motorcycles used for deliveries are logged in the Vehicles module of the admin system with:
+- Vehicle name and plate number
+- Assigned rider
+- Status (Active/Maintenance/Retired)</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-50" data-title="vehicle maintenance policy">
+          <summary>
+            <span class="policy-num">50</span>
+            <span class="policy-heading">
+              <span class="policy-title">Vehicle Maintenance Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>50.1 Rider Responsibility</h3>
+<p>Each rider is responsible for maintaining their own vehicle in a safe, roadworthy condition in compliance with the Road Traffic Act and associated regulations.</p>
+<h3>50.2 Minimum Maintenance Requirements</h3>
+<p>Riders must ensure their vehicle has, at minimum:
+- Valid roadworthy certificate
+- Valid road licence
+- Functioning brakes, lights, and horn
+- Adequate tyre condition
+- Clean engine oil</p>
+<h3>50.3 Maintenance Logging</h3>
+<p>All maintenance activities must be logged in the rider app (🔧 Log Maintenance), including:
+- Type of maintenance (oil change, tyre, brake, service, repair, other)
+- Cost incurred
+- Description of work done</p>
+<p>This data feeds into the company's fleet cost analysis and financial reporting.</p>
+<h3>50.4 Mandatory Reporting</h3>
+<p>Riders must immediately report:
+- Any accident involving their vehicle (see Policy 40)
+- Mechanical failures that prevent safe operation
+- Vehicle theft or damage</p>
+<h3>50.5 Zygo Express Right to Inspect</h3>
+<p>Zygo Express reserves the right to request proof of vehicle maintenance or conduct a basic visual inspection before assigning deliveries.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-51" data-title="operational risk policy">
+          <summary>
+            <span class="policy-num">51</span>
+            <span class="policy-heading">
+              <span class="policy-title">Operational Risk Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>51.1 Purpose</h3>
+<p>To identify, assess, and manage operational risks that could affect Zygo Express's ability to deliver its services safely and reliably.</p>
+<h3>51.2 Key Risk Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rider road accident</td>
+<td>Medium</td>
+<td>High</td>
+<td>Safety training, incident reporting</td>
+</tr>
+<tr>
+<td>Platform outage</td>
+<td>Low</td>
+<td>High</td>
+<td>Backup communication via WhatsApp</td>
+</tr>
+<tr>
+<td>Data breach</td>
+<td>Low</td>
+<td>High</td>
+<td>Security controls, see Section G</td>
+</tr>
+<tr>
+<td>Payment fraud</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Reference verification, trigger guards</td>
+</tr>
+<tr>
+<td>Parcel theft by rider</td>
+<td>Low</td>
+<td>High</td>
+<td>Proof of pickup/delivery, code of conduct</td>
+</tr>
+<tr>
+<td>Customer dispute</td>
+<td>Medium</td>
+<td>Low</td>
+<td>Complaint policy, resolution process</td>
+</tr>
+<tr>
+<td>Rider shortage</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Multiple riders onboarded</td>
+</tr>
+</tbody>
+</table>
+<h3>51.3 Risk Review</h3>
+<p>Operational risks are reviewed quarterly by management. This policy is updated at least annually.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-52" data-title="emergency response procedures">
+          <summary>
+            <span class="policy-num">52</span>
+            <span class="policy-heading">
+              <span class="policy-title">Emergency Response Procedures</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>52.1 Platform Outage</h3>
+<p>If the Platform becomes unavailable:
+1. Customers and riders are directed to WhatsApp: 0202858011
+2. Orders can be taken manually
+3. Management is notified immediately
+4. Expected restoration time is communicated to active users</p>
+<h3>52.2 Rider Emergency</h3>
+<p>If a rider reports an emergency:
+1. Emergency services are called if there is injury (Ambulance: 193, Police: 191)
+2. Management is alerted immediately
+3. Active deliveries are reassigned
+4. Incident is documented per Policy 40</p>
+<h3>52.3 Security Incident</h3>
+<p>See Policy 65 (Incident Response Plan).</p>
+<h3>52.4 Natural Disaster or Civil Unrest</h3>
+<p>In the event of circumstances making safe operation impossible:
+1. All active deliveries are suspended
+2. Customers are notified via WhatsApp
+3. Riders are instructed to cease operations and ensure their safety
+4. Operations resume only when conditions are confirmed safe</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-F" data-section="F">
+      <div class="section-divider">
+        <span class="section-letter">F</span>
+        <span class="section-name">Payments</span>
+        <span class="section-rule"></span>
+        <span class="section-count">9 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-53" data-title="payment processing policy">
+          <summary>
+            <span class="policy-num">53</span>
+            <span class="policy-heading">
+              <span class="policy-title">Payment Processing Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>53.1 Legal Framework</h3>
+<p>This policy is informed by:
+- Electronic Transactions Act, 2008 (Act 772)
+- Bank of Ghana Payment Systems and Services Act, 2019 (Act 987) ⚖️
+- Consumer Protection principles</p>
+<h3>53.2 Payment Architecture</h3>
+<p>All payments are processed through our platform using the following flow:
+1. Customer books delivery → receives tracking ID
+2. Customer sends MoMo payment using tracking ID as reference
+3. Zygo Express confirms receipt in the admin system
+4. Order is marked as paid — delivery proceeds</p>
+<h3>53.3 Payment Record Integrity</h3>
+<ul>
+<li>The same payment reference cannot be used for more than one order (enforced at the database level)</li>
+<li><code>paid_at</code> cannot be set without a valid <code>payment_reference</code></li>
+<li>All payment confirmations are recorded with timestamp and reference</li>
+</ul>
+<h3>53.4 Data Retention</h3>
+<p>Payment records are retained for 7 years in compliance with Ghana Revenue Authority requirements.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-54" data-title="mobile money policy">
+          <summary>
+            <span class="policy-num">54</span>
+            <span class="policy-heading">
+              <span class="policy-title">Mobile Money Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>54.1 Primary Payment Method</h3>
+<p>MTN Mobile Money (MoMo) is Zygo Express's primary payment channel.</p>
+<p><strong>MoMo Merchant Number:</strong> 0240393582 (Zygo Express)
+<strong>WhatsApp/Call:</strong> 0202858011</p>
+<h3>54.2 Payment Instructions</h3>
+<ol>
+<li>Dial *170# on your MTN line</li>
+<li>Select "Transfer Money" → "MoMo User"</li>
+<li>Enter amount: [your delivery price]</li>
+<li>Recipient number: <strong>0240393582</strong></li>
+<li>Reference: <strong>[your tracking ID]</strong></li>
+<li>Confirm with your PIN</li>
+</ol>
+<h3>54.3 Verification</h3>
+<p>Payment is verified manually by Zygo Express staff upon receiving MoMo confirmation. An automated verification system (via Paystack integration) is planned for future implementation.</p>
+<h3>54.4 Failed Payments</h3>
+<p>If your payment fails:
+- Retry the transaction
+- Contact us on 0202858011 with your tracking ID and MoMo transaction ID if the issue persists</p>
+<h3>54.5 Overpayments</h3>
+<p>If you accidentally overpay, contact us within 24 hours. We will arrange a refund of the excess amount within 3 working days.</p>
+<h3>54.6 Future Providers</h3>
+<p>Zygo Express plans to accept Telecel Cash, AirtelTigo Money, and card payments in future. These will be added to this policy upon activation.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-55" data-title="paystack integration policy">
+          <summary>
+            <span class="policy-num">55</span>
+            <span class="policy-heading">
+              <span class="policy-title">Paystack Integration Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective Upon Paystack KYC Completion</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>55.1 Status</h3>
+<p>Zygo Express has registered with Paystack for payment processing. KYC verification is currently in progress. Full integration will be activated upon KYC approval.</p>
+<h3>55.2 Intended Use</h3>
+<p>Upon activation, Paystack will enable:
+- Automatic payment verification (eliminating manual confirmation)
+- Webhook-based order status updates
+- Card payment acceptance
+- Mobile Money API collections (MTN, Telecel, AirtelTigo)</p>
+<h3>55.3 Security</h3>
+<p>All Paystack integration credentials (API keys, secret keys) will be stored as environment variables and will never appear in client-side code or be committed to public repositories.</p>
+<h3>55.4 Data Handling</h3>
+<p>Zygo Express will not store card details. All card processing will be handled entirely by Paystack in compliance with PCI DSS standards (Paystack's compliance, not Zygo Express's own certification).</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-56" data-title="refund processing policy">
+          <summary>
+            <span class="policy-num">56</span>
+            <span class="policy-heading">
+              <span class="policy-title">Refund Processing Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>56.1 Eligibility</h3>
+<p>See Policy 14 (Refund Policy) for eligibility criteria.</p>
+<h3>56.2 Processing Steps</h3>
+<ol>
+<li>Customer submits refund request with tracking ID and reason</li>
+<li>Zygo Express investigates within 3 working days</li>
+<li>Approved refund is processed via MoMo to the original payment number</li>
+<li>Customer is notified of refund status</li>
+</ol>
+<h3>56.3 Processing Time</h3>
+<p>Refunds are processed within 3–5 working days of approval.</p>
+<h3>56.4 Records</h3>
+<p>All refund decisions are documented internally with:
+- Date of request
+- Reason for claim
+- Investigation outcome
+- Amount refunded
+- Confirmation of payment</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-57" data-title="fraud prevention policy">
+          <summary>
+            <span class="policy-num">57</span>
+            <span class="policy-heading">
+              <span class="policy-title">Fraud Prevention Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>57.1 Technical Controls</h3>
+<p>Zygo Express implements the following technical fraud prevention measures:
+- <strong>Unique payment reference enforcement:</strong> Database-level constraint prevents reuse of the same MoMo reference
+- <strong>Payment fraud trigger:</strong> <code>paid_at</code> cannot be set in the database without a valid reference
+- <strong>Cryptographic tracking codes:</strong> Generated using <code>crypto.getRandomValues()</code> — impossible to predict
+- <strong>Bot protection:</strong> Cloudflare Turnstile on booking and partnership forms
+- <strong>Row-level database security:</strong> Preventing unauthorised data manipulation</p>
+<h3>57.2 Operational Controls</h3>
+<ul>
+<li>All payment confirmations are manually verified against MoMo receipts</li>
+<li>Unusual patterns (same customer, multiple orders, single payment reference) are flagged for review</li>
+<li>Rider GPS and proof-of-delivery records are cross-checked against claimed deliveries</li>
+</ul>
+<h3>57.3 Reporting Fraud</h3>
+<p>If you suspect fraudulent activity on your account or our platform, report immediately to zygoexpresssupport@gmail.com or 0202858011.</p>
+<h3>57.4 Consequences</h3>
+<p>Confirmed fraud results in:
+- Permanent suspension from the platform
+- Recovery of fraudulently obtained value
+- Reporting to law enforcement where appropriate</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-58" data-title="chargeback policy">
+          <summary>
+            <span class="policy-num">58</span>
+            <span class="policy-heading">
+              <span class="policy-title">Chargeback Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective Upon Card Payment Activation</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>58.1 Applicability</h3>
+<p>This policy applies to card-based payment chargebacks processed through Paystack upon activation of card payments.</p>
+<h3>58.2 Chargeback Response</h3>
+<p>Upon receiving a chargeback notification from Paystack:
+1. The relevant order is frozen pending investigation
+2. Zygo Express gathers evidence: booking records, GPS data, proof of delivery photo
+3. Evidence is submitted to Paystack within their required timeframe
+4. Outcome is communicated to the customer</p>
+<h3>58.3 Abuse</h3>
+<p>Customers who initiate fraudulent chargebacks for legitimate deliveries will be permanently suspended and may be subject to legal action.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-59" data-title="aml awareness policy">
+          <summary>
+            <span class="policy-num">59</span>
+            <span class="policy-heading">
+              <span class="policy-title">Aml Awareness Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>59.1 Purpose</h3>
+<p>Anti-Money Laundering (AML) awareness is a legal and ethical obligation. This policy outlines Zygo Express's commitment to ensuring our platform is not used for money laundering or terrorist financing.</p>
+<h3>59.2 Legal Framework</h3>
+<p>⚖️ This policy references the Anti-Money Laundering Act, 2008 (Act 749) as amended. Formal AML compliance obligations depend on Zygo Express's classification under Ghanaian financial regulations, which should be reviewed by qualified legal counsel as payment services expand.</p>
+<h3>59.3 Red Flags</h3>
+<p>Zygo Express staff must be alert to:
+- Large numbers of orders paid with different MoMo numbers from the same recipient
+- Payments significantly exceeding delivery values
+- Orders to or from suspicious locations or persons
+- Requests to split payments across multiple references for a single order</p>
+<h3>59.4 Reporting</h3>
+<p>Any suspected money laundering activity must be reported internally to management immediately and may be reported to the Financial Intelligence Centre (FIC) of Ghana where legally required.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-60" data-title="kyc policy (future)">
+          <summary>
+            <span class="policy-num">60</span>
+            <span class="policy-heading">
+              <span class="policy-title">Kyc Policy (Future)</span>
+              <span class="policy-meta">v1.0 &middot; Effective Upon Zygo Wallet Launch</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>60.1 Status</h3>
+<p>Know Your Customer (KYC) procedures will be implemented when Zygo Express launches wallet or financial services features.</p>
+<h3>60.2 Planned KYC Requirements</h3>
+<p>For wallet accounts:
+- Full name verification
+- Ghana Card (National Identification) number
+- Verified phone number (linked to Ghana Card)
+- Selfie verification</p>
+<h3>60.3 Regulatory Alignment</h3>
+<p>The KYC framework will be designed in compliance with Bank of Ghana requirements and the Anti-Money Laundering Act. ⚖️ Legal review will be obtained before implementation.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-61" data-title="transaction monitoring policy">
+          <summary>
+            <span class="policy-num">61</span>
+            <span class="policy-heading">
+              <span class="policy-title">Transaction Monitoring Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>61.1 Current Monitoring</h3>
+<p>Zygo Express currently monitors transactions through:
+- Admin dashboard financial summary (daily, weekly, monthly P&amp;L)
+- Payment reference uniqueness enforcement
+- Manual review of MoMo confirmations</p>
+<h3>61.2 Automated Monitoring (Planned)</h3>
+<p>Upon Paystack integration and future wallet launch, automated transaction monitoring will include:
+- Velocity checks (unusual frequency of transactions)
+- Threshold alerts for large-value transactions
+- Duplicate transaction detection
+- Failed payment pattern analysis</p>
+<h3>61.3 Record Keeping</h3>
+<p>All transaction records are retained for 7 years in compliance with Ghana Revenue Authority obligations.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-G" data-section="G">
+      <div class="section-divider">
+        <span class="section-letter">G</span>
+        <span class="section-name">Information Security</span>
+        <span class="section-rule"></span>
+        <span class="section-count">10 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-62" data-title="information security policy">
+          <summary>
+            <span class="policy-num">62</span>
+            <span class="policy-heading">
+              <span class="policy-title">Information Security Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>62.1 Purpose</h3>
+<p>To establish Zygo Express's commitment to protecting information assets — customer data, operational data, financial records, and system infrastructure — from unauthorised access, disclosure, alteration, or destruction.</p>
+<h3>62.2 Legal Basis</h3>
+<ul>
+<li>Data Protection Act, 2012 (Act 843)</li>
+<li>Cybersecurity Act, 2020 (Act 1038)</li>
+<li>Electronic Transactions Act, 2008 (Act 772)</li>
+</ul>
+<p>This policy is also informed by ISO 27001 principles (without claiming certification).</p>
+<h3>62.3 Information Classification</h3>
+<table>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Definition</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Confidential</strong></td>
+<td>Sensitive data requiring strict access control</td>
+<td>Customer PII, payment records, rider PINs, admin credentials</td>
+</tr>
+<tr>
+<td><strong>Internal</strong></td>
+<td>Operational data for internal use only</td>
+<td>Order history, analytics, pay calculations</td>
+</tr>
+<tr>
+<td><strong>Public</strong></td>
+<td>Information intended for public access</td>
+<td>Pricing, service descriptions, FAQ</td>
+</tr>
+</tbody>
+</table>
+<h3>62.4 Security Controls Implemented</h3>
+<ul>
+<li><strong>Authentication:</strong> Supabase Auth (server-verified) for admin; RPC-based PIN verification for riders</li>
+<li><strong>Database security:</strong> Row-level security on all tables; sensitive tables locked to RPC access only</li>
+<li><strong>Credential storage:</strong> Admin credentials never stored in client code; rider PINs never transmitted</li>
+<li><strong>Photo storage:</strong> Delivery proof photos in private bucket; viewable only via signed URLs</li>
+<li><strong>Bot protection:</strong> Cloudflare Turnstile on all public-facing forms</li>
+<li><strong>Input validation:</strong> Database-level length constraints on all user inputs</li>
+</ul>
+<h3>62.5 Security Responsibility</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Management</td>
+<td>Overall information security accountability</td>
+</tr>
+<tr>
+<td>Technology</td>
+<td>Implement and maintain technical controls</td>
+</tr>
+<tr>
+<td>All staff</td>
+<td>Follow security policies; report incidents</td>
+</tr>
+<tr>
+<td>Riders</td>
+<td>Protect access codes and not share login credentials</td>
+</tr>
+</tbody>
+</table>
+          </div>
+        </details>
+        <details class="policy" id="policy-63" data-title="password policy">
+          <summary>
+            <span class="policy-num">63</span>
+            <span class="policy-heading">
+              <span class="policy-title">Password Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>63.1 Admin Password Requirements</h3>
+<p>The Zygo Express admin dashboard password must:
+- Be at least 12 characters in length
+- Contain uppercase and lowercase letters, numbers, and symbols
+- Not contain the company name or personal information
+- Be changed immediately if suspected of compromise</p>
+<h3>63.2 Rider Access Codes</h3>
+<p>Rider login codes (format: ZYGO-XXXX-XXXX) are:
+- Generated using cryptographically secure random values
+- Valid for 90 days unless revoked earlier
+- Single-user only — never shared between riders
+- Revocable instantly by the superadmin</p>
+<h3>63.3 Sharing Prohibition</h3>
+<p>No credential (password, PIN, access code) may be shared with any other person. Shared credentials are grounds for immediate suspension.</p>
+<h3>63.4 Password Reset</h3>
+<p>Admin passwords are managed through Supabase Auth. To reset: contact zygoexpresssupport@gmail.com or use the Supabase dashboard.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-64" data-title="access control policy">
+          <summary>
+            <span class="policy-num">64</span>
+            <span class="policy-heading">
+              <span class="policy-title">Access Control Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>64.1 Principle of Least Privilege</h3>
+<p>Every user of the Zygo Express system has access only to the information and functions necessary for their role. This is enforced at both the application and database level.</p>
+<h3>64.2 Role-Based Access</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Access Level</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Superadmin</strong></td>
+<td>Full access to all system functions</td>
+</tr>
+<tr>
+<td><strong>Dispatcher</strong></td>
+<td>Orders + Riders (today's stats only) — no Finance, Analytics, or Access Codes</td>
+</tr>
+<tr>
+<td><strong>Rider</strong></td>
+<td>Own deliveries, pay, fuel/maintenance logging only</td>
+</tr>
+<tr>
+<td><strong>Customer</strong></td>
+<td>Own order tracking only</td>
+</tr>
+<tr>
+<td><strong>Public</strong></td>
+<td>Booking form, tracking page, FAQ, partnership form</td>
+</tr>
+</tbody>
+</table>
+<h3>64.3 Database Access Controls</h3>
+<ul>
+<li>Sensitive tables (vehicles, fuel logs, maintenance logs, dispatcher codes, pay settings) have zero direct-access policies</li>
+<li>All access to sensitive data is through Security Definer RPCs that return only what is needed</li>
+<li>Rider PINs are never returned to any client — only verified via RPC</li>
+</ul>
+<h3>64.4 Access Code Management</h3>
+<ul>
+<li>Dispatcher and rider access codes are generated only by the superadmin</li>
+<li>Codes expire after 90 days by default</li>
+<li>Codes are revoked immediately upon a staff member leaving</li>
+<li>All code usage is logged with timestamps</li>
+</ul>
+<h3>64.5 Review</h3>
+<p>Access rights are reviewed:
+- Immediately when a staff member's role changes
+- Immediately when a staff member leaves
+- Quarterly as part of routine security review</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-65" data-title="incident response plan">
+          <summary>
+            <span class="policy-num">65</span>
+            <span class="policy-heading">
+              <span class="policy-title">Incident Response Plan</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>65.1 Definition</h3>
+<p>A security incident is any event that compromises the confidentiality, integrity, or availability of Zygo Express's information assets.</p>
+<h3>65.2 Incident Categories</h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Critical</strong></td>
+<td>Data breach exposing customer PII; admin account compromise; ransomware</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>Unauthorised access to the admin dashboard; payment fraud at scale</td>
+</tr>
+<tr>
+<td><strong>Medium</strong></td>
+<td>Isolated suspicious login; minor data exposure</td>
+</tr>
+<tr>
+<td><strong>Low</strong></td>
+<td>Failed login attempts; spam submissions</td>
+</tr>
+</tbody>
+</table>
+<h3>65.3 Response Steps</h3>
+<p><strong>Step 1 — Detect and Report (0–1 hour)</strong>
+- Incident detected by monitoring, staff report, or customer report
+- Reported immediately to management</p>
+<p><strong>Step 2 — Contain (1–4 hours)</strong>
+- Affected accounts suspended
+- Database access keys rotated if compromised
+- Affected records isolated</p>
+<p><strong>Step 3 — Investigate (4–24 hours)</strong>
+- Determine scope and cause
+- Identify affected data and individuals
+- Preserve evidence</p>
+<p><strong>Step 4 — Notify (24–72 hours)</strong>
+- Notify Data Protection Commission if required under Act 843
+- Notify affected individuals if there is high risk of harm
+- Internal documentation of the incident</p>
+<p><strong>Step 5 — Recover (72 hours+)</strong>
+- Restore affected systems from backup
+- Implement remediation measures
+- Monitor for recurrence</p>
+<p><strong>Step 6 — Review</strong>
+- Post-incident review within 5 working days
+- Update policies and controls as necessary</p>
+<h3>65.4 Contact for Reporting</h3>
+<p>Suspected security incidents: zygoexpresssupport@gmail.com — mark subject "SECURITY INCIDENT"</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-66" data-title="cybersecurity policy">
+          <summary>
+            <span class="policy-num">66</span>
+            <span class="policy-heading">
+              <span class="policy-title">Cybersecurity Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>66.1 Legal Basis</h3>
+<p>Cybersecurity Act, 2020 (Act 1038), Electronic Transactions Act, 2008 (Act 772)</p>
+<h3>66.2 Commitment</h3>
+<p>Zygo Express is committed to implementing cybersecurity measures proportionate to the risk and nature of the information we hold, in compliance with Ghanaian law.</p>
+<h3>66.3 Technical Measures in Place</h3>
+<ul>
+<li>HTTPS enforced across all Platform URLs</li>
+<li>Supabase Row Level Security on all database tables</li>
+<li>Cloudflare bot protection on all public forms</li>
+<li>Cryptographically secure code generation</li>
+<li>Private storage for sensitive files (delivery photos)</li>
+<li>Input length constraints preventing injection via oversized data</li>
+</ul>
+<h3>66.4 Measures Informed by International Standards</h3>
+<p>Without claiming certification, Zygo Express's approach is informed by:
+- <strong>OWASP Top 10</strong> — protection against common web application vulnerabilities
+- <strong>ISO 27001 principles</strong> — information security management
+- <strong>SOC 2 principles</strong> — security, availability, and confidentiality</p>
+<h3>66.5 Staff Obligations</h3>
+<p>All staff must:
+- Use only company-approved devices and connections for accessing admin systems
+- Never access the admin dashboard on public or shared computers
+- Report suspicious activity immediately
+- Not install unauthorised software that may compromise company systems</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-67" data-title="backup policy">
+          <summary>
+            <span class="policy-num">67</span>
+            <span class="policy-heading">
+              <span class="policy-title">Backup Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>67.1 Database Backups</h3>
+<p>Zygo Express uses Supabase for database management. Supabase provides:
+- Point-in-time recovery (PITR) on eligible plans
+- Automatic daily backups</p>
+<p>Zygo Express management is responsible for ensuring the appropriate Supabase plan is maintained to include adequate backup coverage.</p>
+<h3>67.2 Application Code Backups</h3>
+<p>All application code is version-controlled via GitHub:
+- Repository: github.com/zygoexpresssupport-sketch/zygo-express-hub
+- Every stable version is tagged (e.g., v1.0, v1.1)
+- Tags serve as restoration points for the application</p>
+<h3>67.3 Backup Testing</h3>
+<p>Backup restoration capability should be tested at least annually by attempting to restore a test environment from backup.</p>
+<h3>67.4 Document Backups</h3>
+<p>Critical business documents (policies, contracts, records) should be backed up in a secure cloud storage location separate from the main platform.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-68" data-title="disaster recovery plan">
+          <summary>
+            <span class="policy-num">68</span>
+            <span class="policy-heading">
+              <span class="policy-title">Disaster Recovery Plan</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>68.1 Recovery Objectives</h3>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recovery Time Objective (RTO)</td>
+<td>4 hours (platform restoration)</td>
+</tr>
+<tr>
+<td>Recovery Point Objective (RPO)</td>
+<td>24 hours (maximum data loss)</td>
+</tr>
+</tbody>
+</table>
+<h3>68.2 Disaster Scenarios and Response</h3>
+<p><strong>Platform/Website Down:</strong>
+1. Check Supabase status (status.supabase.com)
+2. Check GitHub Pages status
+3. If infrastructure issue: communicate to users via WhatsApp 0202858011
+4. Take orders manually during outage</p>
+<p><strong>Database Compromise:</strong>
+1. Immediately revoke all access keys via Supabase dashboard
+2. Restore from most recent clean backup
+3. Issue new access keys to admin
+4. Notify affected users per Policy 65</p>
+<p><strong>Domain/Hosting Loss:</strong>
+1. Alternative URL communicated via WhatsApp
+2. Static files can be redeployed from GitHub to any hosting platform within 1 hour</p>
+<h3>68.3 Recovery Team</h3>
+<p>Primary: Management (Emmanuel)
+Secondary: Technical support contact</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-69" data-title="business continuity plan">
+          <summary>
+            <span class="policy-num">69</span>
+            <span class="policy-heading">
+              <span class="policy-title">Business Continuity Plan</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>69.1 Purpose</h3>
+<p>To ensure Zygo Express can maintain essential operations during disruptions.</p>
+<h3>69.2 Essential Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Minimum Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Order taking</td>
+<td>1 staff member + WhatsApp (0202858011)</td>
+</tr>
+<tr>
+<td>Rider dispatch</td>
+<td>1 dispatcher + at least 1 active rider</td>
+</tr>
+<tr>
+<td>Payment confirmation</td>
+<td>1 staff member with MoMo access</td>
+</tr>
+<tr>
+<td>Customer communication</td>
+<td>WhatsApp access</td>
+</tr>
+</tbody>
+</table>
+<h3>69.3 Disruption Scenarios</h3>
+<p><strong>Key person unavailability:</strong>
+- Dispatcher access codes allow operational continuity without the superadmin
+- WhatsApp can receive and manage orders manually</p>
+<p><strong>Technology failure:</strong>
+- Orders can be taken manually via WhatsApp
+- MoMo payments still processed normally
+- GPS tracking suspended but deliveries continue</p>
+<p><strong>Rider shortage:</strong>
+- Priority given to merchant partners and medical deliveries
+- Customers informed of potential delays</p>
+<h3>69.4 Review</h3>
+<p>Business continuity plan is reviewed every 6 months or after any actual disruption.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-70" data-title="api security policy">
+          <summary>
+            <span class="policy-num">70</span>
+            <span class="policy-heading">
+              <span class="policy-title">Api Security Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>70.1 Current API Usage</h3>
+<p>Zygo Express uses the following external APIs:
+- <strong>Supabase REST API</strong> — database operations
+- <strong>OpenStreetMap Nominatim</strong> — address geocoding
+- <strong>OSRM Router</strong> — road distance calculation
+- <strong>Cloudflare Turnstile</strong> — bot protection</p>
+<h3>70.2 API Key Management</h3>
+<ul>
+<li>Supabase publishable key: used for client-side database access (limited by RLS)</li>
+<li>Supabase service role key: never used in client code — admin operations only</li>
+<li>All API keys stored as environment variables, never hardcoded in public repositories</li>
+</ul>
+<h3>70.3 Planned Integrations</h3>
+<ul>
+<li>Paystack API (upon KYC completion) — payment processing</li>
+<li>MTN MoMo API (future) — direct payment collection</li>
+</ul>
+<p>All future API integrations must:
+- Use HTTPS exclusively
+- Store credentials securely as environment variables
+- Be reviewed for security before deployment
+- Have documented incident response procedures</p>
+<h3>70.4 Rate Limiting</h3>
+<p>Third-party APIs (especially Nominatim and OSRM) are used in compliance with their usage policies. Excessive automated use that violates provider terms is prohibited.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-71" data-title="third party integration policy">
+          <summary>
+            <span class="policy-num">71</span>
+            <span class="policy-heading">
+              <span class="policy-title">Third Party Integration Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>71.1 Approval</h3>
+<p>All third-party integrations must be reviewed and approved by management before implementation.</p>
+<h3>71.2 Due Diligence</h3>
+<p>Before integrating any third-party service, Zygo Express will:
+- Review the provider's security and privacy practices
+- Confirm the provider's compliance with applicable law
+- Establish what data will be shared with the provider
+- Confirm data processing agreements are in place where required</p>
+<h3>71.3 Current Approved Integrations</h3>
+<table>
+<thead>
+<tr>
+<th>Provider</th>
+<th>Purpose</th>
+<th>Data Shared</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supabase</td>
+<td>Database and authentication</td>
+<td>All platform data</td>
+</tr>
+<tr>
+<td>Cloudflare</td>
+<td>Bot protection and CDN</td>
+<td>IP addresses, browser fingerprints</td>
+</tr>
+<tr>
+<td>GitHub Pages</td>
+<td>Static file hosting</td>
+<td>Application code (public)</td>
+</tr>
+<tr>
+<td>Nominatim (OSM)</td>
+<td>Address geocoding</td>
+<td>Location strings only</td>
+</tr>
+<tr>
+<td>OSRM</td>
+<td>Route calculation</td>
+<td>Geographic coordinates only</td>
+</tr>
+</tbody>
+</table>
+<h3>71.4 Termination of Integrations</h3>
+<p>If a third-party integration is terminated:
+- All shared data must be requested for deletion from the provider
+- Alternative services must be evaluated and approved before switching</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-H" data-section="H">
+      <div class="section-divider">
+        <span class="section-letter">H</span>
+        <span class="section-name">Artificial Intelligence</span>
+        <span class="section-rule"></span>
+        <span class="section-count">4 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-72" data-title="ai usage policy">
+          <summary>
+            <span class="policy-num">72</span>
+            <span class="policy-heading">
+              <span class="policy-title">Ai Usage Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>72.1 Current AI Use</h3>
+<p>Zygo Express currently uses artificial intelligence in the following ways:
+- Analytics and pattern recognition in the admin dashboard (statistical analysis, not machine learning)
+- Future: AI customer support (planned)
+- Future: Business intelligence and demand forecasting (planned)</p>
+<h3>72.2 Approved Uses</h3>
+<p>AI may be used for:
+- Improving delivery route efficiency
+- Identifying patterns in order data for business planning
+- Customer support automation (with human escalation available)
+- Fraud pattern detection</p>
+<h3>72.3 Prohibited Uses</h3>
+<p>AI must not be used to:
+- Make binding legal or contractual decisions without human review
+- Discriminate against customers or riders on protected grounds
+- Process special category personal data without appropriate safeguards
+- Operate without adequate human oversight</p>
+<h3>72.4 Staff Use of External AI Tools</h3>
+<p>Staff who use external AI tools (e.g., for drafting content) must:
+- Never input customer personal data into external AI tools
+- Never input confidential business information without management approval
+- Review all AI-generated content before use</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-73" data-title="ai ethics policy">
+          <summary>
+            <span class="policy-num">73</span>
+            <span class="policy-heading">
+              <span class="policy-title">Ai Ethics Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>73.1 Principles</h3>
+<p>Zygo Express's use of AI is governed by:
+- <strong>Fairness:</strong> AI must not produce outcomes that discriminate unfairly
+- <strong>Transparency:</strong> We will disclose when AI is used in ways that affect users
+- <strong>Accountability:</strong> A human is always ultimately responsible for AI-influenced decisions
+- <strong>Privacy:</strong> AI systems must comply with our data protection obligations
+- <strong>Safety:</strong> AI must not create or exacerbate safety risks for riders or customers</p>
+<h3>73.2 Human Oversight</h3>
+<p>All AI-influenced decisions that affect:
+- Customer orders or pricing
+- Rider pay or performance
+- Merchant standing or access</p>
+<p>...must be reviewable by a human and may be appealed.</p>
+<h3>73.3 Bias Monitoring</h3>
+<p>Where AI tools generate insights or recommendations, Zygo Express will periodically review outputs for signs of unfair bias and take corrective action where found.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-74" data-title="automated decision policy">
+          <summary>
+            <span class="policy-num">74</span>
+            <span class="policy-heading">
+              <span class="policy-title">Automated Decision Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>74.1 Definition</h3>
+<p>An automated decision is any decision made, or significantly influenced by, an automated process without human review.</p>
+<h3>74.2 Current Automated Decisions</h3>
+<table>
+<thead>
+<tr>
+<th>Decision</th>
+<th>Automated?</th>
+<th>Human Review?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Delivery price calculation</td>
+<td>Yes (zone-based formula)</td>
+<td>No (formula is transparent)</td>
+</tr>
+<tr>
+<td>Rider pay calculation</td>
+<td>Yes (formula-based)</td>
+<td>Yes (visible in app; can be queried)</td>
+</tr>
+<tr>
+<td>Stale order alerts</td>
+<td>Yes (time-based)</td>
+<td>Yes (admin reviews and acts)</td>
+</tr>
+<tr>
+<td>Payment fraud blocking</td>
+<td>Yes (database trigger)</td>
+<td>Yes (admin can override)</td>
+</tr>
+</tbody>
+</table>
+<h3>74.3 Right to Challenge</h3>
+<p>Any rider, customer, or merchant who believes an automated decision has affected them unfairly may request a human review by contacting zygoexpresssupport@gmail.com.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-75" data-title="ai customer support guidelines">
+          <summary>
+            <span class="policy-num">75</span>
+            <span class="policy-heading">
+              <span class="policy-title">Ai Customer Support Guidelines</span>
+              <span class="policy-meta">v1.0 &middot; Effective Upon AI Support Launch</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>75.1 Purpose</h3>
+<p>When Zygo Express launches AI-powered customer support, it will operate under these guidelines.</p>
+<h3>75.2 Disclosure</h3>
+<p>Customers will always be informed when they are interacting with an AI system, not a human.</p>
+<h3>75.3 Escalation</h3>
+<p>AI customer support must always be able to escalate to a human agent for:
+- Complaints
+- Refund requests
+- Safety incidents
+- Any situation the AI cannot resolve with confidence</p>
+<h3>75.4 Prohibited AI Support Actions</h3>
+<p>AI customer support may not:
+- Make binding commitments on behalf of Zygo Express
+- Access payment credentials or MoMo accounts
+- Process refunds without human approval
+- Dismiss a legitimate complaint</p>
+<h3>75.5 Quality Review</h3>
+<p>AI support interactions will be reviewed periodically to ensure quality, accuracy, and compliance with these guidelines.</p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section class="section-block" id="section-I" data-section="I">
+      <div class="section-divider">
+        <span class="section-letter">I</span>
+        <span class="section-name">Corporate Governance</span>
+        <span class="section-rule"></span>
+        <span class="section-count">10 policies</span>
+      </div>
+      <div class="policy-list">
+        
+        <details class="policy" id="policy-76" data-title="whistleblower policy">
+          <summary>
+            <span class="policy-num">76</span>
+            <span class="policy-heading">
+              <span class="policy-title">Whistleblower Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>76.1 Purpose</h3>
+<p>To create a safe environment for anyone — staff, riders, merchants, or customers — to report genuine concerns about wrongdoing within Zygo Express without fear of retaliation.</p>
+<h3>76.2 What Can Be Reported</h3>
+<ul>
+<li>Theft or fraud by staff or riders</li>
+<li>Falsification of delivery records</li>
+<li>Bribery or corruption</li>
+<li>Safety violations</li>
+<li>Data protection breaches</li>
+<li>Discrimination or harassment</li>
+<li>Any other serious misconduct</li>
+</ul>
+<h3>76.3 How to Report</h3>
+<p>Reports may be submitted to:
+- <strong>Email:</strong> zygoexpresssupport@gmail.com (subject: CONFIDENTIAL REPORT)
+- <strong>WhatsApp (private):</strong> 0202858011</p>
+<p>All reports will be treated with strict confidentiality. The identity of the reporter will not be disclosed without their explicit consent except where required by law.</p>
+<h3>76.4 Protection Against Retaliation</h3>
+<p>Any person who makes a good-faith report will be protected from:
+- Dismissal or suspension
+- Harassment or intimidation
+- Any other adverse treatment related to the report</p>
+<p>Retaliation against a whistleblower is itself a disciplinary offence.</p>
+<h3>76.5 False Reports</h3>
+<p>Deliberately false or malicious reports are a disciplinary offence.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-77" data-title="conflict of interest policy">
+          <summary>
+            <span class="policy-num">77</span>
+            <span class="policy-heading">
+              <span class="policy-title">Conflict Of Interest Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>77.1 Definition</h3>
+<p>A conflict of interest arises when a person's personal interests conflict, or may appear to conflict, with their duties to Zygo Express.</p>
+<h3>77.2 Examples</h3>
+<ul>
+<li>A dispatcher who owns a competing delivery business</li>
+<li>A rider who diverts Zygo Express customers to a personal service</li>
+<li>A staff member who accepts gifts from merchants in exchange for preferential treatment</li>
+</ul>
+<h3>77.3 Disclosure Obligation</h3>
+<p>All staff and riders must disclose any potential conflict of interest to management as soon as it arises.</p>
+<h3>77.4 Management of Conflicts</h3>
+<p>Upon disclosure:
+- The affected person steps back from relevant decisions
+- Management determines the appropriate course of action
+- The outcome is documented</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-78" data-title="anti-bribery policy">
+          <summary>
+            <span class="policy-num">78</span>
+            <span class="policy-heading">
+              <span class="policy-title">Anti-Bribery Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>78.1 Zero Tolerance</h3>
+<p>Zygo Express has a zero-tolerance approach to bribery in any form. No employee, rider, dispatcher, or contractor may:
+- Offer, give, or accept a bribe
+- Facilitate a bribe on behalf of another person
+- Turn a blind eye to suspected bribery</p>
+<h3>78.2 Gifts and Hospitality</h3>
+<p>Minor gifts of nominal value (under GHS 50) from established merchants or partners are permissible. All gifts above this threshold must be disclosed to management.</p>
+<h3>78.3 Reporting</h3>
+<p>Suspected bribery must be reported through the Whistleblower Policy (Policy 76).</p>
+<h3>78.4 Consequences</h3>
+<p>Confirmed bribery results in immediate termination and potential reporting to law enforcement. ⚖️ This policy is informed by general Ghanaian corruption laws; formal compliance requirements should be reviewed by legal counsel.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-79" data-title="anti-corruption policy">
+          <summary>
+            <span class="policy-num">79</span>
+            <span class="policy-heading">
+              <span class="policy-title">Anti-Corruption Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>79.1 Commitment</h3>
+<p>Zygo Express is committed to conducting business with integrity and in compliance with all applicable anti-corruption laws in Ghana.</p>
+<h3>79.2 Prohibited Conduct</h3>
+<ul>
+<li>Offering or accepting payments to government officials to influence decisions ⚖️</li>
+<li>Manipulating company financial records</li>
+<li>Misusing company funds for personal gain</li>
+<li>Creating false invoices or documentation</li>
+</ul>
+<h3>79.3 Record Keeping</h3>
+<p>All financial transactions are recorded accurately and completely in our financial management system. No off-book transactions are permitted.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-80" data-title="equal opportunity policy">
+          <summary>
+            <span class="policy-num">80</span>
+            <span class="policy-heading">
+              <span class="policy-title">Equal Opportunity Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>80.1 Commitment</h3>
+<p>Zygo Express is committed to equal opportunity in all its activities, including recruitment, engagement of riders and merchants, and service provision to customers.</p>
+<h3>80.2 Protected Characteristics</h3>
+<p>Zygo Express does not discriminate on the basis of:
+- Gender or gender identity
+- Age
+- Religion or belief
+- Ethnicity or tribal background
+- Disability
+- Marital status
+- Political opinion</p>
+<h3>80.3 Service Delivery</h3>
+<p>Every customer is entitled to the same quality of service regardless of their background. Every rider and merchant partner is evaluated solely on the basis of relevant capabilities and compliance.</p>
+<h3>80.4 Complaints</h3>
+<p>Discrimination complaints should be submitted to zygoexpresssupport@gmail.com with the subject "DISCRIMINATION COMPLAINT." All complaints are investigated confidentially.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-81" data-title="environmental sustainability policy">
+          <summary>
+            <span class="policy-num">81</span>
+            <span class="policy-heading">
+              <span class="policy-title">Environmental Sustainability Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>81.1 Our Commitment</h3>
+<p>Zygo Express acknowledges the environmental impact of delivery operations and commits to operating as responsibly as possible given our current scale.</p>
+<h3>81.2 Current Initiatives</h3>
+<ul>
+<li><strong>Motorcycle fleet:</strong> Two-wheeled motorcycles produce significantly lower emissions than four-wheeled delivery vehicles</li>
+<li><strong>Route efficiency:</strong> Road distance optimisation reduces unnecessary fuel consumption</li>
+<li><strong>Fuel logging:</strong> Monitoring fuel efficiency per vehicle to identify and address inefficient vehicles</li>
+<li><strong>Packaging materials:</strong> Encouraging customers and merchants to use recyclable packaging</li>
+</ul>
+<h3>81.3 Future Commitments</h3>
+<p>As Zygo Express grows:
+- Evaluate electric motorcycles for the fleet
+- Partner with eco-conscious merchants
+- Reduce single-use packaging materials in our own operations</p>
+<h3>81.4 Review</h3>
+<p>Environmental commitments are reviewed annually in line with the growth of the business.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-82" data-title="corporate social responsibility policy">
+          <summary>
+            <span class="policy-num">82</span>
+            <span class="policy-heading">
+              <span class="policy-title">Corporate Social Responsibility Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>82.1 Our Role in Wa</h3>
+<p>Zygo Express is a Wa-born company and is committed to making a positive contribution to the community we serve.</p>
+<h3>82.2 Current CSR Activities</h3>
+<ul>
+<li><strong>Employment:</strong> Creating income opportunities for motorcycle riders in Wa</li>
+<li><strong>Local business support:</strong> Making logistics affordable for small businesses that previously had no reliable delivery option</li>
+<li><strong>Access to medicines:</strong> Enabling pharmacies to deliver prescriptions across Wa</li>
+</ul>
+<h3>82.3 Future CSR Commitments</h3>
+<ul>
+<li>Rider safety training programmes</li>
+<li>Supporting female riders and entrepreneurs</li>
+<li>Educational content on safe riding for the wider Wa community</li>
+<li>Partnership with local health facilities for medical delivery programmes</li>
+</ul>
+<h3>82.4 Reporting</h3>
+<p>CSR activities will be documented and reported annually.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-83" data-title="records retention policy">
+          <summary>
+            <span class="policy-num">83</span>
+            <span class="policy-heading">
+              <span class="policy-title">Records Retention Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>83.1 Purpose</h3>
+<p>To ensure records are retained for appropriate periods to meet legal, operational, and audit requirements, and securely deleted thereafter.</p>
+<h3>83.2 Retention Schedule</h3>
+<table>
+<thead>
+<tr>
+<th>Record Type</th>
+<th>Retention Period</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Customer orders</td>
+<td>7 years</td>
+<td>GRA / legal</td>
+</tr>
+<tr>
+<td>Payment records</td>
+<td>7 years</td>
+<td>GRA / financial</td>
+</tr>
+<tr>
+<td>Delivery photos</td>
+<td>1 year</td>
+<td>Operational</td>
+</tr>
+<tr>
+<td>GPS logs</td>
+<td>90 days</td>
+<td>Operational</td>
+</tr>
+<tr>
+<td>Rider activity logs</td>
+<td>2 years</td>
+<td>Pay disputes</td>
+</tr>
+<tr>
+<td>Complaint records</td>
+<td>3 years</td>
+<td>Legal</td>
+</tr>
+<tr>
+<td>Contracts and agreements</td>
+<td>7 years after expiry</td>
+<td>Legal</td>
+</tr>
+<tr>
+<td>Staff records</td>
+<td>7 years after departure</td>
+<td>Labour Act</td>
+</tr>
+<tr>
+<td>Security incident records</td>
+<td>5 years</td>
+<td>Cybersecurity Act</td>
+</tr>
+</tbody>
+</table>
+<h3>83.3 Secure Deletion</h3>
+<p>Records past their retention period are permanently deleted. Digital records are deleted from the database and backups where technically feasible.</p>
+<h3>83.4 Legal Hold</h3>
+<p>If legal proceedings are anticipated or commenced, records relevant to those proceedings are retained regardless of the normal retention period until proceedings are concluded.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-84" data-title="media communication policy">
+          <summary>
+            <span class="policy-num">84</span>
+            <span class="policy-heading">
+              <span class="policy-title">Media Communication Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>84.1 Authorised Spokespersons</h3>
+<p>Only authorised personnel (currently: company founders/management) may make public statements on behalf of Zygo Express, including:
+- Media interviews
+- Press releases
+- Public social media posts from company accounts
+- Comments to journalists</p>
+<h3>84.2 Social Media</h3>
+<p>Official Zygo Express accounts:
+- TikTok: @zygo.express
+- Facebook: ZygoExpress
+- X (Twitter): @ZygoExpress</p>
+<p>Only authorised personnel manage these accounts. Staff personal social media use is governed by Policy 7 (Code of Conduct).</p>
+<h3>84.3 Crisis Communication</h3>
+<p>In the event of a significant incident requiring public communication:
+1. All public statements are approved by management before publication
+2. Communications are factual, compassionate, and do not admit liability without legal review
+3. Regular updates are provided until the matter is resolved</p>
+<h3>84.4 No Unauthorised Disclosure</h3>
+<p>Staff must not disclose non-public information about Zygo Express's business, finances, or legal matters to media or the public.</p>
+          </div>
+        </details>
+        <details class="policy" id="policy-85" data-title="document control policy">
+          <summary>
+            <span class="policy-num">85</span>
+            <span class="policy-heading">
+              <span class="policy-title">Document Control Policy</span>
+              <span class="policy-meta">v1.0 &middot; Effective July 2026</span>
+            </span>
+            <span class="chev" aria-hidden="true"></span>
+          </summary>
+          <div class="policy-body">
+            <h3>85.1 Purpose</h3>
+<p>To ensure all Zygo Express policies and documents are properly maintained, versioned, and accessible.</p>
+<h3>85.2 Document Ownership</h3>
+<p>Each policy has a designated owner responsible for keeping it current. The owner is management unless otherwise specified.</p>
+<h3>85.3 Version Control</h3>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Requirement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version number</td>
+<td>Incremented for every material change</td>
+</tr>
+<tr>
+<td>Effective date</td>
+<td>Date from which the version applies</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>Date by which the document must be reviewed</td>
+</tr>
+<tr>
+<td>Revision history</td>
+<td>Summary of changes made in each version</td>
+</tr>
+</tbody>
+</table>
+<h3>85.4 Review Schedule</h3>
+<table>
+<thead>
+<tr>
+<th>Document Category</th>
+<th>Review Frequency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Core legal policies (Terms, Privacy, etc.)</td>
+<td>Annually</td>
+</tr>
+<tr>
+<td>Security policies</td>
+<td>Annually or after any incident</td>
+</tr>
+<tr>
+<td>Operational policies</td>
+<td>Every 2 years</td>
+</tr>
+<tr>
+<td>Payment policies</td>
+<td>Upon any significant change</td>
+</tr>
+</tbody>
+</table>
+<h3>85.5 Accessibility</h3>
+<p>All policies published for public access are available on the Zygo Express website. Internal policies are accessible to relevant staff.</p>
+<h3>85.6 Amendment Process</h3>
+<ol>
+<li>Proposed change submitted to management with reason</li>
+<li>Legal review where required (⚖️ especially for consumer, data, and payment policies)</li>
+<li>Updated document prepared with new version number</li>
+<li>Approved by management</li>
+<li>Published and effective date set</li>
+<li>Previous version archived</li>
+</ol>
+          </div>
+        </details>
+      </div>
+    </section>
+    </div>
+
+    <div class="empty-state" id="emptyState">No policies match your search.</div>
+
+    <div class="appendices">
+      <hr />
+<h2>APPENDIX A — DEFINITIONS REFERENCE GLOSSARY</h2>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Act 843</td>
+<td>Data Protection Act, 2012 (Ghana)</td>
+</tr>
+<tr>
+<td>Act 772</td>
+<td>Electronic Transactions Act, 2008 (Ghana)</td>
+</tr>
+<tr>
+<td>Act 992</td>
+<td>Companies Act, 2019 (Ghana)</td>
+</tr>
+<tr>
+<td>Act 651</td>
+<td>Labour Act, 2003 (Ghana)</td>
+</tr>
+<tr>
+<td>Act 1038</td>
+<td>Cybersecurity Act, 2020 (Ghana)</td>
+</tr>
+<tr>
+<td>AML</td>
+<td>Anti-Money Laundering</td>
+</tr>
+<tr>
+<td>API</td>
+<td>Application Programming Interface</td>
+</tr>
+<tr>
+<td>COD</td>
+<td>Cash on Delivery</td>
+</tr>
+<tr>
+<td>DPC</td>
+<td>Data Protection Commission (Ghana)</td>
+</tr>
+<tr>
+<td>FIC</td>
+<td>Financial Intelligence Centre (Ghana)</td>
+</tr>
+<tr>
+<td>GHS</td>
+<td>Ghana Cedis</td>
+</tr>
+<tr>
+<td>GPS</td>
+<td>Global Positioning System</td>
+</tr>
+<tr>
+<td>GRA</td>
+<td>Ghana Revenue Authority</td>
+</tr>
+<tr>
+<td>ISO 27001</td>
+<td>International standard for information security management</td>
+</tr>
+<tr>
+<td>KYC</td>
+<td>Know Your Customer</td>
+</tr>
+<tr>
+<td>MoMo</td>
+<td>MTN Mobile Money</td>
+</tr>
+<tr>
+<td>OWASP</td>
+<td>Open Web Application Security Project</td>
+</tr>
+<tr>
+<td>PCI DSS</td>
+<td>Payment Card Industry Data Security Standard</td>
+</tr>
+<tr>
+<td>PII</td>
+<td>Personally Identifiable Information</td>
+</tr>
+<tr>
+<td>POD</td>
+<td>Proof of Delivery</td>
+</tr>
+<tr>
+<td>POP</td>
+<td>Proof of Pickup</td>
+</tr>
+<tr>
+<td>RLS</td>
+<td>Row Level Security</td>
+</tr>
+<tr>
+<td>RPC</td>
+<td>Remote Procedure Call</td>
+</tr>
+<tr>
+<td>SOC 2</td>
+<td>Service Organization Control 2 (auditing standard)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>APPENDIX B — POLICY CROSS-REFERENCE</h2>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Closely Related Policies</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 (Privacy Policy)</td>
+<td>3, 4, 62, 63, 64, 65</td>
+</tr>
+<tr>
+<td>11 (Customer T&amp;C)</td>
+<td>12, 13, 14, 15, 19, 22</td>
+</tr>
+<tr>
+<td>17 (Lost Parcel)</td>
+<td>18, 46, 56</td>
+</tr>
+<tr>
+<td>35 (Rider Terms)</td>
+<td>36, 37, 40, 41, 42, 43, 44</td>
+</tr>
+<tr>
+<td>53 (Payment Processing)</td>
+<td>54, 55, 56, 57, 58</td>
+</tr>
+<tr>
+<td>62 (Information Security)</td>
+<td>63, 64, 65, 66, 67, 68</td>
+</tr>
+<tr>
+<td>65 (Incident Response)</td>
+<td>62, 66, 67, 68</td>
+</tr>
+<tr>
+<td>76 (Whistleblower)</td>
+<td>77, 78, 79</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>APPENDIX C — CONTACT DIRECTORY</h2>
+<table>
+<thead>
+<tr>
+<th>Contact Type</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>General enquiries</td>
+<td>zygoexpresssupport@gmail.com</td>
+</tr>
+<tr>
+<td>Complaints</td>
+<td>zygoexpresssupport@gmail.com (subject: COMPLAINT)</td>
+</tr>
+<tr>
+<td>Data protection</td>
+<td>zygoexpresssupport@gmail.com (subject: DATA REQUEST)</td>
+</tr>
+<tr>
+<td>Security incidents</td>
+<td>zygoexpresssupport@gmail.com (subject: SECURITY INCIDENT)</td>
+</tr>
+<tr>
+<td>Whistleblowing</td>
+<td>zygoexpresssupport@gmail.com (subject: CONFIDENTIAL REPORT)</td>
+</tr>
+<tr>
+<td>WhatsApp / Call</td>
+<td>0202858011</td>
+</tr>
+<tr>
+<td>Emergency</td>
+<td>Police: 191</td>
+</tr>
+<tr>
+<td>Data Protection Commission Ghana</td>
+<td>dpc.gov.gh</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>APPENDIX D — REVISION HISTORY</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+<th>Author</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>July 2026</td>
+<td>Initial publication of all 85 policies</td>
+<td>Zygo Express Management</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>DOCUMENT CERTIFICATION</h2>
+<p>This Legal, Governance &amp; Compliance Manual has been prepared specifically for Zygo Express, a technology-enabled logistics company registered and operating in Wa, Upper West Region, Ghana.</p>
+<p><strong>Version:</strong> 1.0
+<strong>Effective Date:</strong> July 2026
+<strong>Next Review:</strong> July 2027</p>
+<blockquote>
+<p>⚖️ <strong>Legal Counsel Note:</strong> Provisions marked with ⚖️ throughout this document should be reviewed and confirmed by a qualified Ghanaian lawyer before formal adoption. This document is not a substitute for professional legal advice. Zygo Express should engage qualified legal counsel as it scales, particularly before launching payment/wallet features and formalising employment relationships.</p>
+</blockquote>
+<hr />
+<p><em>© 2026 Zygo Express. All rights reserved. Wa, Upper West Region, Ghana.</em>
+<em>zygoexpresssupport@gmail.com | 0202858011</em></p>
+    </div>
+  </main>
+</div>
+
+<footer class="page-footer">
+  &copy; 2026 Zygo Express &middot; Wa, Upper West Region, Ghana &middot;
+  <a href="https://www.zygoxpress.com/">zygoxpress.com</a> &middot;
+  zygoexpresssupport@gmail.com &middot; 0202858011
+</footer>
+
+<script>
+(function(){
+  var drawer = document.getElementById('drawer');
+  var backdrop = document.getElementById('drawerBackdrop');
+  document.getElementById('openDrawer').addEventListener('click', function(){
+    document.body.classList.add('drawer-open');
+  });
+  function closeDrawer(){ document.body.classList.remove('drawer-open'); }
+  document.getElementById('closeDrawer').addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.nav-link').forEach(function(a){
+    a.addEventListener('click', closeDrawer);
+  });
+
+  // Active section highlight on scroll
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.section-block'));
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+  function onScroll(){
+    var pos = window.scrollY + 100;
+    var current = null;
+    sections.forEach(function(s){
+      if (s.offsetTop <= pos) current = s.id;
+    });
+    navLinks.forEach(function(l){
+      l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // Search
+  var input = document.getElementById('searchInput');
+  var policies = Array.prototype.slice.call(document.querySelectorAll('.policy'));
+  var emptyState = document.getElementById('emptyState');
+  input.addEventListener('input', function(){
+    var q = input.value.trim().toLowerCase();
+    var anyVisible = false;
+    sections.forEach(function(sec){
+      var visibleInSection = 0;
+      sec.querySelectorAll('.policy').forEach(function(p){
+        var hay = p.dataset.title + ' ' + p.innerText.toLowerCase();
+        var match = q === '' || hay.indexOf(q) !== -1;
+        p.classList.toggle('hidden', !match);
+        if (match) { visibleInSection++; anyVisible = true; }
+        p.open = q !== '' && match;
+      });
+      sec.classList.toggle('hidden', visibleInSection === 0);
+    });
+    emptyState.classList.toggle('show', !anyVisible);
+  });
+
+  // Expand all
+  var expanded = false;
+  document.getElementById('expandAll').addEventListener('click', function(){
+    expanded = !expanded;
+    policies.forEach(function(p){ p.open = expanded; });
+    this.textContent = expanded ? 'Collapse all' : 'Expand all';
+  });
+
+  // Deep link on load
+  if (location.hash) {
+    var target = document.querySelector(location.hash);
+    if (target && target.tagName === 'DETAILS') {
+      target.open = true;
+      setTimeout(function(){ target.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+    }
+  }
+
+  // Print: open everything first
+  window.addEventListener('beforeprint', function(){
+    policies.forEach(function(p){ p.dataset.wasOpen = p.open ? '1':'0'; p.open = true; });
+  });
+  window.addEventListener('afterprint', function(){
+    policies.forEach(function(p){ p.open = p.dataset.wasOpen === '1'; });
+  });
+})();
+</script>
+
+</body>
+</html>

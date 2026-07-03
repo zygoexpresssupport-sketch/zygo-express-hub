@@ -1,5 +1,5 @@
 import { Phone, MapPin, Mail } from "lucide-react";
-
+<a href="/legal.html" style="color:#78716c;text-decoration:none;">Legal &amp; Policies</a>
 const PHONE = "0202858011";
 const WA_LINK = `https://wa.me/233202858011?text=${encodeURIComponent("Hi Zygo Express, I'd like to make a delivery enquiry.")}`;
 const BOOK_URL = "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html";

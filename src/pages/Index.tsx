@@ -6,6 +6,7 @@ import { Tracking }        from "@/components/site/Tracking";
 import { About }           from "@/components/site/About";
 import { Testimonials }    from "@/components/site/Testimonials";
 import { Quote }           from "@/components/site/Quote";
+import { Partners }        from "@/components/Partners";
 import { Footer }          from "@/components/site/Footer";
 
 const Index = () => (
@@ -18,6 +19,7 @@ const Index = () => (
     <About />
     <Testimonials />
     <Quote />
+    <Partners />
     <Footer />
   </main>
 );

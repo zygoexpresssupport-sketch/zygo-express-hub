@@ -3,242 +3,643 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<meta name="theme-color" content="#0f0f0f"/>
+<meta name="theme-color" content="#f97316"/>
 <title>Zygo Express — Book Delivery</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--orange:#f97316;--amber:#f59e0b;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;--green:#16a34a;--red:#dc2626;--r:12px;}
+:root{
+  --orange:#f97316;
+  --orange-deep:#c2410c;
+  --amber:#f59e0b;
+  --amber-light:#fef3c7;
+  --ink:#0f0f0f;
+  --ink2:#1c1917;
+  --paper:#fafaf9;
+  --stone:#e8e4dc;
+  --stone2:#f5f3ef;
+  --muted:#9c9589;
+  --green:#16a34a;
+  --green-light:#f0fdf4;
+  --red:#dc2626;
+  --blue:#1d4ed8;
+  --r:14px;
+  --r-sm:10px;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
 
-.topbar{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--ink);}
+/* ── TOPBAR ── */
+.topbar{
+  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--ink);position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(0,0,0,0.4);
+}
 .logo{display:flex;align-items:center;gap:10px;}
-.logo-mark{width:34px;height:34px;background:var(--orange);border-radius:8px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:white;}
-.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;color:white;}
+.logo-mark{
+  width:36px;height:36px;background:var(--orange);border-radius:10px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:14px;color:white;
+  box-shadow:0 0 12px rgba(249,115,22,0.5);
+}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:white;letter-spacing:-0.5px;}
 .logo-name em{color:var(--orange);font-style:normal;}
-.topbar-pill{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:11px;font-weight:500;padding:5px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);}
+.topbar-badge{
+  background:linear-gradient(135deg,rgba(249,115,22,0.2),rgba(245,158,11,0.15));
+  color:#fb923c;font-size:11px;font-weight:700;padding:6px 12px;
+  border-radius:20px;border:1px solid rgba(249,115,22,0.3);letter-spacing:0.3px;
+}
 
-.hero{background:var(--ink);padding:28px 20px 44px;position:relative;overflow:hidden;}
-.hero::after{content:'';position:absolute;bottom:-30px;right:-30px;width:180px;height:180px;background:rgba(255,255,255,0.04);border-radius:50%;}
-.hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;font-size:11px;font-weight:700;padding:5px 12px;border-radius:4px;margin-bottom:14px;letter-spacing:0.5px;text-transform:uppercase;}
-.hero-title{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:white;line-height:1.05;letter-spacing:-1px;margin-bottom:10px;}
-.hero-title span{color:var(--orange);}
-.hero-sub{color:rgba(255,255,255,0.55);font-size:14px;line-height:1.65;max-width:320px;}
+/* ── HERO ── */
+.hero{
+  background:var(--ink);padding:36px 20px 52px;
+  position:relative;overflow:hidden;
+}
+.hero-bg-1{
+  position:absolute;top:-60px;right:-60px;width:240px;height:240px;
+  background:radial-gradient(circle,rgba(249,115,22,0.18) 0%,transparent 70%);
+  border-radius:50%;
+}
+.hero-bg-2{
+  position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;
+  background:radial-gradient(circle,rgba(245,158,11,0.12) 0%,transparent 70%);
+  border-radius:50%;
+}
+.hero-bg-3{
+  position:absolute;top:50%;right:20px;transform:translateY(-50%);
+  width:3px;height:80px;
+  background:linear-gradient(to bottom,transparent,rgba(249,115,22,0.4),transparent);
+  border-radius:2px;
+}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(249,115,22,0.15);color:var(--orange);
+  font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;
+  margin-bottom:16px;letter-spacing:0.8px;text-transform:uppercase;
+  border:1px solid rgba(249,115,22,0.25);position:relative;z-index:1;
+}
+.hero-tag::before{content:'';width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 1.5s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
 
-/* Zone Cards */
-.zone-wrap{background:var(--ink);padding:0 20px 20px;}
-.zone-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;padding:14px 0 10px;}
+.hero-title{
+  font-family:'Syne',sans-serif;font-weight:900;
+  font-size:36px;color:white;line-height:1.0;
+  letter-spacing:-1.5px;margin-bottom:12px;position:relative;z-index:1;
+}
+.hero-title .line1{display:block;color:rgba(255,255,255,0.6);font-size:26px;letter-spacing:-0.5px;margin-bottom:2px;}
+.hero-title .line2{display:block;}
+.hero-title .hl{
+  color:transparent;
+  background:linear-gradient(90deg,var(--orange),var(--amber));
+  -webkit-background-clip:text;background-clip:text;
+}
+.hero-sub{color:rgba(255,255,255,0.45);font-size:14px;line-height:1.7;max-width:300px;position:relative;z-index:1;}
+.hero-sub strong{color:rgba(255,255,255,0.75);font-weight:600;}
+
+/* ── ZONE CARDS ── */
+.zone-wrap{background:var(--ink);padding:0 16px 24px;}
+.zone-label{
+  font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:1.5px;padding:16px 0 10px;
+}
 .zone-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.zone-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 6px;text-align:center;transition:all 0.2s;}
-.zone-card.active{background:var(--orange);border-color:var(--orange);}
-.zone-price{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--orange);}
+.zone-card{
+  border-radius:12px;padding:12px 6px;text-align:center;
+  cursor:default;position:relative;overflow:hidden;
+  transition:transform 0.2s,box-shadow 0.2s;
+  border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.04);
+}
+.zone-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(249,115,22,0),rgba(249,115,22,0));
+  transition:background 0.25s;
+}
+.zone-card.active{
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  border-color:var(--orange);
+  box-shadow:0 4px 20px rgba(249,115,22,0.4);
+  transform:translateY(-2px);
+}
+.zone-ghs{font-size:9px;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.zone-card.active .zone-ghs{color:rgba(255,255,255,0.7);}
+.zone-price{
+  font-family:'Syne',sans-serif;font-weight:900;font-size:18px;
+  color:var(--orange);line-height:1;margin:3px 0;
+}
 .zone-card.active .zone-price{color:white;}
-.zone-km{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;}
-.zone-card.active .zone-km{color:rgba(255,255,255,0.8);}
-.zone-name{font-size:8px;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
-.zone-card.active .zone-name{color:rgba(255,255,255,0.7);}
+.zone-km{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;}
+.zone-card.active .zone-km{color:rgba(255,255,255,0.75);}
+.zone-name{
+  font-size:8px;color:rgba(255,255,255,0.2);text-transform:uppercase;
+  letter-spacing:0.8px;margin-top:3px;font-weight:600;
+}
+.zone-card.active .zone-name{color:rgba(255,255,255,0.65);}
 
-/* Form */
-.form-wrap{padding:0 16px 40px;background:var(--ink);}
-.form-card{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px;position:relative;}
-.form-card::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:36px;height:4px;background:var(--stone);border-radius:2px;}
-.group-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;margin-top:20px;display:flex;align-items:center;gap:6px;}
-.group-label:first-of-type{margin-top:0;}
-.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* ── FORM WRAP ── */
+.form-wrap{padding:0 14px 0;background:var(--ink);}
+.form-card{
+  background:var(--paper);border-radius:22px 22px 0 0;padding:30px 18px 24px;
+  position:relative;box-shadow:0 -8px 40px rgba(0,0,0,0.25);
+}
+.form-card::before{
+  content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:40px;height:4px;background:var(--stone);border-radius:2px;
+}
+
+/* Section headers */
+.section-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;margin-top:24px;
+}
+.section-head:first-of-type{margin-top:0;}
+.section-icon{
+  width:32px;height:32px;border-radius:9px;
+  display:grid;place-items:center;font-size:15px;flex-shrink:0;
+}
+.section-icon.amber{background:#fef3c7;}
+.section-icon.orange{background:#fff7ed;}
+.section-icon.green{background:#f0fdf4;}
+.section-icon.blue{background:#eff6ff;}
+.section-icon.purple{background:#faf5ff;}
+.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--ink);}
+.section-badge{
+  margin-left:auto;font-size:10px;font-weight:700;
+  padding:3px 8px;border-radius:20px;letter-spacing:0.3px;
+}
+.section-badge.required{background:#fef2f2;color:var(--red);}
+.section-badge.optional{background:var(--stone2);color:var(--muted);}
+
+/* Input fields */
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .input-wrap{margin-bottom:10px;position:relative;}
-.input-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:block;}
-.input-field{width:100%;background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:14px 16px;font-size:15px;font-family:'Inter',sans-serif;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;-webkit-appearance:none;}
-.input-field:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.1);}
-.input-field::placeholder{color:#bbb;}
-textarea.input-field{min-height:72px;resize:none;}
-.divider{height:1px;background:var(--stone);margin:20px 0;}
+.input-label{
+  font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;
+  display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.6px;
+}
+.required-dot{color:var(--red);font-size:14px;line-height:1;}
+.input-field{
+  width:100%;background:white;border:2px solid var(--stone);border-radius:var(--r-sm);
+  padding:13px 14px;font-size:15px;font-family:'Inter',sans-serif;
+  color:var(--ink);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+  -webkit-appearance:none;
+}
+.input-field:focus{
+  border-color:var(--orange);
+  box-shadow:0 0 0 4px rgba(249,115,22,0.12);
+  background:#fff;
+}
+.input-field::placeholder{color:#c4c0bb;}
+.input-field.has-icon{padding-left:40px;}
+.input-icon{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  font-size:16px;pointer-events:none;
+}
+textarea.input-field{min-height:76px;resize:none;padding:13px 14px;}
 
-/* Route */
-.route-group{position:relative;}
-.route-track{position:absolute;left:22px;top:54px;bottom:54px;width:2px;background:linear-gradient(to bottom,var(--amber),var(--orange));border-radius:1px;}
-.route-dot{position:absolute;left:16px;width:12px;height:12px;border-radius:50%;z-index:2;}
-.route-dot-top{top:20px;background:var(--amber);box-shadow:0 0 0 3px rgba(245,158,11,0.2);}
-.route-dot-bot{bottom:20px;background:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.2);}
-.route-group .input-field{padding-left:38px;}
+/* Counter badges on phone inputs */
+.phone-counter{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:11px;font-weight:700;color:var(--muted);
+  background:var(--stone2);padding:2px 7px;border-radius:20px;
+  pointer-events:none;transition:color 0.2s,background 0.2s;
+}
+.phone-counter.ok{color:var(--green);background:#f0fdf4;}
+.phone-counter.err{color:var(--red);background:#fef2f2;}
+
+.divider{height:1px;background:var(--stone);margin:18px 0;}
+
+/* ── ROUTE SECTION ── */
+.route-group{position:relative;padding-left:0;}
+.route-track-wrap{
+  position:absolute;left:20px;top:58px;bottom:56px;
+  display:flex;flex-direction:column;align-items:center;width:2px;
+  z-index:1;
+}
+.route-line{flex:1;width:2px;background:repeating-linear-gradient(to bottom,var(--amber) 0px,var(--amber) 5px,transparent 5px,transparent 10px);}
+.route-dot{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-left:-6px;
+  position:absolute;
+}
+.route-dot-top{top:18px;background:var(--amber);box-shadow:0 0 0 4px rgba(245,158,11,0.2);}
+.route-dot-bot{bottom:18px;background:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,0.2);}
+.route-group .input-field{padding-left:42px;}
 
 /* Autocomplete */
-.suggestions{position:absolute;top:100%;left:0;right:0;z-index:999;background:white;border:1.5px solid var(--stone);border-top:none;border-radius:0 0 12px 12px;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.1);display:none;}
-.suggestion-item{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid #f5f5f5;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.suggestions{
+  position:absolute;top:100%;left:0;right:0;z-index:999;
+  background:white;border:2px solid var(--stone);border-top:none;
+  border-radius:0 0 12px 12px;max-height:200px;overflow-y:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);display:none;
+}
+.suggestion-item{
+  padding:11px 14px;cursor:pointer;font-size:14px;
+  border-bottom:1px solid #f5f5f5;color:var(--ink);
+  display:flex;align-items:center;gap:9px;transition:background 0.1s;
+}
 .suggestion-item:hover{background:#fff7f0;}
+.suggestion-item .sug-icon{color:var(--orange);}
 .suggestion-item:last-child{border-bottom:none;}
 
-/* Price reveal */
-.price-reveal{background:#fff7f0;border:1.5px solid #fed7aa;border-radius:var(--r);padding:16px;display:none;margin-bottom:12px;}
-.price-top{display:flex;align-items:center;justify-content:space-between;}
-.price-tag{font-size:11px;font-weight:700;color:#c2410c;text-transform:uppercase;letter-spacing:0.5px;}
-.price-zone{font-size:13px;color:var(--muted);margin-top:2px;}
-.price-dist{font-size:11px;color:var(--muted);margin-top:1px;}
-.price-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:var(--orange);letter-spacing:-1px;}
+/* ── PRICE REVEAL ── */
+.price-reveal{
+  background:linear-gradient(135deg,#fff7ed,#fffbeb);
+  border:2px solid #fed7aa;border-radius:var(--r);
+  padding:16px;display:none;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.price-reveal::after{
+  content:'GHS';position:absolute;right:-8px;top:-8px;
+  font-family:'Syne',sans-serif;font-weight:900;font-size:60px;
+  color:rgba(249,115,22,0.06);pointer-events:none;letter-spacing:-2px;
+}
+.price-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.price-label{font-size:10px;font-weight:800;color:#c2410c;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.price-zone{font-size:13px;color:var(--muted);font-weight:500;}
+.price-dist{font-size:11px;color:#d97706;margin-top:3px;font-weight:600;}
+.price-amount{
+  font-family:'Syne',sans-serif;font-weight:900;font-size:36px;
+  color:var(--orange);letter-spacing:-2px;line-height:1;
+}
 
-/* Submit */
-.submit-section{padding:0 16px 40px;background:var(--paper);}
-.trust-row{display:flex;justify-content:center;gap:16px;padding:0 0 16px;flex-wrap:wrap;}
-.trust-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);}
-.trust-item span{font-size:18px;}
-.submit-btn{width:100%;padding:18px;background:var(--ink);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;letter-spacing:-0.3px;}
-.submit-btn:active{transform:scale(0.98);opacity:0.9;}
-.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.submit-note{text-align:center;font-size:12px;color:var(--muted);margin-top:10px;}
+/* ── SUBMIT ── */
+.submit-section{padding:0 14px 48px;background:var(--paper);}
+.trust-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;padding:0 0 18px;
+}
+.trust-item{
+  background:white;border:1.5px solid var(--stone);border-radius:12px;
+  padding:12px 8px;text-align:center;
+}
+.trust-item .t-icon{font-size:20px;margin-bottom:4px;display:block;}
+.trust-item .t-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
+.trust-item .t-val{font-size:12px;color:var(--ink);font-weight:700;margin-top:1px;}
 
-/* Error */
-.error-msg{background:#fef2f2;border:1.5px solid #fecaca;color:var(--red);padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;display:none;}
-.error-msg.show{display:block;}
+.submit-btn{
+  width:100%;padding:18px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--orange) 0%,var(--orange-deep) 100%);
+  color:white;border-radius:var(--r);
+  font-family:'Syne',sans-serif;font-size:17px;font-weight:900;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  letter-spacing:-0.3px;position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(249,115,22,0.4);
+  transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;
+}
+.submit-btn::before{
+  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
+  animation:shimmer 2.5s ease infinite;
+}
+@keyframes shimmer{0%{left:-100%;}100%{left:200%;}}
+.submit-btn:active{transform:scale(0.98);box-shadow:0 2px 10px rgba(249,115,22,0.3);}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;animation:none;}
 
-/* SUCCESS */
+.submit-note{
+  text-align:center;font-size:12px;color:var(--muted);
+  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.submit-note::before{content:'🔒';font-size:12px;}
+
+/* ── ERROR ── */
+.error-msg{
+  background:#fef2f2;border:2px solid #fecaca;color:var(--red);
+  padding:13px 15px;border-radius:var(--r-sm);font-size:13px;
+  margin-bottom:14px;display:none;font-weight:500;
+  display:flex;align-items:flex-start;gap:8px;
+}
+.error-msg.show{display:flex;}
+.error-msg::before{content:'⚠';flex-shrink:0;}
+
+/* ── SUCCESS ── */
 #screen-success{display:none;}
-.success-top{background:var(--ink);padding:48px 20px 56px;text-align:center;position:relative;overflow:hidden;}
-.success-top::before{content:'';position:absolute;width:300px;height:300px;background:rgba(255,255,255,0.04);border-radius:50%;top:-100px;left:-80px;}
-.success-ring{width:80px;height:80px;border-radius:50%;background:var(--orange);display:grid;place-items:center;margin:0 auto 20px;font-size:36px;position:relative;z-index:1;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
+.success-top{
+  background:var(--ink);padding:56px 20px 72px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.confetti-dot{
+  position:absolute;border-radius:2px;
+  animation:fall linear infinite;
+  opacity:0.7;
+}
+@keyframes fall{
+  0%{transform:translateY(-20px) rotate(0deg);opacity:0.8;}
+  100%{transform:translateY(120%) rotate(360deg);opacity:0;}
+}
+.success-ring{
+  width:88px;height:88px;border-radius:50%;margin:0 auto 22px;
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  display:grid;place-items:center;font-size:38px;
+  position:relative;z-index:1;
+  box-shadow:0 0 0 12px rgba(249,115,22,0.15),0 0 40px rgba(249,115,22,0.3);
+  animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.success-title{font-family:'Syne',sans-serif;font-weight:900;font-size:28px;color:white;letter-spacing:-1px;margin-bottom:8px;position:relative;z-index:1;}
-.success-sub{color:rgba(255,255,255,0.55);font-size:14px;line-height:1.6;position:relative;z-index:1;}
+.success-title{
+  font-family:'Syne',sans-serif;font-weight:900;font-size:30px;
+  color:white;letter-spacing:-1.2px;margin-bottom:8px;position:relative;z-index:1;
+}
+.success-sub{color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7;position:relative;z-index:1;}
+.success-sub strong{color:rgba(255,255,255,0.8);}
 
-.success-body{padding:0 16px 40px;background:var(--paper);}
+.success-body{padding:0 14px 48px;background:var(--paper);}
 
-/* Tracking code card */
-.code-block{background:var(--ink);border-radius:16px;padding:24px;text-align:center;margin-top:-24px;margin-bottom:12px;position:relative;z-index:2;}
-.code-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
-.code-value{font-family:'Syne',sans-serif;font-weight:900;font-size:32px;color:var(--orange);letter-spacing:4px;}
-.code-hint{font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;}
-.copy-code-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.3);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;margin-top:12px;font-family:'Inter',sans-serif;}
-.copy-code-btn:active{opacity:0.8;}
+/* Tracking code */
+.code-block{
+  background:var(--ink);border-radius:18px;padding:26px 20px;
+  text-align:center;margin-top:-28px;margin-bottom:14px;
+  position:relative;z-index:2;
+  box-shadow:0 -4px 30px rgba(0,0,0,0.2);
+}
+.code-label{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.code-value{
+  font-family:'Syne',sans-serif;font-weight:900;font-size:34px;
+  color:var(--orange);letter-spacing:5px;
+  text-shadow:0 0 30px rgba(249,115,22,0.4);
+}
+.code-hint{font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px;}
+.copy-code-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(249,115,22,0.15);color:var(--orange);
+  border:1px solid rgba(249,115,22,0.3);border-radius:9px;
+  padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;
+  margin-top:14px;font-family:'Inter',sans-serif;
+  transition:background 0.15s;
+}
+.copy-code-btn:active{background:rgba(249,115,22,0.25);}
 
 /* Summary card */
-.summary-card{background:white;border:1px solid var(--stone);border-radius:14px;overflow:hidden;margin-bottom:12px;}
-.summary-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--stone);font-size:13px;}
+.summary-card{
+  background:white;border:2px solid var(--stone);border-radius:var(--r);
+  overflow:hidden;margin-bottom:12px;
+}
+.summary-card-head{
+  padding:12px 16px;background:var(--stone2);
+  font-size:10px;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:1.2px;
+  border-bottom:1px solid var(--stone);
+}
+.summary-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 16px;border-bottom:1px solid var(--stone);font-size:13px;
+}
 .summary-row:last-child{border-bottom:none;}
-.summary-key{color:var(--muted);}
-.summary-val{font-weight:600;text-align:right;max-width:55%;}
-.summary-val.price{color:var(--orange);font-family:'Syne',sans-serif;font-size:17px;font-weight:800;}
-.summary-val.paid{color:var(--green);}
+.summary-key{color:var(--muted);font-weight:500;}
+.summary-val{font-weight:700;text-align:right;max-width:58%;color:var(--ink);}
+.summary-val.price{
+  color:var(--orange);font-family:'Syne',sans-serif;font-size:18px;font-weight:900;
+}
 
 /* MoMo card */
-.momo-card{background:white;border:1.5px solid #fcd34d;border-radius:16px;overflow:hidden;margin-bottom:12px;}
-.momo-header{background:#fffbeb;padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #fde68a;}
-.momo-icon{font-size:26px;}
-.momo-title{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#92400e;}
-.momo-sub{font-size:12px;color:#b45309;margin-top:2px;}
-.momo-number-wrap{padding:16px;text-align:center;border-bottom:1px solid #fde68a;}
-.momo-label-sm{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.momo-number{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;color:var(--ink);letter-spacing:2px;}
-.momo-name-sm{font-size:12px;color:var(--muted);margin-top:4px;}
-.momo-copy-btn{margin-top:10px;padding:8px 20px;background:#f59e0b;color:white;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
-.momo-ref-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;margin:12px 16px;font-size:13px;}
-.momo-ref-label{font-size:11px;color:#b45309;font-weight:700;margin-bottom:4px;}
-.momo-ref-code{font-family:monospace;font-size:16px;font-weight:700;color:var(--ink);letter-spacing:2px;}
-.momo-steps{padding:12px 16px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid #fde68a;}
-.momo-step{display:flex;align-items:flex-start;gap:10px;font-size:12px;line-height:1.5;}
-.step-num{width:20px;height:20px;border-radius:50%;background:#f59e0b;color:white;display:grid;place-items:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
-.momo-note{padding:10px 16px;font-size:11px;color:#b45309;background:#fffbeb;}
+.momo-card{
+  background:white;border:2px solid #fcd34d;border-radius:var(--r);
+  overflow:hidden;margin-bottom:14px;
+}
+.momo-header{
+  background:linear-gradient(135deg,#fffbeb,#fef3c7);padding:16px;
+  display:flex;align-items:center;gap:13px;border-bottom:1.5px solid #fde68a;
+}
+.momo-icon{font-size:28px;}
+.momo-title{font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:#92400e;}
+.momo-sub{font-size:12px;color:#b45309;margin-top:2px;font-weight:500;}
 
-.btn-primary{display:block;width:100%;padding:16px;background:var(--orange);color:white;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:800;text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;letter-spacing:-0.3px;}
-.btn-ghost{display:block;width:100%;padding:14px;background:white;border:1.5px solid var(--stone);color:var(--ink);border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;text-align:center;cursor:pointer;}
+.momo-number-wrap{padding:18px;text-align:center;border-bottom:1.5px solid #fde68a;}
+.momo-label-sm{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:700;}
+.momo-number{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;color:var(--ink);letter-spacing:3px;}
+.momo-name-sm{font-size:12px;color:var(--muted);margin-top:5px;}
+.momo-copy-btn{
+  margin-top:12px;padding:9px 22px;
+  background:linear-gradient(135deg,#f59e0b,#d97706);
+  color:white;border:none;border-radius:9px;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 2px 10px rgba(245,158,11,0.3);
+}
 
-/* OTP Verification */
-.otp-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;align-items:flex-end;justify-content:center;}
-.otp-overlay.show{display:flex;}
-.otp-box{background:var(--paper);border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;max-width:480px;animation:slideUp 0.3s ease;}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.otp-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;margin-bottom:6px;}
-.otp-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
-.otp-steps{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
-.otp-step{display:flex;align-items:flex-start;gap:12px;background:white;border:1px solid var(--stone);border-radius:12px;padding:14px;}
-.otp-step-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:white;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
-.otp-step-text{font-size:13px;line-height:1.5;color:var(--ink);}
-.otp-code-display{background:#fff7f0;border:2px solid var(--orange);border-radius:12px;padding:16px;text-align:center;margin-bottom:16px;}
-.otp-code-label{font-size:11px;color:#c2410c;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-.otp-code-value{font-family:'Syne',sans-serif;font-size:32px;font-weight:900;color:var(--orange);letter-spacing:4px;}
-.otp-wa-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:#25D366;color:white;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;text-decoration:none;}
-.otp-wa-btn:active{opacity:0.9;}
-.otp-manual-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
-.otp-verify-row{display:flex;gap:10px;margin-top:14px;}
-.otp-input{flex:1;padding:14px;border:1.5px solid var(--stone);border-radius:12px;font-size:18px;font-family:monospace;font-weight:700;text-align:center;letter-spacing:4px;outline:none;}
-.otp-input:focus{border-color:var(--orange);}
-.otp-verify-btn{padding:14px 20px;background:var(--ink);color:white;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;}
-.otp-verify-btn:disabled{opacity:0.5;}
-.otp-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;display:none;}
-.otp-err.show{display:block;}
-.verified-badge{display:inline-flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #bbf7d0;color:#16a34a;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;margin-left:8px;}
+.momo-ref-box{
+  background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;
+  padding:12px 16px;margin:14px 16px;
+}
+.momo-ref-label{font-size:11px;color:#b45309;font-weight:800;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
+.momo-ref-code{font-family:monospace;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:2px;}
 
-.spinner{width:18px;height:18px;
-.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;}
+.momo-steps{padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1.5px solid #fde68a;}
+.momo-step{display:flex;align-items:flex-start;gap:11px;font-size:13px;line-height:1.55;color:#57534e;}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:linear-gradient(135deg,#f59e0b,var(--orange));
+  color:white;display:grid;place-items:center;
+  font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;
+}
+.momo-note{padding:12px 16px;font-size:12px;color:#b45309;background:#fffbeb;font-weight:500;}
+
+.btn-primary{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+  color:white;border:none;border-radius:var(--r);
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:900;
+  text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;
+  letter-spacing:-0.3px;box-shadow:0 4px 16px rgba(249,115,22,0.35);
+}
+.btn-ghost{
+  display:block;width:100%;padding:14px;background:white;
+  border:2px solid var(--stone);color:var(--ink);border-radius:var(--r);
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  text-align:center;cursor:pointer;transition:border-color 0.15s;
+}
+.btn-ghost:hover{border-color:var(--orange);}
+
+/* ── SPINNER ── */
+.spinner{
+  width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);
+  border-top-color:white;border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── OTP OVERLAY ── */
+.otp-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:500;display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.otp-overlay.show{display:flex;}
+.otp-box{
+  background:var(--paper);border-radius:22px 22px 0 0;
+  padding:28px 18px 44px;width:100%;max-width:480px;
+  animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.otp-title{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;margin-bottom:6px;letter-spacing:-0.5px;}
+.otp-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.65;}
+.otp-code-display{
+  background:linear-gradient(135deg,#fff7ed,#fffbeb);
+  border:2px solid var(--orange);border-radius:var(--r);
+  padding:18px;text-align:center;margin-bottom:18px;
+}
+.otp-code-label{font-size:10px;color:#c2410c;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
+.otp-code-value{font-family:'Syne',sans-serif;font-size:34px;font-weight:900;color:var(--orange);letter-spacing:5px;}
+.otp-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+.otp-step{display:flex;align-items:flex-start;gap:12px;background:white;border:1.5px solid var(--stone);border-radius:12px;padding:13px;}
+.otp-step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-deep));color:white;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
+.otp-step-text{font-size:13px;line-height:1.55;color:var(--ink);}
+.otp-wa-btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;padding:16px;background:#25D366;color:white;border:none;
+  border-radius:var(--r);font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;
+  text-decoration:none;letter-spacing:-0.3px;
+  box-shadow:0 4px 16px rgba(37,211,102,0.3);
+}
+.otp-verify-row{display:flex;gap:10px;margin-top:14px;}
+.otp-input{
+  flex:1;padding:14px;border:2px solid var(--stone);border-radius:12px;
+  font-size:20px;font-family:monospace;font-weight:700;
+  text-align:center;letter-spacing:5px;outline:none;
+}
+.otp-input:focus{border-color:var(--orange);}
+.otp-verify-btn{
+  padding:14px 18px;background:var(--ink);color:white;border:none;
+  border-radius:12px;font-family:'Syne',sans-serif;font-weight:800;
+  font-size:14px;cursor:pointer;white-space:nowrap;
+}
+.otp-verify-btn:disabled{opacity:0.5;}
+.otp-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;display:none;font-weight:600;}
+.otp-err.show{display:block;}
+.otp-manual-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.65;margin-top:12px;}
+
+.verified-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--green-light);border:1px solid #bbf7d0;
+  color:var(--green);font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;margin-left:6px;
+}
 </style>
 </head>
 <body>
 
-<!-- BOOKING FORM -->
+<!-- ══════════════════════════════════
+     BOOKING FORM SCREEN
+══════════════════════════════════ -->
 <div id="screen-form">
+
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark">ZE</div>
       <div class="logo-name">Zygo<em>Express</em></div>
     </div>
-    <div class="topbar-pill">🇬🇭 Wa, Ghana</div>
+    <div class="topbar-badge">📍 Wa, Ghana</div>
   </div>
 
+  <!-- Hero -->
   <div class="hero">
+    <div class="hero-bg-1"></div>
+    <div class="hero-bg-2"></div>
+    <div class="hero-bg-3"></div>
     <div class="hero-tag">⚡ Book in 60 seconds</div>
-    <div class="hero-title">Your parcel.<br><span>Delivered fast.</span></div>
-    <div class="hero-sub">Same-day pickups across Wa & Upper West. Real-time tracking included.</div>
+    <div class="hero-title">
+      <span class="line1">Your parcel.</span>
+      <span class="line2">Delivered <span class="hl">fast.</span></span>
+    </div>
+    <div class="hero-sub">Same-day pickups across <strong>Wa & Upper West</strong>. Real-time tracking with every order.</div>
   </div>
 
+  <!-- Zone pricing -->
   <div class="zone-wrap">
-    <div class="zone-label">Delivery Pricing Zones</div>
+    <div class="zone-label">📦 Pricing Zones · Road Distance</div>
     <div class="zone-row">
-      <div class="zone-card" id="zone-1"><div class="zone-price">GHS 13</div><div class="zone-km">0–2 km</div><div class="zone-name">Zone 1</div></div>
-      <div class="zone-card" id="zone-2"><div class="zone-price">GHS 16</div><div class="zone-km">2.1–4 km</div><div class="zone-name">Zone 2</div></div>
-      <div class="zone-card" id="zone-3"><div class="zone-price">GHS 20</div><div class="zone-km">4.1–6 km</div><div class="zone-name">Zone 3</div></div>
-      <div class="zone-card" id="zone-4"><div class="zone-price">GHS 30</div><div class="zone-km">6.1–9 km</div><div class="zone-name">Zone 4</div></div>
+      <div class="zone-card" id="zone-1">
+        <div class="zone-ghs">GHS</div>
+        <div class="zone-price">13</div>
+        <div class="zone-km">0–2 km</div>
+        <div class="zone-name">Zone 1</div>
+      </div>
+      <div class="zone-card" id="zone-2">
+        <div class="zone-ghs">GHS</div>
+        <div class="zone-price">16</div>
+        <div class="zone-km">2.1–4 km</div>
+        <div class="zone-name">Zone 2</div>
+      </div>
+      <div class="zone-card" id="zone-3">
+        <div class="zone-ghs">GHS</div>
+        <div class="zone-price">20</div>
+        <div class="zone-km">4.1–6 km</div>
+        <div class="zone-name">Zone 3</div>
+      </div>
+      <div class="zone-card" id="zone-4">
+        <div class="zone-ghs">GHS</div>
+        <div class="zone-price">30</div>
+        <div class="zone-km">6.1–9 km</div>
+        <div class="zone-name">Zone 4</div>
+      </div>
     </div>
   </div>
 
+  <!-- Form -->
   <div class="form-wrap">
     <div class="form-card">
+
       <div class="error-msg" id="error-box"></div>
 
-      <div class="group-label">👤 Your Details</div>
-      <div class="input-row">
+      <!-- SENDER -->
+      <div class="section-head">
+        <div class="section-icon amber">👤</div>
+        <div class="section-title">Your Details</div>
+        <span class="section-badge required">Required</span>
+      </div>
+      <div class="input-grid">
         <div class="input-wrap">
-          <span class="input-label">Full Name</span>
-          <input class="input-field" type="text" id="f-name" placeholder="Janet Musah" required/>
+          <label class="input-label">Full Name <span class="required-dot">*</span></label>
+          <input class="input-field" type="text" id="f-name" placeholder="Janet Musah" required autocomplete="name"/>
         </div>
-        <div class="input-wrap">
-          <span class="input-label">Phone Number</span>
-          <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456" required/>
+        <div class="input-wrap" style="position:relative">
+          <label class="input-label">Phone Number <span class="required-dot">*</span></label>
+          <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456"
+            required maxlength="13" inputmode="tel" autocomplete="tel"
+            oninput="updateCounter(this,'phone-counter-1')"/>
+          <span class="phone-counter" id="phone-counter-1">0/10</span>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <div class="group-label">📍 Delivery Route</div>
+      <!-- ROUTE -->
+      <div class="section-head">
+        <div class="section-icon orange">📍</div>
+        <div class="section-title">Delivery Route</div>
+        <span class="section-badge required">Auto-priced</span>
+      </div>
       <div class="route-group">
-        <div class="route-dot route-dot-top"></div>
-        <div class="route-track"></div>
-        <div class="route-dot route-dot-bot"></div>
+        <div class="route-track-wrap">
+          <div class="route-dot route-dot-top"></div>
+          <div class="route-line"></div>
+          <div class="route-dot route-dot-bot"></div>
+        </div>
         <div class="input-wrap">
-          <span class="input-label">Pickup Location</span>
-          <input class="input-field" type="text" id="f-pickup" placeholder="e.g. Kpaguri, Wa Hospital" required autocomplete="off"/>
+          <label class="input-label">Pickup Location <span class="required-dot">*</span></label>
+          <span class="input-icon">🟡</span>
+          <input class="input-field has-icon" type="text" id="f-pickup"
+            placeholder="e.g. Kpaguri, Wa Hospital" required autocomplete="off"/>
           <div class="suggestions" id="pickup-suggestions"></div>
         </div>
         <div class="input-wrap" style="margin-top:10px">
-          <span class="input-label">Drop-off Location</span>
-          <input class="input-field" type="text" id="f-dropoff" placeholder="e.g. Jahan, Ssnit" required autocomplete="off"/>
+          <label class="input-label">Drop-off Location <span class="required-dot">*</span></label>
+          <span class="input-icon">🔴</span>
+          <input class="input-field has-icon" type="text" id="f-dropoff"
+            placeholder="e.g. Jahan, SSNIT, Dobile" required autocomplete="off"/>
           <div class="suggestions" id="dropoff-suggestions"></div>
         </div>
       </div>
 
+      <!-- Price reveal -->
       <div class="price-reveal" id="price-reveal">
         <div class="price-top">
           <div>
-            <div class="price-tag">Estimated Cost</div>
+            <div class="price-label">Estimated Cost</div>
             <div class="price-zone" id="p-zone">Calculating…</div>
             <div class="price-dist" id="p-dist"></div>
           </div>
@@ -248,81 +649,131 @@ textarea.input-field{min-height:72px;resize:none;}
 
       <div class="divider"></div>
 
-      <div class="group-label">👥 Recipient Details</div>
-      <div class="input-row">
+      <!-- RECIPIENT -->
+      <div class="section-head">
+        <div class="section-icon green">👥</div>
+        <div class="section-title">Recipient Details</div>
+        <span class="section-badge required">Required</span>
+      </div>
+      <div class="input-grid">
         <div class="input-wrap">
-          <span class="input-label">Recipient Name</span>
-          <input class="input-field" type="text" id="f-rec-name" placeholder="Who receives it?"/>
+          <label class="input-label">Recipient Name</label>
+          <input class="input-field" type="text" id="f-rec-name" placeholder="Who receives it?" autocomplete="off"/>
         </div>
-        <div class="input-wrap">
-          <span class="input-label">Recipient Phone</span>
-          <input class="input-field" type="tel" id="f-rec-phone" placeholder="0244 000 000" required/>
+        <div class="input-wrap" style="position:relative">
+          <label class="input-label">Recipient Phone <span class="required-dot">*</span></label>
+          <input class="input-field" type="tel" id="f-rec-phone"
+            placeholder="0244 000 000" required maxlength="13"
+            inputmode="tel"
+            oninput="updateCounter(this,'phone-counter-2')"/>
+          <span class="phone-counter" id="phone-counter-2">0/10</span>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <div class="group-label">📦 Parcel Details <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:0.5;font-size:10px">(optional)</span></div>
+      <!-- PARCEL -->
+      <div class="section-head">
+        <div class="section-icon purple">📦</div>
+        <div class="section-title">Parcel Details</div>
+        <span class="section-badge optional">Optional</span>
+      </div>
       <div class="input-wrap">
-        <textarea class="input-field" id="f-details" placeholder="Size, weight, fragile items, special instructions…"></textarea>
+        <textarea class="input-field" id="f-details"
+          placeholder="Size, weight, fragile items, special instructions…"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-section">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <span class="t-icon">⚡</span>
+        <div class="t-label">Pickup</div>
+        <div class="t-val">Same Day</div>
+      </div>
+      <div class="trust-item">
+        <span class="t-icon">📍</span>
+        <div class="t-label">Tracking</div>
+        <div class="t-val">Live GPS</div>
+      </div>
+      <div class="trust-item">
+        <span class="t-icon">💰</span>
+        <div class="t-label">Price</div>
+        <div class="t-val">From GHS 13</div>
+      </div>
+      <div class="trust-item">
+        <span class="t-icon">🛡️</span>
+        <div class="t-label">Booking</div>
+        <div class="t-val">Secure</div>
       </div>
     </div>
-  </div>
 
-  <div class="submit-section">
-    <div class="trust-row">
-      <div class="trust-item"><span>⚡</span>Same Day</div>
-      <div class="trust-item"><span>📍</span>Live Track</div>
-      <div class="trust-item"><span>💰</span>Fair Price</div>
-      <div class="trust-item"><span>🛡️</span>Insured</div>
+    <div style="display:flex;justify-content:center;margin-bottom:16px">
+      <div class="cf-turnstile"
+        data-sitekey="0x4AAAAAADonetaLeSDtIQU7"
+        data-callback="onTurnstileSuccess"
+        data-theme="light"></div>
     </div>
-    <!-- Free bot protection — invisible to genuine customers in most cases -->
-    <div style="display:flex;justify-content:center;margin-bottom:14px">
-      <div class="cf-turnstile" data-sitekey=0x4AAAAAADonetaLeSDtIQU7 data-callback="onTurnstileSuccess" data-theme="light"></div>
-    </div>
-    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">Confirm Booking →</button>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
+      Confirm Booking <span style="font-size:18px">→</span>
+    </button>
     <div class="submit-note">No payment needed now · We'll contact you to confirm</div>
   </div>
-</div>
 
-<!-- SUCCESS -->
+</div><!-- /screen-form -->
+
+
+<!-- ══════════════════════════════════
+     SUCCESS SCREEN
+══════════════════════════════════ -->
 <div id="screen-success">
+
   <div class="topbar">
     <div class="logo">
       <div class="logo-mark">ZE</div>
       <div class="logo-name">Zygo<em>Express</em></div>
     </div>
+    <div class="topbar-badge">✅ Confirmed</div>
   </div>
 
   <div class="success-top">
+    <div class="confetti-wrap" id="confetti-wrap"></div>
     <div class="success-ring">✓</div>
     <div class="success-title">You're booked!</div>
-    <div class="success-sub">Your delivery request is confirmed.<br>We'll call you to arrange pickup.</div>
+    <div class="success-sub">Your delivery is confirmed.<br><strong>We'll call you to arrange pickup.</strong></div>
   </div>
 
   <div class="success-body">
-    <!-- Tracking Code -->
+
+    <!-- Tracking code -->
     <div class="code-block">
       <div class="code-label">Your Tracking ID</div>
       <div class="code-value" id="s-code">ZGX-XXXXXX</div>
-      <div class="code-hint">Use this to track your parcel anytime</div>
+      <div class="code-hint">Save this — use it to track & pay for your delivery</div>
       <button class="copy-code-btn" onclick="copyCode()" id="copy-code-btn">📋 Copy Tracking ID</button>
     </div>
 
-    <!-- Order Summary -->
-    <div class="summary-card" id="s-summary"></div>
+    <!-- Summary -->
+    <div class="summary-card">
+      <div class="summary-card-head">Order Summary</div>
+      <div id="s-summary"></div>
+    </div>
 
-    <!-- MoMo Payment -->
+    <!-- MoMo -->
     <div class="momo-card">
       <div class="momo-header">
         <div class="momo-icon">📱</div>
         <div>
           <div class="momo-title">Pay via MTN MoMo</div>
-          <div class="momo-sub">Send payment to confirm your delivery</div>
+          <div class="momo-sub">Send payment to activate your delivery</div>
         </div>
       </div>
       <div class="momo-number-wrap">
-        <div class="momo-label-sm">Send to this number</div>
+        <div class="momo-label-sm">Send Payment To</div>
         <div class="momo-number">0240393582</div>
         <div class="momo-name-sm">Zygo Express</div>
         <button class="momo-copy-btn" onclick="copyMomo()">Copy Number</button>
@@ -332,81 +783,77 @@ textarea.input-field{min-height:72px;resize:none;}
         <div class="momo-ref-code" id="momo-ref-code">ZGX-XXXXXX</div>
       </div>
       <div class="momo-steps">
-        <div class="momo-step"><div class="step-num">1</div>Dial <strong>*170#</strong> on your MTN phone</div>
+        <div class="momo-step"><div class="step-num">1</div>Dial <strong>*170#</strong> on your MTN line</div>
         <div class="momo-step"><div class="step-num">2</div>Select <strong>Transfer Money → MoMo User</strong></div>
         <div class="momo-step"><div class="step-num">3</div>Send <strong id="momo-amount">GHS 13</strong> to <strong>0240393582</strong></div>
-        <div class="momo-step"><div class="step-num">4</div>Enter <strong id="momo-ref-step">your tracking ID</strong> as reference</div>
+        <div class="momo-step"><div class="step-num">4</div>Enter <strong id="momo-ref-step">your tracking ID</strong> as the reference</div>
       </div>
       <div class="momo-note">💡 Payment confirms your booking. We'll call once verified.</div>
     </div>
 
-    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary" id="track-link">📍 Track My Parcel</a>
+    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary" id="track-link">
+      📍 Track My Parcel
+    </a>
     <div class="btn-ghost" onclick="bookAnother()">+ Book Another Delivery</div>
-  </div>
-</div>
 
-<!-- OTP Verification Overlay -->
+  </div>
+</div><!-- /screen-success -->
+
+
+<!-- ══════════════════════════════════
+     OTP OVERLAY (dormant)
+══════════════════════════════════ -->
 <div class="otp-overlay" id="otp-overlay">
   <div class="otp-box">
     <div class="otp-title">📱 Verify Your Number</div>
-    <div class="otp-sub">We need to verify your WhatsApp number before confirming your booking. This is free and takes 30 seconds.</div>
-
+    <div class="otp-sub">Verify your WhatsApp number to secure your booking. Free and takes 30 seconds.</div>
     <div class="otp-code-display">
       <div class="otp-code-label">Your Verification Code</div>
       <div class="otp-code-value" id="otp-code-display">------</div>
     </div>
-
     <div class="otp-steps">
-      <div class="otp-step">
-        <div class="otp-step-num">1</div>
-        <div class="otp-step-text">Tap the button below — WhatsApp opens with your code pre-filled.</div>
-      </div>
-      <div class="otp-step">
-        <div class="otp-step-num">2</div>
-        <div class="otp-step-text">Send the message to <strong>0202858011</strong> (Zygo Express).</div>
-      </div>
-      <div class="otp-step">
-        <div class="otp-step-num">3</div>
-        <div class="otp-step-text">Enter the 6-digit code below to confirm your number.</div>
-      </div>
+      <div class="otp-step"><div class="otp-step-num">1</div><div class="otp-step-text">Tap below — WhatsApp opens with your code pre-filled.</div></div>
+      <div class="otp-step"><div class="otp-step-num">2</div><div class="otp-step-text">Send the message to <strong>0202858011</strong> (Zygo Express).</div></div>
+      <div class="otp-step"><div class="otp-step-num">3</div><div class="otp-step-text">Enter the 6-digit code to confirm.</div></div>
     </div>
-
     <a id="otp-wa-link" href="#" target="_blank" class="otp-wa-btn">
       <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Send Code via WhatsApp
     </a>
-
     <div class="otp-verify-row">
       <input class="otp-input" type="text" id="otp-input" placeholder="000000" maxlength="6" inputmode="numeric"/>
       <button class="otp-verify-btn" onclick="verifyOTP()" id="otp-verify-btn">Verify →</button>
     </div>
-    <div class="otp-err" id="otp-err">❌ Incorrect code. Please check and try again.</div>
-    <div class="otp-manual-note" style="margin-top:12px">
-      Don't have WhatsApp? Call us on <a href="tel:0202858011" style="color:var(--orange);font-weight:700">0202858011</a> to verify manually.
+    <div class="otp-err" id="otp-err">Incorrect code. Please check and try again.</div>
+    <div class="otp-manual-note">
+      No WhatsApp? Call us: <a href="tel:0202858011" style="color:var(--orange);font-weight:700">0202858011</a>
     </div>
   </div>
 </div>
 
+
 <script>
 const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
 const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
-const GOOGLE_MAPS_KEY = ""; // Add your Google Maps API key here if available
 let sb, currentCode = '';
 let turnstileToken = null;
 
-// Called automatically by the Turnstile widget once a visitor passes the
-// (usually invisible) bot check — enables the Confirm Booking button.
-function onTurnstileSuccess(token){
-  turnstileToken = token;
+function onTurnstileSuccess(token){ turnstileToken = token; }
+
+// ── Phone counter ─────────────────────────────────────────────────────────────
+function updateCounter(input, counterId) {
+  const raw = input.value.replace(/[\s\-\(\)]/g,'');
+  const digits = raw.replace(/\D/g,'');
+  const counter = document.getElementById(counterId);
+  counter.textContent = digits.length + '/10';
+  counter.className = 'phone-counter ' + (digits.length === 10 ? 'ok' : digits.length > 0 ? 'err' : '');
 }
 
-window.addEventListener('load', () => {
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  setupAutocomplete('f-pickup',  'pickup-suggestions');
-  setupAutocomplete('f-dropoff', 'dropoff-suggestions');
-  document.getElementById('f-pickup').addEventListener('blur',  () => setTimeout(estimatePrice, 300));
-  document.getElementById('f-dropoff').addEventListener('blur', () => setTimeout(estimatePrice, 300));
-});
+// ── Strict Ghana phone validation — exactly 10 digits, valid prefix ───────────
+function validateGhanaPhone(raw) {
+  const clean = raw.replace(/[\s\-\(\)]/g,'');
+  return clean.length === 10 && /^0[2345679]\d{8}$/.test(clean);
+}
 
 // ── Wa Locations ──────────────────────────────────────────────────────────────
 const WA_LOCATIONS = [
@@ -418,8 +865,17 @@ const WA_LOCATIONS = [
   "Catholic Hospital","Airstrip","Magazine Road","Real Spicy","Kumbehi",
   "Lowcost","RST","Zongo","Mabia","Loho","Kambali","Nyanshegu","Tindama",
   "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road","UDS","Wa UDS",
-  "Wa Market","Wa Round About","Nkoranza","Bulenga","Sankana Road"
+  "Wa Market","Wa Round About","Nkoranza","Bulenga","Sankana Road","VIP Terminal",
+  "STC Terminal","OA Travel Station","Konba","Kantu","Dobile Market","Chapari"
 ];
+
+window.addEventListener('load', () => {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  setupAutocomplete('f-pickup',  'pickup-suggestions');
+  setupAutocomplete('f-dropoff', 'dropoff-suggestions');
+  document.getElementById('f-pickup').addEventListener('blur',  () => setTimeout(estimatePrice, 300));
+  document.getElementById('f-dropoff').addEventListener('blur', () => setTimeout(estimatePrice, 300));
+});
 
 function setupAutocomplete(inputId, suggestId) {
   const input = document.getElementById(inputId);
@@ -427,13 +883,13 @@ function setupAutocomplete(inputId, suggestId) {
   input.addEventListener('input', () => {
     const val = input.value.trim().toLowerCase();
     box.innerHTML = '';
-    if (val.length < 1) { box.style.display = 'none'; return; }
-    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0, 6);
-    if (!matches.length) { box.style.display = 'none'; return; }
+    if (val.length < 1) { box.style.display='none'; return; }
+    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0,6);
+    if (!matches.length) { box.style.display='none'; return; }
     matches.forEach(loc => {
       const item = document.createElement('div');
       item.className = 'suggestion-item';
-      item.innerHTML = `<span>📍</span>${loc}, Wa`;
+      item.innerHTML = `<span class="sug-icon">📍</span>${loc}, Wa`;
       item.addEventListener('mousedown', () => {
         input.value = loc + ', Wa';
         box.style.display = 'none';
@@ -443,15 +899,15 @@ function setupAutocomplete(inputId, suggestId) {
     });
     box.style.display = 'block';
   });
-  input.addEventListener('blur', () => setTimeout(() => { box.style.display = 'none'; }, 200));
+  input.addEventListener('blur', () => setTimeout(() => { box.style.display='none'; }, 200));
 }
 
-// ── Zone Pricing ──────────────────────────────────────────────────────────────
+// ── Zone pricing ──────────────────────────────────────────────────────────────
 function getZone(km) {
-  if (km <= 2.0)  return { price:13, name:'Zone 1 · 0–2 km',    id:'zone-1' };
-  if (km <= 4.0)  return { price:16, name:'Zone 2 · 2.1–4 km',  id:'zone-2' };
-  if (km <= 6.0)  return { price:20, name:'Zone 3 · 4.1–6 km',  id:'zone-3' };
-  return           { price:30, name:'Zone 4 · 6.1–9 km',        id:'zone-4' };
+  if (km <= 2.0) return { price:13, name:'Zone 1 · 0–2 km',    id:'zone-1' };
+  if (km <= 4.0) return { price:16, name:'Zone 2 · 2.1–4 km',  id:'zone-2' };
+  if (km <= 6.0) return { price:20, name:'Zone 3 · 4.1–6 km',  id:'zone-3' };
+  return          { price:30, name:'Zone 4 · 6.1–9 km',         id:'zone-4' };
 }
 
 function highlightZone(id) {
@@ -460,7 +916,6 @@ function highlightZone(id) {
   if (el) el.classList.add('active');
 }
 
-// ── Price Estimation (OSRM + Nominatim) ──────────────────────────────────────
 async function estimatePrice() {
   const pickup  = document.getElementById('f-pickup').value.trim();
   const dropoff = document.getElementById('f-dropoff').value.trim();
@@ -471,61 +926,51 @@ async function estimatePrice() {
   const pZone  = document.getElementById('p-zone');
   const pDist  = document.getElementById('p-dist');
 
-  reveal.style.display = 'block';
-  pAmt.textContent  = '…';
-  pZone.textContent = 'Calculating route distance…';
-  pDist.textContent = '';
+  reveal.style.display='block';
+  pAmt.textContent='…';
+  pZone.textContent='Calculating route…';
+  pDist.textContent='';
 
   try {
-    // Geocode using Nominatim with Wa context
-    const geoBase = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh';
-    const [pRes, dRes] = await Promise.all([
-      fetch(`${geoBase}&q=${encodeURIComponent(pickup + ', Wa, Upper West, Ghana')}`, { headers:{'User-Agent':'ZygoExpress/1.0'} }).then(r=>r.json()),
-      fetch(`${geoBase}&q=${encodeURIComponent(dropoff + ', Wa, Upper West, Ghana')}`, { headers:{'User-Agent':'ZygoExpress/1.0'} }).then(r=>r.json()),
+    const geoBase='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh';
+    const [pRes,dRes] = await Promise.all([
+      fetch(`${geoBase}&q=${encodeURIComponent(pickup+', Wa, Upper West, Ghana')}`,{headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
+      fetch(`${geoBase}&q=${encodeURIComponent(dropoff+', Wa, Upper West, Ghana')}`,{headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
     ]);
-
     if (pRes.length && dRes.length) {
-      const oLat=parseFloat(pRes[0].lat), oLng=parseFloat(pRes[0].lon);
-      const dLat=parseFloat(dRes[0].lat), dLng=parseFloat(dRes[0].lon);
-
-      // Get road distance from OSRM
-      const routeRes = await fetch(
+      const oLat=parseFloat(pRes[0].lat),oLng=parseFloat(pRes[0].lon);
+      const dLat=parseFloat(dRes[0].lat),dLng=parseFloat(dRes[0].lon);
+      const routeRes=await fetch(
         `https://router.project-osrm.org/route/v1/driving/${oLng},${oLat};${dLng},${dLat}?overview=false`
       ).then(r=>r.json());
-
-      if (routeRes.code === 'Ok' && routeRes.routes?.[0]) {
-        const distM = routeRes.routes[0].distance;
-        const km    = distM / 1000;
-        const zone  = getZone(km);
-        pAmt.textContent  = `GHS ${zone.price}`;
-        pZone.textContent = zone.name;
-        pDist.textContent = `Road distance: ${km.toFixed(2)} km`;
+      if (routeRes.code==='Ok'&&routeRes.routes?.[0]) {
+        const km=routeRes.routes[0].distance/1000;
+        const zone=getZone(km);
+        pAmt.textContent='GHS '+zone.price;
+        pZone.textContent=zone.name;
+        pDist.textContent='Road distance: '+km.toFixed(2)+' km';
         highlightZone(zone.id);
         return;
       }
     }
-
     // Fallback
-    pAmt.textContent  = 'GHS 13';
-    pZone.textContent = 'Zone 1 (minimum · could not calculate exact distance)';
-    pDist.textContent = 'Try entering full location names e.g. "Kpaguri, Wa"';
+    pAmt.textContent='GHS 13';
+    pZone.textContent='Zone 1 (minimum — enter full location names for accuracy)';
     highlightZone('zone-1');
-
   } catch {
-    pAmt.textContent  = 'GHS 13';
-    pZone.textContent = 'Zone 1 (minimum)';
+    pAmt.textContent='GHS 13';
+    pZone.textContent='Zone 1 (minimum)';
     highlightZone('zone-1');
   }
 }
 
-// ── Generate secure tracking code ─────────────────────────────────────────────
 function generateCode() {
-  const arr = new Uint8Array(5);
+  const arr=new Uint8Array(5);
   crypto.getRandomValues(arr);
-  return 'ZGX-' + Array.from(arr, b => b.toString(36)).join('').substring(0,6).toUpperCase();
+  return 'ZGX-'+Array.from(arr,b=>b.toString(36)).join('').substring(0,6).toUpperCase();
 }
 
-// ── Submit ────────────────────────────────────────────────────────────────────
+// ── Main submit ───────────────────────────────────────────────────────────────
 async function submitBooking() {
   const name    = document.getElementById('f-name').value.trim();
   const phone   = document.getElementById('f-phone').value.trim();
@@ -534,44 +979,41 @@ async function submitBooking() {
   const details = document.getElementById('f-details').value.trim();
   const recName = document.getElementById('f-rec-name').value.trim();
   const recPhone= document.getElementById('f-rec-phone').value.trim();
-  const errBox  = document.getElementById('error-box');
 
+  const errBox = document.getElementById('error-box');
   errBox.classList.remove('show');
 
-  if (!name || name.length < 2)   { showErr('Please enter your full name.'); return; }
-
-  const cleanPhone = phone.replace(/[\s\-\(\)]/g,'');
-  if (!/^(0[2345679]\d{8}|233[2345679]\d{8}|\+233[2345679]\d{8})$/.test(cleanPhone)) {
-    showErr('Please enter a valid Ghana phone number e.g. 0244 123 456'); return;
+  // ── Validation ──────────────────────────────────────────────────────────────
+  if (!name || name.length < 2) {
+    return showErr('Please enter your full name.');
   }
-  if (!pickup)  { showErr('Please enter a pickup location.'); return; }
-  if (!dropoff) { showErr('Please enter a drop-off location.'); return; }
 
-  // Bot protection — free Cloudflare Turnstile check before allowing submission
+  if (!validateGhanaPhone(phone)) {
+    return showErr('Sender phone must be exactly 10 digits starting with 0 (e.g. 0244 123 456).');
+  }
+
+  if (!pickup)  return showErr('Please enter a pickup location.');
+  if (!dropoff) return showErr('Please enter a drop-off location.');
+
+  if (!recPhone) {
+    return showErr('Recipient phone number is required before booking.');
+  }
+  if (!validateGhanaPhone(recPhone)) {
+    return showErr('Recipient phone must be exactly 10 digits starting with 0 (e.g. 0244 000 000).');
+  }
+
   if (!turnstileToken) {
-    showErr('Please complete the verification check above before booking.');
-    return;
+    return showErr('Please complete the verification check above before booking.');
   }
 
-  // Snap price to valid zone
+  // ── Snap price ──────────────────────────────────────────────────────────────
   const priceText  = document.getElementById('p-amount').textContent;
-  const priceNum   = parseFloat((priceText.match(/[\d.]+/) || ['13'])[0]);
-  const validPrices= [13, 16, 20, 30];
+  const priceNum   = parseFloat((priceText.match(/[\d.]+/)||['13'])[0]);
+  const validPrices= [13,16,20,30];
   const finalPrice = validPrices.includes(priceNum) ? priceNum :
-    validPrices.reduce((p,c) => Math.abs(c-priceNum) < Math.abs(p-priceNum) ? c : p);
+    validPrices.reduce((p,c)=>Math.abs(c-priceNum)<Math.abs(p-priceNum)?c:p);
 
-  // OTP verification temporarily disabled (dormant) — proceed straight to booking.
-  // To re-enable: replace the line below with the commented-out verification block.
   await processBooking({ name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
-  return;
-
-  /* ── DORMANT: phone verification gate ──────────────────────────────────
-  if (phoneVerified) {
-    await processBooking({ name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
-    return;
-  }
-  startPhoneVerification(phone, { name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
-  ────────────────────────────────────────────────────────────────────── */
 }
 
 async function processBooking(payload) {
@@ -589,53 +1031,50 @@ async function processBooking(payload) {
     const { error } = await sb.from('quote_requests').insert({
       tracking_code:   code,
       status:          'pending',
-      name:            name,
-      phone:           phone,
-      pickup:          pickup,
-      dropoff:         dropoff,
-      details:         details || null,
+      name,phone,pickup,dropoff,
+      details:         details||null,
       source:          'Website',
       price:           finalPrice,
       currency:        'GHS',
-      recipient_name:  recName  || null,
-      recipient_phone: recPhone || null,
+      recipient_name:  recName||null,
+      recipient_phone: recPhone||null,
       created_at:      new Date().toISOString(),
     });
 
     if (error) {
-      showErr('Booking failed: ' + (error.message || 'Please try again.'));
-      btn.disabled = false;
-      btn.innerHTML = 'Confirm Booking →';
+      showErr('Booking failed: '+(error.message||'Please try again.'));
+      btn.disabled=false;
+      btn.innerHTML='Confirm Booking <span style="font-size:18px">→</span>';
       return;
     }
 
-    document.getElementById('screen-form').style.display    = 'none';
-    document.getElementById('screen-success').style.display = 'block';
+    // Show success
+    document.getElementById('screen-form').style.display='none';
+    document.getElementById('screen-success').style.display='block';
 
     document.getElementById('s-code').textContent        = code;
     document.getElementById('momo-ref-code').textContent = code;
     document.getElementById('momo-ref-step').textContent = code;
-    document.getElementById('momo-amount').textContent   = `GHS ${finalPrice}`;
-
-    document.getElementById('track-link').href =
-      `https://zygo-express-hub.lovable.app/#track?code=${code}`;
+    document.getElementById('momo-amount').textContent   = 'GHS '+finalPrice;
+    document.getElementById('track-link').href           = 'https://zygo-express-hub.lovable.app/#track?code='+code;
 
     document.getElementById('s-summary').innerHTML = `
       <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${sx(name)}</span></div>
-      <div class="summary-row"><span class="summary-key">Phone</span><span class="summary-val">${sx(phone)} <span class="verified-badge">✓ Verified</span></span></div>
+      <div class="summary-row"><span class="summary-key">Sender Phone</span><span class="summary-val">${sx(phone)}</span></div>
       <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
       <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
       <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice}</span></div>
-      ${recName ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(recName)}</span></div>` : ''}
-      ${recPhone ? `<div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(recPhone)}</span></div>` : ''}
+      ${recName  ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(recName)}</span></div>` : ''}
+      <div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(recPhone)}</span></div>
     `;
 
-    window.scrollTo(0, 0);
+    spawnConfetti();
+    window.scrollTo(0,0);
 
-  } catch (err) {
+  } catch(err) {
     showErr('Something went wrong. Check your connection and try again.');
-    btn.disabled = false;
-    btn.innerHTML = 'Confirm Booking →';
+    btn.disabled=false;
+    btn.innerHTML='Confirm Booking <span style="font-size:18px">→</span>';
   }
 }
 
@@ -643,111 +1082,96 @@ function showErr(msg) {
   const b = document.getElementById('error-box');
   b.textContent = msg;
   b.classList.add('show');
-  b.scrollIntoView({ behavior:'smooth', block:'center' });
+  b.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+// ── Confetti on success ───────────────────────────────────────────────────────
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  if (!wrap) return;
+  const colors = ['#f97316','#f59e0b','#ffffff','#fcd34d','#fdba74'];
+  for (let i=0;i<30;i++) {
+    const dot = document.createElement('div');
+    dot.className = 'confetti-dot';
+    const size = 4 + Math.random()*8;
+    Object.assign(dot.style, {
+      left: Math.random()*100+'%',
+      top: '-20px',
+      width: size+'px',
+      height: size+'px',
+      background: colors[Math.floor(Math.random()*colors.length)],
+      animationDuration: (1.5+Math.random()*2)+'s',
+      animationDelay: Math.random()*1+'s',
+      transform: `rotate(${Math.random()*360}deg)`,
+      borderRadius: Math.random()>0.5 ? '50%' : '2px',
+    });
+    wrap.appendChild(dot);
+  }
 }
 
 function copyCode() {
   const code = document.getElementById('s-code').textContent;
-  navigator.clipboard.writeText(code).catch(() => {
-    const el = document.createElement('input');
-    el.value = code;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+  navigator.clipboard.writeText(code).catch(()=>{
+    const el=document.createElement('input');el.value=code;
+    document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
   });
-  const btn = document.getElementById('copy-code-btn');
-  btn.textContent = '✅ Copied!';
-  setTimeout(() => btn.innerHTML = '📋 Copy Tracking ID', 2000);
+  const btn=document.getElementById('copy-code-btn');
+  btn.textContent='✅ Copied!';
+  setTimeout(()=>btn.innerHTML='📋 Copy Tracking ID',2000);
 }
 
 function copyMomo() {
-  navigator.clipboard.writeText('0240393582').catch(() => {});
-  const btn = document.querySelector('.momo-copy-btn');
-  btn.textContent = '✅ Copied!';
-  setTimeout(() => btn.textContent = 'Copy Number', 2000);
+  navigator.clipboard.writeText('0240393582').catch(()=>{});
+  const btn=document.querySelector('.momo-copy-btn');
+  btn.textContent='✅ Copied!';
+  setTimeout(()=>btn.textContent='Copy Number',2000);
 }
 
-// ── OTP VERIFICATION ─────────────────────────────────────────────────────────
-let currentOTP = null;
-let phoneVerified = false;
-let pendingBookingData = null;
-
-function generateOTP(){
-  const arr = new Uint8Array(3);
-  crypto.getRandomValues(arr);
-  return arr.map(b => b % 10).join('').padStart(6,'0').substring(0,6);
-}
-
-function startPhoneVerification(phone, bookingData){
-  currentOTP = generateOTP();
-  pendingBookingData = bookingData;
-
-  // Store OTP in Supabase for admin visibility
-  sb.from('phone_verifications').insert({
-    phone: phone,
-    otp: currentOTP,
-    context: 'booking',
-    expires_at: new Date(Date.now() + 30*60*1000).toISOString()
-  }).then(()=>{});
-
-  // Show OTP code
-  document.getElementById('otp-code-display').textContent = currentOTP;
-
-  // Build WhatsApp link
-  const msg = 'ZYGO VERIFY ' + phone + ' ' + currentOTP;
-  document.getElementById('otp-wa-link').href =
-    'https://wa.me/233202858011?text=' + encodeURIComponent(msg);
-
-  // Clear input
-  document.getElementById('otp-input').value = '';
+// ── OTP (dormant) ─────────────────────────────────────────────────────────────
+let currentOTP=null,phoneVerified=false,pendingBookingData=null;
+function generateOTP(){const arr=new Uint8Array(3);crypto.getRandomValues(arr);return arr.map(b=>b%10).join('').padStart(6,'0').substring(0,6);}
+function startPhoneVerification(phone,bookingData){
+  currentOTP=generateOTP();pendingBookingData=bookingData;
+  sb.from('phone_verifications').insert({phone,otp:currentOTP,context:'booking',expires_at:new Date(Date.now()+30*60*1000).toISOString()}).then(()=>{});
+  document.getElementById('otp-code-display').textContent=currentOTP;
+  const msg='ZYGO VERIFY '+phone+' '+currentOTP;
+  document.getElementById('otp-wa-link').href='https://wa.me/233202858011?text='+encodeURIComponent(msg);
+  document.getElementById('otp-input').value='';
   document.getElementById('otp-err').classList.remove('show');
-
-  // Show overlay
   document.getElementById('otp-overlay').classList.add('show');
 }
-
 function verifyOTP(){
-  const entered = document.getElementById('otp-input').value.trim();
-  const btn     = document.getElementById('otp-verify-btn');
-  const err     = document.getElementById('otp-err');
-
-  if(entered.length < 6){ err.textContent='Please enter the full 6-digit code.'; err.classList.add('show'); return; }
-
-  if(entered === currentOTP){
-    // Correct
-    phoneVerified = true;
+  const entered=document.getElementById('otp-input').value.trim();
+  const err=document.getElementById('otp-err');
+  if(entered.length<6){err.textContent='Enter the full 6-digit code.';err.classList.add('show');return;}
+  if(entered===currentOTP){
+    phoneVerified=true;
     document.getElementById('otp-overlay').classList.remove('show');
-
-    // Mark verified in Supabase
-    sb.from('phone_verifications').update({
-      verified: true,
-      verified_at: new Date().toISOString()
-    }).eq('otp', currentOTP).then(()=>{});
-
-    // Proceed with actual booking
-    if(pendingBookingData) processBooking(pendingBookingData);
+    sb.from('phone_verifications').update({verified:true,verified_at:new Date().toISOString()}).eq('otp',currentOTP).then(()=>{});
+    if(pendingBookingData)processBooking(pendingBookingData);
   } else {
-    err.textContent = '❌ Incorrect code. Check your WhatsApp and try again.';
-    err.classList.add('show');
-    document.getElementById('otp-input').value = '';
-    document.getElementById('otp-input').focus();
+    err.textContent='Incorrect code. Check your WhatsApp and try again.';err.classList.add('show');
+    document.getElementById('otp-input').value='';document.getElementById('otp-input').focus();
   }
 }
 
-// Allow Enter key in OTP input
-document.addEventListener('DOMContentLoaded', function(){
-  const otpInput = document.getElementById('otp-input');
-  if(otpInput) otpInput.addEventListener('keydown', function(e){ if(e.key==='Enter') verifyOTP(); });
+document.addEventListener('DOMContentLoaded',function(){
+  const otpInput=document.getElementById('otp-input');
+  if(otpInput)otpInput.addEventListener('keydown',function(e){if(e.key==='Enter')verifyOTP();});
 });
 
-function bookAnother() {
-  document.getElementById('screen-form').style.display    = 'block';
-  document.getElementById('screen-success').style.display = 'none';
-  ['f-name','f-phone','f-pickup','f-dropoff','f-details'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('price-reveal').style.display = 'none';
-  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
-  window.scrollTo(0, 0);
+function bookAnother(){
+  document.getElementById('screen-form').style.display='block';
+  document.getElementById('screen-success').style.display='none';
+  ['f-name','f-phone','f-pickup','f-dropoff','f-details','f-rec-name','f-rec-phone'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('price-reveal').style.display='none';
+  document.querySelectorAll('.zone-card').forEach(c=>c.classList.remove('active'));
+  ['phone-counter-1','phone-counter-2'].forEach(id=>{
+    const el=document.getElementById(id);if(el){el.textContent='0/10';el.className='phone-counter';}
+  });
+  window.scrollTo(0,0);
 }
 </script>
 </body>

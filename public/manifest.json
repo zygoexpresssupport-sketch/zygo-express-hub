@@ -1,0 +1,45 @@
+{
+  "name": "Zygo Express",
+  "short_name": "Zygo",
+  "description": "Fast motorcycle delivery in Wa, Ghana. Book from GHS 13.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0f0f",
+  "theme_color": "#f97316",
+  "categories": ["shopping", "logistics"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Delivery",
+      "short_name": "Book",
+      "url": "https://zygoexpresssupport-sketch.github.io/zygo-express-hub/public/book.html",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Track Parcel",
+      "short_name": "Track",
+      "url": "/#track",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

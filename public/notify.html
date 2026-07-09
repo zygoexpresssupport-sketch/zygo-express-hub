@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="theme-color" content="#0f0f0f"/>
+<title>Zygo Notify — Dispatcher Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#f97316;--orange-d:#c2410c;--ink:#0f0f0f;--ink2:#1c1917;
+  --paper:#fafaf9;--stone:#e8e4dc;--muted:#9c9589;
+  --green:#16a34a;--green-l:#dcfce7;
+  --blue:#1d4ed8;--blue-l:#dbeafe;
+  --red:#dc2626;--red-l:#fee2e2;
+  --amber:#f59e0b;--amber-l:#fef3c7;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --r:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--ink);color:white;font-family:'Inter',sans-serif;min-height:100vh;}
+a{text-decoration:none;}
+
+/* ── LOGIN ── */
+#login-screen{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;
+}
+.login-logo{
+  width:72px;height:72px;background:var(--orange);border-radius:18px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:32px;color:white;margin-bottom:20px;
+  box-shadow:0 0 40px rgba(249,115,22,0.4);
+}
+.login-title{font-family:'Syne',sans-serif;font-weight:900;font-size:26px;margin-bottom:6px;letter-spacing:-1px;}
+.login-sub{color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:32px;}
+.login-card{
+  background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px;padding:24px 20px;width:100%;max-width:380px;
+}
+.login-label{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block;}
+.login-input{
+  width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:var(--r);padding:14px 16px;font-size:16px;color:white;
+  font-family:monospace;letter-spacing:3px;outline:none;text-align:center;
+  transition:border-color 0.2s;
+}
+.login-input:focus{border-color:var(--orange);}
+.login-input::placeholder{letter-spacing:0;font-family:'Inter',sans-serif;font-size:14px;}
+.login-btn{
+  width:100%;margin-top:14px;padding:15px;background:var(--orange);
+  border:none;border-radius:var(--r);font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:900;color:white;cursor:pointer;
+  transition:background 0.2s;letter-spacing:-0.3px;
+}
+.login-btn:active{background:var(--orange-d);}
+.login-err{color:#f87171;font-size:13px;text-align:center;margin-top:10px;display:none;}
+
+/* ── TOPBAR ── */
+#main-screen{display:none;}
+.topbar{
+  position:sticky;top:0;z-index:50;background:var(--ink);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-logo{
+  width:34px;height:34px;background:var(--orange);border-radius:8px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:14px;color:white;
+}
+.topbar-name{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;}
+.topbar-name em{color:var(--orange);font-style:normal;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.refresh-btn{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.refresh-btn:active{background:rgba(255,255,255,0.15);}
+.logout-btn{
+  background:none;border:none;color:rgba(255,255,255,0.3);
+  font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;
+}
+
+/* ── STATS BAR ── */
+.stats-bar{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  padding:14px 16px;background:#111;border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.stat-block{text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;}
+.stat-num.orange{color:var(--orange);}
+.stat-num.green{color:#4ade80;}
+.stat-num.red{color:#f87171;}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* ── FILTER TABS ── */
+.filter-tabs{
+  display:flex;gap:8px;padding:12px 16px;overflow-x:auto;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.filter-tabs::-webkit-scrollbar{display:none;}
+.ftab{
+  padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  white-space:nowrap;cursor:pointer;border:1.5px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.5);background:transparent;transition:all 0.15s;flex-shrink:0;
+}
+.ftab.active{background:var(--orange);border-color:var(--orange);color:white;}
+.ftab .badge{
+  display:inline-block;background:rgba(255,255,255,0.2);
+  border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px;
+}
+.ftab.active .badge{background:rgba(0,0,0,0.2);}
+
+/* ── ORDER CARDS ── */
+.orders-list{padding:12px 16px 80px;display:flex;flex-direction:column;gap:12px;}
+.empty-state{
+  text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2);
+}
+.empty-state .emoji{font-size:40px;margin-bottom:12px;}
+.empty-state p{font-size:14px;}
+
+.order-card{
+  background:#161616;border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;overflow:hidden;
+}
+.order-card.notified{opacity:0.55;}
+
+.card-top{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.card-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.tracking-code{
+  font-family:monospace;font-size:15px;font-weight:700;
+  color:var(--orange);letter-spacing:1px;
+}
+.status-badge{
+  font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.status-pending   {background:rgba(245,158,11,0.15);color:#fbbf24;}
+.status-confirmed {background:rgba(29,78,216,0.15);color:#60a5fa;}
+.status-picked_up {background:rgba(124,58,237,0.15);color:#a78bfa;}
+.status-rider_assigned{background:rgba(16,185,129,0.15);color:#34d399;}
+.status-delivered {background:rgba(22,163,74,0.15);color:#4ade80;}
+.status-cancelled {background:rgba(220,38,38,0.15);color:#f87171;}
+.status-failed    {background:rgba(220,38,38,0.15);color:#f87171;}
+
+.customer-row{display:flex;align-items:center;gap:8px;}
+.customer-avatar{
+  width:32px;height:32px;border-radius:50%;background:rgba(249,115,22,0.15);
+  display:grid;place-items:center;font-size:13px;font-weight:700;
+  color:var(--orange);flex-shrink:0;
+}
+.customer-info{flex:1;min-width:0;}
+.customer-name{font-size:14px;font-weight:700;color:white;}
+.customer-phone{font-size:12px;color:rgba(255,255,255,0.4);font-family:monospace;}
+
+.route-row{
+  display:flex;align-items:center;gap:6px;
+  padding:10px 16px;background:rgba(0,0,0,0.2);
+  font-size:12px;color:rgba(255,255,255,0.5);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.route-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.route-dot.pickup{background:var(--amber);}
+.route-dot.dropoff{background:var(--orange);}
+.route-arrow{color:rgba(255,255,255,0.2);font-size:10px;}
+.route-loc{color:rgba(255,255,255,0.7);font-weight:500;}
+
+/* ── MESSAGE SECTION ── */
+.msg-section{padding:14px 16px;}
+.msg-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.mtab{
+  padding:5px 10px;border-radius:6px;font-size:11px;font-weight:700;
+  cursor:pointer;border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);background:transparent;
+}
+.mtab.active{background:rgba(249,115,22,0.15);border-color:rgba(249,115,22,0.3);color:var(--orange);}
+
+.msg-preview{
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;padding:12px 14px;font-size:13px;
+  color:rgba(255,255,255,0.75);line-height:1.6;
+  margin-bottom:12px;min-height:60px;
+}
+
+.action-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.action-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:11px 6px;border:none;border-radius:10px;
+  font-size:11px;font-weight:700;cursor:pointer;transition:all 0.15s;
+}
+.action-btn:active{transform:scale(0.96);}
+.btn-wa{background:#25D366;color:white;}
+.btn-sms{background:var(--blue);color:white;}
+.btn-copy{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.1);}
+.btn-copy.copied{background:rgba(22,163,74,0.2);color:#4ade80;border-color:rgba(22,163,74,0.3);}
+.action-btn .icon{font-size:18px;}
+
+.notified-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);
+}
+.notified-check{
+  display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.4);
+}
+.notified-check input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--orange);cursor:pointer;
+}
+.time-ago{font-size:11px;color:rgba(255,255,255,0.25);}
+
+/* ── SPINNER ── */
+.spinner{
+  width:20px;height:20px;border:2.5px solid rgba(255,255,255,0.2);
+  border-top-color:var(--orange);border-radius:50%;
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-state{display:flex;justify-content:center;padding:60px 20px;}
+
+/* ── FAB ── */
+.fab-refresh{
+  position:fixed;bottom:20px;right:20px;z-index:100;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--orange);border:none;
+  display:grid;place-items:center;font-size:20px;
+  cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,0.4);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="login-screen">
+  <div class="login-logo">Z</div>
+  <div class="login-title">Zygo Notify</div>
+  <div class="login-sub">Dispatcher Notification Panel</div>
+  <div class="login-card">
+    <label class="login-label">Dispatcher PIN</label>
+    <input class="login-input" type="password" id="pin-input"
+      placeholder="Enter your PIN" inputmode="numeric" maxlength="20"
+      onkeydown="if(event.key==='Enter')login()"/>
+    <button class="login-btn" onclick="login()">Access Panel →</button>
+    <div class="login-err" id="login-err">❌ Incorrect PIN. Try again.</div>
+  </div>
+</div>
+
+<!-- ═══════ MAIN ═══════ -->
+<div id="main-screen">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">Z</div>
+      <div class="topbar-name">Zygo<em>Notify</em></div>
+    </div>
+    <div class="topbar-right">
+      <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-block">
+      <div class="stat-num orange" id="stat-pending">—</div>
+      <div class="stat-lbl">Need Notif.</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num green" id="stat-today">—</div>
+      <div class="stat-lbl">Today's Orders</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-lbl">Total Orders</div>
+    </div>
+  </div>
+
+  <div class="filter-tabs" id="filter-tabs">
+    <button class="ftab active" onclick="setFilter('all',this)">
+      All Orders <span class="badge" id="badge-all">0</span>
+    </button>
+    <button class="ftab" onclick="setFilter('needs',this)">
+      🔔 Needs Notification <span class="badge" id="badge-needs">0</span>
+    </button>
+    <button class="ftab" onclick="setFilter('confirmed',this)">
+      Confirmed <span class="badge" id="badge-confirmed">0</span>
+    </button>
+    <button class="ftab" onclick="setFilter('picked_up',this)">
+      Picked Up <span class="badge" id="badge-picked">0</span>
+    </button>
+    <button class="ftab" onclick="setFilter('delivered',this)">
+      Delivered <span class="badge" id="badge-delivered">0</span>
+    </button>
+  </div>
+
+  <div class="orders-list" id="orders-list">
+    <div class="loading-state"><div class="spinner"></div></div>
+  </div>
+
+  <button class="fab-refresh" onclick="loadOrders()" title="Refresh">↻</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
+const SB_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
+const DISPATCHER_PIN = "ZYGO2026"; // Change this to your actual dispatcher PIN
+const WA_NUMBER = "233202858011"; // Zygo Express WhatsApp
+
+let sb, allOrders = [], currentFilter = 'all';
+let msgTab = {}; // tracks sender/recipient tab per order
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+function login() {
+  const pin = document.getElementById('pin-input').value.trim().toUpperCase();
+  const err = document.getElementById('login-err');
+  if (pin === DISPATCHER_PIN || pin === DISPATCHER_PIN.toLowerCase()) {
+    sessionStorage.setItem('zygo_notify_auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    loadOrders();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('pin-input').value = '';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function logout() {
+  sessionStorage.removeItem('zygo_notify_auth');
+  location.reload();
+}
+
+// Check if already authed
+window.addEventListener('load', () => {
+  if (sessionStorage.getItem('zygo_notify_auth') === '1') {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    sb = supabase.createClient(SB_URL, SB_KEY);
+    loadOrders();
+  }
+});
+
+// ── LOAD ORDERS ───────────────────────────────────────────────────────────────
+async function loadOrders() {
+  document.getElementById('orders-list').innerHTML =
+    '<div class="loading-state"><div class="spinner"></div></div>';
+  try {
+    const { data, error } = await sb
+      .from('quote_requests')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(100);
+    if (error) throw error;
+    allOrders = data || [];
+    updateStats();
+    renderOrders();
+  } catch(e) {
+    document.getElementById('orders-list').innerHTML =
+      '<div class="empty-state"><div class="emoji">⚠️</div><p>Failed to load orders.<br>Check connection and refresh.</p></div>';
+  }
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const today = new Date().toDateString();
+  const todayOrders = allOrders.filter(o => new Date(o.created_at).toDateString() === today);
+  const needsNotif = allOrders.filter(o => !isNotified(o.tracking_code, o.status));
+
+  document.getElementById('stat-pending').textContent = needsNotif.length;
+  document.getElementById('stat-today').textContent = todayOrders.length;
+  document.getElementById('stat-total').textContent = allOrders.length;
+
+  document.getElementById('badge-all').textContent = allOrders.length;
+  document.getElementById('badge-needs').textContent = needsNotif.length;
+  document.getElementById('badge-confirmed').textContent =
+    allOrders.filter(o => o.status === 'confirmed').length;
+  document.getElementById('badge-picked').textContent =
+    allOrders.filter(o => o.status === 'picked_up' || o.status === 'rider_assigned').length;
+  document.getElementById('badge-delivered').textContent =
+    allOrders.filter(o => o.status === 'delivered').length;
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderOrders();
+}
+
+function filteredOrders() {
+  if (currentFilter === 'needs') return allOrders.filter(o => !isNotified(o.tracking_code, o.status));
+  if (currentFilter === 'all') return allOrders;
+  if (currentFilter === 'picked_up') return allOrders.filter(o => o.status === 'picked_up' || o.status === 'rider_assigned');
+  return allOrders.filter(o => o.status === currentFilter);
+}
+
+// ── NOTIFIED TRACKING ─────────────────────────────────────────────────────────
+function notifKey(code, status) { return `zygo_notif_${code}_${status}`; }
+function isNotified(code, status) { return localStorage.getItem(notifKey(code, status)) === '1'; }
+function markNotified(code, status, checked) {
+  if (checked) localStorage.setItem(notifKey(code, status), '1');
+  else localStorage.removeItem(notifKey(code, status));
+  updateStats();
+  renderOrders();
+}
+
+// ── MESSAGES ──────────────────────────────────────────────────────────────────
+function buildMessage(order, recipient = false) {
+  const name   = recipient ? (order.recipient_name || 'Customer') : (order.name || 'Customer');
+  const code   = order.tracking_code || '';
+  const from   = order.pickup   || '';
+  const to     = order.dropoff  || '';
+  const price  = order.price    || '';
+  const status = order.status   || '';
+  const track  = `zygoexpress.com`;
+  const phone  = `0202858011`;
+
+  const msgs = {
+    pending: recipient ? null : [
+      `Hi ${name}! 👋 Your Zygo Express booking *${code}* is received and pending confirmation.`,
+      ``,
+      `📦 Pickup: ${from}`,
+      `📍 Drop-off: ${to}`,
+      `💰 Cost: GHS ${price}`,
+      ``,
+      `Please pay GHS ${price} via MTN MoMo to *0240393582* (Zygo Express).`,
+      `Use *${code}* as your payment reference.`,
+      ``,
+      `Track your order: ${track}`,
+      `Questions? Call ${phone} — Zygo Express 🧡`,
+    ].join('\n'),
+
+    confirmed: recipient ? null : [
+      `Hi ${name}! ✅ Your Zygo Express delivery *${code}* is *confirmed*!`,
+      ``,
+      `📦 Pickup: ${from}`,
+      `📍 Drop-off: ${to}`,
+      `💰 Cost: GHS ${price}`,
+      ``,
+      `A rider is being assigned and will collect your parcel soon.`,
+      `Average pickup time: *28 minutes*.`,
+      ``,
+      `Track live: ${track}`,
+      `Questions? Call ${phone} — Zygo Express 🧡`,
+    ].join('\n'),
+
+    rider_assigned: [
+      recipient
+        ? [
+            `Hi ${name}! 🏍️ A delivery for you is on its way from *${from}*!`,
+            ``,
+            `Our rider has been assigned and will deliver to you shortly.`,
+            `Reference: *${code}*`,
+            ``,
+            `Track: ${track} | Questions? ${phone}`,
+          ].join('\n')
+        : [
+            `Hi ${name}! 🏍️ Great news — a rider has been assigned to your delivery *${code}*!`,
+            ``,
+            `Your rider is heading to collect your parcel from *${from}*.`,
+            `Estimated pickup: *~28 minutes*.`,
+            ``,
+            `Track live: ${track}`,
+            `Questions? Call ${phone} — Zygo Express 🧡`,
+          ].join('\n')
+    ][0],
+
+    picked_up: [
+      recipient
+        ? [
+            `Hi ${name}! 📦 Your delivery from *${from}* has been collected and is on its way to you!`,
+            ``,
+            `Ref: *${code}*`,
+            `Track live: ${track}`,
+            `Questions? Call ${phone} — Zygo Express 🧡`,
+          ].join('\n')
+        : [
+            `Hi ${name}! 📦 Your parcel *${code}* has been collected from *${from}* and is on its way to *${to}*!`,
+            ``,
+            `Track your delivery live: ${track}`,
+            `Questions? Call ${phone} — Zygo Express 🧡`,
+          ].join('\n')
+    ][0],
+
+    delivered: [
+      recipient
+        ? [
+            `Hi ${name}! ✅ Your delivery *${code}* has been delivered!`,
+            ``,
+            `We hope everything arrived safely. If you did NOT receive this parcel, call *${phone}* immediately.`,
+            ``,
+            `Thank you — Zygo Express 🧡`,
+          ].join('\n')
+        : [
+            `Hi ${name}! 🎉 Your delivery *${code}* has been *successfully delivered* to *${to}*!`,
+            ``,
+            `Thank you for choosing Zygo Express. We'd love your feedback!`,
+            `Please rate your rider (1–5 ⭐): ${track}/#track`,
+            ``,
+            `Zygo Express — Wa's fastest delivery service 🧡`,
+          ].join('\n')
+    ][0],
+
+    cancelled: recipient ? null : [
+      `Hi ${name}, unfortunately your Zygo Express delivery *${code}* has been *cancelled*.`,
+      ``,
+      `If you paid, a refund will be processed within 3–5 working days.`,
+      `For assistance, call ${phone} or WhatsApp us.`,
+      ``,
+      `Sorry for the inconvenience — Zygo Express`,
+    ].join('\n'),
+
+    failed: recipient ? null : [
+      `Hi ${name}, we were unable to complete your delivery *${code}* at *${to}*.`,
+      ``,
+      `Please call us on *${phone}* so we can rearrange your delivery.`,
+      `We apologise for the inconvenience — Zygo Express`,
+    ].join('\n'),
+  };
+
+  return msgs[status] || `Hi ${name}, update on your Zygo Express order *${code}*: Status is now *${status}*.\n\nTrack: ${track} | Help: ${phone}`;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function renderOrders() {
+  const list = document.getElementById('orders-list');
+  const orders = filteredOrders();
+
+  if (!orders.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">📭</div>
+        <p>No orders in this category.</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = orders.map(o => buildCard(o)).join('');
+}
+
+function statusLabel(s) {
+  const labels = {
+    pending:'Pending', confirmed:'Confirmed', rider_assigned:'Rider Assigned',
+    picked_up:'Picked Up', delivered:'Delivered', cancelled:'Cancelled', failed:'Failed'
+  };
+  return labels[s] || s;
+}
+
+function timeAgo(ts) {
+  if (!ts) return '';
+  const diff = Date.now() - new Date(ts).getTime();
+  const m = Math.floor(diff/60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m/60);
+  if (h < 24) return h + 'h ago';
+  return Math.floor(h/24) + 'd ago';
+}
+
+function buildCard(o) {
+  const code    = o.tracking_code || '';
+  const status  = o.status || 'pending';
+  const notified = isNotified(code, status);
+  const tab     = msgTab[code] || 'sender';
+  const hasRecip = !!(o.recipient_name || o.recipient_phone);
+  const msg     = buildMessage(o, tab === 'recipient');
+  const phone   = tab === 'recipient' ? (o.recipient_phone || '') : (o.phone || '');
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '').replace(/^0/, '233');
+  const waLink  = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+  const smsLink = `sms:${phone}?body=${encodeURIComponent(msg)}`;
+  const initial = (o.name || 'C').charAt(0).toUpperCase();
+
+  return `
+<div class="order-card ${notified ? 'notified' : ''}" id="card-${code}">
+  <div class="card-top">
+    <div class="card-top-row">
+      <div class="tracking-code">${code}</div>
+      <div class="status-badge status-${status}">${statusLabel(status)}</div>
+    </div>
+    <div class="customer-row">
+      <div class="customer-avatar">${initial}</div>
+      <div class="customer-info">
+        <div class="customer-name">${o.name || 'Unknown'}</div>
+        <div class="customer-phone">${o.phone || '—'}</div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:right;line-height:1.4;">
+        GHS ${o.price || '—'}<br>${timeAgo(o.created_at)}
+      </div>
+    </div>
+  </div>
+
+  <div class="route-row">
+    <div class="route-dot pickup"></div>
+    <span class="route-loc">${(o.pickup||'—').split(',')[0]}</span>
+    <span class="route-arrow">→</span>
+    <div class="route-dot dropoff"></div>
+    <span class="route-loc">${(o.dropoff||'—').split(',')[0]}</span>
+  </div>
+
+  <div class="msg-section">
+    ${hasRecip ? `
+    <div class="msg-tabs">
+      <button class="mtab ${tab==='sender'?'active':''}"
+        onclick="switchTab('${code}','sender')">👤 Sender</button>
+      <button class="mtab ${tab==='recipient'?'active':''}"
+        onclick="switchTab('${code}','recipient')">📬 Recipient</button>
+    </div>` : ''}
+
+    <div class="msg-preview" id="msg-${code}">${msg.replace(/\n/g,'<br>')}</div>
+
+    <div class="action-row">
+      <button class="action-btn btn-wa" onclick="openWA('${code}')">
+        <span class="icon">💬</span>WhatsApp
+      </button>
+      <button class="action-btn btn-sms" onclick="openSMS('${code}')">
+        <span class="icon">📱</span>Send SMS
+      </button>
+      <button class="action-btn btn-copy" id="copy-${code}" onclick="copyMsg('${code}')">
+        <span class="icon">📋</span>Copy
+      </button>
+    </div>
+
+    <div class="notified-row">
+      <label class="notified-check">
+        <input type="checkbox" ${notified?'checked':''}
+          onchange="markNotified('${code}','${status}',this.checked)">
+        Mark as notified
+      </label>
+      <div class="time-ago">${timeAgo(o.created_at)}</div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function getOrderByCode(code) { return allOrders.find(o => o.tracking_code === code); }
+
+function switchTab(code, tab) {
+  msgTab[code] = tab;
+  // Re-render just this card
+  const o = getOrderByCode(code);
+  if (!o) return;
+  const card = document.getElementById('card-' + code);
+  if (!card) return;
+  const newCard = document.createElement('div');
+  newCard.innerHTML = buildCard(o);
+  card.replaceWith(newCard.firstElementChild);
+}
+
+function openWA(code) {
+  const o = getOrderByCode(code);
+  if (!o) return;
+  const tab = msgTab[code] || 'sender';
+  const msg = buildMessage(o, tab === 'recipient');
+  const phone = ((tab === 'recipient' ? o.recipient_phone : o.phone) || '').replace(/[\s\-\(\)]/g,'').replace(/^0/,'233');
+  if (!phone) { alert('No phone number available.'); return; }
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  // Auto-mark as notified after opening WA
+  setTimeout(() => {
+    if (!isNotified(code, o.status)) {
+      localStorage.setItem(notifKey(code, o.status), '1');
+      updateStats();
+    }
+  }, 2000);
+}
+
+function openSMS(code) {
+  const o = getOrderByCode(code);
+  if (!o) return;
+  const tab = msgTab[code] || 'sender';
+  const msg = buildMessage(o, tab === 'recipient');
+  const phone = (tab === 'recipient' ? o.recipient_phone : o.phone) || '';
+  if (!phone) { alert('No phone number available.'); return; }
+  window.open(`sms:${phone}?body=${encodeURIComponent(msg)}`);
+  setTimeout(() => {
+    if (!isNotified(code, o.status)) {
+      localStorage.setItem(notifKey(code, o.status), '1');
+      updateStats();
+    }
+  }, 2000);
+}
+
+function copyMsg(code) {
+  const o = getOrderByCode(code);
+  if (!o) return;
+  const tab = msgTab[code] || 'sender';
+  const msg = buildMessage(o, tab === 'recipient');
+  navigator.clipboard.writeText(msg).then(() => {
+    const btn = document.getElementById('copy-' + code);
+    if (btn) {
+      btn.classList.add('copied');
+      btn.innerHTML = '<span class="icon">✅</span>Copied!';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = '<span class="icon">📋</span>Copy';
+      }, 2000);
+    }
+  }).catch(() => {
+    // Fallback
+    const el = document.createElement('textarea');
+    el.value = msg; el.style.position = 'fixed'; el.style.opacity = '0';
+    document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    alert('Message copied!');
+  });
+}
+
+// Auto-refresh every 60 seconds
+setInterval(() => {
+  if (sessionStorage.getItem('zygo_notify_auth') === '1') loadOrders();
+}, 60000);
+</script>
+</body>
+</html>

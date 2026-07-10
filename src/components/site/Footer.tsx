@@ -22,7 +22,7 @@ const MAP_URL = "https://maps.app.goo.gl/BRcQmznphU7dfKjE8";
 
 const EMAIL = "support@zygoexpress.com";
 
-const MOMO_NUMBER = "0240393582";
+const MOMO_NUMBER = "0559382734";
 
 const SOCIALS = [
   {

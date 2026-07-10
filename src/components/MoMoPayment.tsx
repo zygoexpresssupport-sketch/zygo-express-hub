@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const MOMO_NUMBER = "0240393582";
+const MOMO_NUMBER = "0559382734";
 const MOMO_NAME   = "Zygo Express";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

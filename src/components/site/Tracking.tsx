@@ -217,7 +217,7 @@ export const Tracking = () => {
                     </span>
                   </div>
                   <div className="text-sm text-gray-600">
-                    Send to <strong className="text-gray-900">0240393582</strong> (Zygo Express) via MTN *170#
+                    Send to <strong className="text-gray-900">0559382734</strong> (Zygo Express) via MTN *170#
                   </div>
                   <div>
                     <div className="text-xs text-gray-400 mb-1.5">MoMo Reference</div>

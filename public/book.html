@@ -4,1174 +4,355 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <meta name="theme-color" content="#f97316"/>
-<title>Zygo Express — Book Delivery</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Book a Delivery — Zygo Express Wa</title>
+<meta name="description" content="Book same-day motorcycle delivery in Wa, Ghana. Pay with MTN MoMo, Vodafone Cash, AirtelTigo or card. From GHS 13."/>
+<meta name="robots" content="noindex"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://js.paystack.co/v2/inline.js"></script>
 <style>
-:root{
-  --orange:#f97316;
-  --orange-deep:#c2410c;
-  --amber:#f59e0b;
-  --amber-light:#fef3c7;
-  --ink:#0f0f0f;
-  --ink2:#1c1917;
-  --paper:#fafaf9;
-  --stone:#e8e4dc;
-  --stone2:#f5f3ef;
-  --muted:#9c9589;
-  --green:#16a34a;
-  --green-light:#f0fdf4;
-  --red:#dc2626;
-  --blue:#1d4ed8;
-  --r:14px;
-  --r-sm:10px;
-}
+:root{--orange:#f97316;--orange-d:#c2410c;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;--muted:#78716c;--green:#16a34a;--r:14px;}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-behavior:smooth;}
-body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
-
-/* ── TOPBAR ── */
-.topbar{
-  padding:14px 20px;display:flex;align-items:center;justify-content:space-between;
-  background:var(--ink);position:sticky;top:0;z-index:100;
-  box-shadow:0 2px 20px rgba(0,0,0,0.4);
-}
-.logo{display:flex;align-items:center;gap:10px;}
-.logo-mark{
-  width:36px;height:36px;background:var(--orange);border-radius:10px;
-  display:grid;place-items:center;font-family:'Syne',sans-serif;
-  font-weight:900;font-size:14px;color:white;
-  box-shadow:0 0 12px rgba(249,115,22,0.5);
-}
-.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:white;letter-spacing:-0.5px;}
+body{background:var(--paper);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+a{color:inherit;text-decoration:none;}
+.topbar{background:var(--ink);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.logo{display:flex;align-items:center;gap:9px;}
+.logo-mark{width:32px;height:32px;background:var(--orange);border-radius:8px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:13px;color:white;}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:white;letter-spacing:-0.3px;}
 .logo-name em{color:var(--orange);font-style:normal;}
-.topbar-badge{
-  background:linear-gradient(135deg,rgba(249,115,22,0.2),rgba(245,158,11,0.15));
-  color:#fb923c;font-size:11px;font-weight:700;padding:6px 12px;
-  border-radius:20px;border:1px solid rgba(249,115,22,0.3);letter-spacing:0.3px;
-}
-
-/* ── HERO ── */
-.hero{
-  background:var(--ink);padding:36px 20px 52px;
-  position:relative;overflow:hidden;
-}
-.hero-bg-1{
-  position:absolute;top:-60px;right:-60px;width:240px;height:240px;
-  background:radial-gradient(circle,rgba(249,115,22,0.18) 0%,transparent 70%);
-  border-radius:50%;
-}
-.hero-bg-2{
-  position:absolute;bottom:-40px;left:-40px;width:180px;height:180px;
-  background:radial-gradient(circle,rgba(245,158,11,0.12) 0%,transparent 70%);
-  border-radius:50%;
-}
-.hero-bg-3{
-  position:absolute;top:50%;right:20px;transform:translateY(-50%);
-  width:3px;height:80px;
-  background:linear-gradient(to bottom,transparent,rgba(249,115,22,0.4),transparent);
-  border-radius:2px;
-}
-.hero-tag{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(249,115,22,0.15);color:var(--orange);
-  font-size:11px;font-weight:700;padding:6px 14px;border-radius:6px;
-  margin-bottom:16px;letter-spacing:0.8px;text-transform:uppercase;
-  border:1px solid rgba(249,115,22,0.25);position:relative;z-index:1;
-}
-.hero-tag::before{content:'';width:6px;height:6px;background:var(--orange);border-radius:50%;animation:pulse 1.5s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.3);}}
-
-.hero-title{
-  font-family:'Syne',sans-serif;font-weight:900;
-  font-size:36px;color:white;line-height:1.0;
-  letter-spacing:-1.5px;margin-bottom:12px;position:relative;z-index:1;
-}
-.hero-title .line1{display:block;color:rgba(255,255,255,0.6);font-size:26px;letter-spacing:-0.5px;margin-bottom:2px;}
-.hero-title .line2{display:block;}
-.hero-title .hl{
-  color:transparent;
-  background:linear-gradient(90deg,var(--orange),var(--amber));
-  -webkit-background-clip:text;background-clip:text;
-}
-.hero-sub{color:rgba(255,255,255,0.45);font-size:14px;line-height:1.7;max-width:300px;position:relative;z-index:1;}
-.hero-sub strong{color:rgba(255,255,255,0.75);font-weight:600;}
-
-/* ── ZONE CARDS ── */
-.zone-wrap{background:var(--ink);padding:0 16px 24px;}
-.zone-label{
-  font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);
-  text-transform:uppercase;letter-spacing:1.5px;padding:16px 0 10px;
-}
-.zone-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-.zone-card{
-  border-radius:12px;padding:12px 6px;text-align:center;
-  cursor:default;position:relative;overflow:hidden;
-  transition:transform 0.2s,box-shadow 0.2s;
-  border:1px solid rgba(255,255,255,0.07);
-  background:rgba(255,255,255,0.04);
-}
-.zone-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(249,115,22,0),rgba(249,115,22,0));
-  transition:background 0.25s;
-}
-.zone-card.active{
-  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
-  border-color:var(--orange);
-  box-shadow:0 4px 20px rgba(249,115,22,0.4);
-  transform:translateY(-2px);
-}
-.zone-ghs{font-size:9px;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
-.zone-card.active .zone-ghs{color:rgba(255,255,255,0.7);}
-.zone-price{
-  font-family:'Syne',sans-serif;font-weight:900;font-size:18px;
-  color:var(--orange);line-height:1;margin:3px 0;
-}
-.zone-card.active .zone-price{color:white;}
-.zone-km{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;}
-.zone-card.active .zone-km{color:rgba(255,255,255,0.75);}
-.zone-name{
-  font-size:8px;color:rgba(255,255,255,0.2);text-transform:uppercase;
-  letter-spacing:0.8px;margin-top:3px;font-weight:600;
-}
-.zone-card.active .zone-name{color:rgba(255,255,255,0.65);}
-
-/* ── FORM WRAP ── */
-.form-wrap{padding:0 14px 0;background:var(--ink);}
-.form-card{
-  background:var(--paper);border-radius:22px 22px 0 0;padding:30px 18px 24px;
-  position:relative;box-shadow:0 -8px 40px rgba(0,0,0,0.25);
-}
-.form-card::before{
-  content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);
-  width:40px;height:4px;background:var(--stone);border-radius:2px;
-}
-
-/* Section headers */
-.section-head{
-  display:flex;align-items:center;gap:10px;
-  margin-bottom:14px;margin-top:24px;
-}
-.section-head:first-of-type{margin-top:0;}
-.section-icon{
-  width:32px;height:32px;border-radius:9px;
-  display:grid;place-items:center;font-size:15px;flex-shrink:0;
-}
-.section-icon.amber{background:#fef3c7;}
-.section-icon.orange{background:#fff7ed;}
-.section-icon.green{background:#f0fdf4;}
-.section-icon.blue{background:#eff6ff;}
-.section-icon.purple{background:#faf5ff;}
-.section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:var(--ink);}
-.section-badge{
-  margin-left:auto;font-size:10px;font-weight:700;
-  padding:3px 8px;border-radius:20px;letter-spacing:0.3px;
-}
-.section-badge.required{background:#fef2f2;color:var(--red);}
-.section-badge.optional{background:var(--stone2);color:var(--muted);}
-
-/* Input fields */
-.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.input-wrap{margin-bottom:10px;position:relative;}
-.input-label{
-  font-size:11px;font-weight:700;color:var(--muted);margin-bottom:5px;
-  display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:0.6px;
-}
-.required-dot{color:var(--red);font-size:14px;line-height:1;}
-.input-field{
-  width:100%;background:white;border:2px solid var(--stone);border-radius:var(--r-sm);
-  padding:13px 14px;font-size:15px;font-family:'Inter',sans-serif;
-  color:var(--ink);outline:none;
-  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
-  -webkit-appearance:none;
-}
-.input-field:focus{
-  border-color:var(--orange);
-  box-shadow:0 0 0 4px rgba(249,115,22,0.12);
-  background:#fff;
-}
+.hero-strip{background:linear-gradient(135deg,var(--ink),#1a1a1a);padding:28px 20px 32px;text-align:center;}
+.hero-strip h1{font-family:'Syne',sans-serif;font-weight:900;font-size:clamp(22px,5vw,32px);color:white;letter-spacing:-1px;margin-bottom:8px;}
+.hero-strip h1 em{color:var(--orange);font-style:normal;}
+.hero-strip p{color:rgba(255,255,255,0.5);font-size:14px;line-height:1.6;}
+.progress-wrap{background:#1a1a1a;padding:16px 20px;display:flex;align-items:center;justify-content:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);}
+.step-dot{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.3);font-weight:600;}
+.step-dot .dot{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);display:grid;place-items:center;font-size:11px;font-weight:700;transition:all 0.3s;}
+.step-dot.active .dot{background:var(--orange);border-color:var(--orange);color:white;}
+.step-dot.done .dot{background:var(--green);border-color:var(--green);color:white;}
+.step-dot.active{color:var(--orange);}
+.step-line{width:32px;height:2px;background:rgba(255,255,255,0.1);border-radius:2px;}
+.step-line.done{background:var(--green);}
+.form-wrap{max-width:520px;margin:0 auto;padding:24px 20px 80px;}
+.form-section{margin-bottom:24px;}
+.section-label{font-size:11px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.input-group{margin-bottom:12px;}
+.input-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;}
+.req{color:var(--orange);}
+.input-field{width:100%;background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:13px 16px;font-size:15px;color:var(--ink);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;}
+.input-field:focus{border-color:var(--orange);}
 .input-field::placeholder{color:#c4c0bb;}
-.input-field.has-icon{padding-left:40px;}
-.input-icon{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  font-size:16px;pointer-events:none;
-}
-textarea.input-field{min-height:76px;resize:none;padding:13px 14px;}
-
-/* Counter badges on phone inputs */
-.phone-counter{
-  position:absolute;right:12px;top:50%;transform:translateY(-50%);
-  font-size:11px;font-weight:700;color:var(--muted);
-  background:var(--stone2);padding:2px 7px;border-radius:20px;
-  pointer-events:none;transition:color 0.2s,background 0.2s;
-}
-.phone-counter.ok{color:var(--green);background:#f0fdf4;}
-.phone-counter.err{color:var(--red);background:#fef2f2;}
-
-.divider{height:1px;background:var(--stone);margin:18px 0;}
-
-/* ── ROUTE SECTION ── */
-.route-group{position:relative;padding-left:0;}
-.route-track-wrap{
-  position:absolute;left:20px;top:58px;bottom:56px;
-  display:flex;flex-direction:column;align-items:center;width:2px;
-  z-index:1;
-}
-.route-line{flex:1;width:2px;background:repeating-linear-gradient(to bottom,var(--amber) 0px,var(--amber) 5px,transparent 5px,transparent 10px);}
-.route-dot{
-  width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-left:-6px;
-  position:absolute;
-}
-.route-dot-top{top:18px;background:var(--amber);box-shadow:0 0 0 4px rgba(245,158,11,0.2);}
-.route-dot-bot{bottom:18px;background:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,0.2);}
-.route-group .input-field{padding-left:42px;}
-
-/* Autocomplete */
-.suggestions{
-  position:absolute;top:100%;left:0;right:0;z-index:999;
-  background:white;border:2px solid var(--stone);border-top:none;
-  border-radius:0 0 12px 12px;max-height:200px;overflow-y:auto;
-  box-shadow:0 10px 30px rgba(0,0,0,0.12);display:none;
-}
-.suggestion-item{
-  padding:11px 14px;cursor:pointer;font-size:14px;
-  border-bottom:1px solid #f5f5f5;color:var(--ink);
-  display:flex;align-items:center;gap:9px;transition:background 0.1s;
-}
-.suggestion-item:hover{background:#fff7f0;}
-.suggestion-item .sug-icon{color:var(--orange);}
-.suggestion-item:last-child{border-bottom:none;}
-
-/* ── PRICE REVEAL ── */
-.price-reveal{
-  background:linear-gradient(135deg,#fff7ed,#fffbeb);
-  border:2px solid #fed7aa;border-radius:var(--r);
-  padding:16px;display:none;margin-bottom:14px;
-  position:relative;overflow:hidden;
-}
-.price-reveal::after{
-  content:'GHS';position:absolute;right:-8px;top:-8px;
-  font-family:'Syne',sans-serif;font-weight:900;font-size:60px;
-  color:rgba(249,115,22,0.06);pointer-events:none;letter-spacing:-2px;
-}
-.price-top{display:flex;align-items:flex-start;justify-content:space-between;}
-.price-label{font-size:10px;font-weight:800;color:#c2410c;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
-.price-zone{font-size:13px;color:var(--muted);font-weight:500;}
-.price-dist{font-size:11px;color:#d97706;margin-top:3px;font-weight:600;}
-.price-amount{
-  font-family:'Syne',sans-serif;font-weight:900;font-size:36px;
-  color:var(--orange);letter-spacing:-2px;line-height:1;
-}
-
-/* ── SUBMIT ── */
-.submit-section{padding:0 14px 48px;background:var(--paper);}
-.trust-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:8px;padding:0 0 18px;
-}
-.trust-item{
-  background:white;border:1.5px solid var(--stone);border-radius:12px;
-  padding:12px 8px;text-align:center;
-}
-.trust-item .t-icon{font-size:20px;margin-bottom:4px;display:block;}
-.trust-item .t-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.3px;}
-.trust-item .t-val{font-size:12px;color:var(--ink);font-weight:700;margin-top:1px;}
-
-.submit-btn{
-  width:100%;padding:18px;border:none;cursor:pointer;
-  background:linear-gradient(135deg,var(--orange) 0%,var(--orange-deep) 100%);
-  color:white;border-radius:var(--r);
-  font-family:'Syne',sans-serif;font-size:17px;font-weight:900;
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  letter-spacing:-0.3px;position:relative;overflow:hidden;
-  box-shadow:0 4px 20px rgba(249,115,22,0.4);
-  transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;
-}
-.submit-btn::before{
-  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);
-  animation:shimmer 2.5s ease infinite;
-}
-@keyframes shimmer{0%{left:-100%;}100%{left:200%;}}
-.submit-btn:active{transform:scale(0.98);box-shadow:0 2px 10px rgba(249,115,22,0.3);}
-.submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;animation:none;}
-
-.submit-note{
-  text-align:center;font-size:12px;color:var(--muted);
-  margin-top:12px;display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.submit-note::before{content:'🔒';font-size:12px;}
-
-/* ── ERROR ── */
-.error-msg{
-  background:#fef2f2;border:2px solid #fecaca;color:var(--red);
-  padding:13px 15px;border-radius:var(--r-sm);font-size:13px;
-  margin-bottom:14px;display:none;font-weight:500;
-  display:flex;align-items:flex-start;gap:8px;
-}
-.error-msg.show{display:flex;}
-.error-msg::before{content:'⚠';flex-shrink:0;}
-
-/* ── SUCCESS ── */
-#screen-success{display:none;}
-.success-top{
-  background:var(--ink);padding:56px 20px 72px;text-align:center;
-  position:relative;overflow:hidden;
-}
-.confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
-.confetti-dot{
-  position:absolute;border-radius:2px;
-  animation:fall linear infinite;
-  opacity:0.7;
-}
-@keyframes fall{
-  0%{transform:translateY(-20px) rotate(0deg);opacity:0.8;}
-  100%{transform:translateY(120%) rotate(360deg);opacity:0;}
-}
-.success-ring{
-  width:88px;height:88px;border-radius:50%;margin:0 auto 22px;
-  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
-  display:grid;place-items:center;font-size:38px;
-  position:relative;z-index:1;
-  box-shadow:0 0 0 12px rgba(249,115,22,0.15),0 0 40px rgba(249,115,22,0.3);
-  animation:popIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.success-title{
-  font-family:'Syne',sans-serif;font-weight:900;font-size:30px;
-  color:white;letter-spacing:-1.2px;margin-bottom:8px;position:relative;z-index:1;
-}
-.success-sub{color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7;position:relative;z-index:1;}
-.success-sub strong{color:rgba(255,255,255,0.8);}
-
-.success-body{padding:0 14px 48px;background:var(--paper);}
-
-/* Tracking code */
-.code-block{
-  background:var(--ink);border-radius:18px;padding:26px 20px;
-  text-align:center;margin-top:-28px;margin-bottom:14px;
-  position:relative;z-index:2;
-  box-shadow:0 -4px 30px rgba(0,0,0,0.2);
-}
-.code-label{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
-.code-value{
-  font-family:'Syne',sans-serif;font-weight:900;font-size:34px;
-  color:var(--orange);letter-spacing:5px;
-  text-shadow:0 0 30px rgba(249,115,22,0.4);
-}
-.code-hint{font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px;}
-.copy-code-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  background:rgba(249,115,22,0.15);color:var(--orange);
-  border:1px solid rgba(249,115,22,0.3);border-radius:9px;
-  padding:9px 18px;font-size:12px;font-weight:700;cursor:pointer;
-  margin-top:14px;font-family:'Inter',sans-serif;
-  transition:background 0.15s;
-}
-.copy-code-btn:active{background:rgba(249,115,22,0.25);}
-
-/* Summary card */
-.summary-card{
-  background:white;border:2px solid var(--stone);border-radius:var(--r);
-  overflow:hidden;margin-bottom:12px;
-}
-.summary-card-head{
-  padding:12px 16px;background:var(--stone2);
-  font-size:10px;font-weight:800;color:var(--muted);
-  text-transform:uppercase;letter-spacing:1.2px;
-  border-bottom:1px solid var(--stone);
-}
-.summary-row{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:11px 16px;border-bottom:1px solid var(--stone);font-size:13px;
-}
-.summary-row:last-child{border-bottom:none;}
-.summary-key{color:var(--muted);font-weight:500;}
-.summary-val{font-weight:700;text-align:right;max-width:58%;color:var(--ink);}
-.summary-val.price{
-  color:var(--orange);font-family:'Syne',sans-serif;font-size:18px;font-weight:900;
-}
-
-/* MoMo card */
-.momo-card{
-  background:white;border:2px solid #fcd34d;border-radius:var(--r);
-  overflow:hidden;margin-bottom:14px;
-}
-.momo-header{
-  background:linear-gradient(135deg,#fffbeb,#fef3c7);padding:16px;
-  display:flex;align-items:center;gap:13px;border-bottom:1.5px solid #fde68a;
-}
-.momo-icon{font-size:28px;}
-.momo-title{font-family:'Syne',sans-serif;font-weight:900;font-size:15px;color:#92400e;}
-.momo-sub{font-size:12px;color:#b45309;margin-top:2px;font-weight:500;}
-
-.momo-number-wrap{padding:18px;text-align:center;border-bottom:1.5px solid #fde68a;}
-.momo-label-sm{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:7px;font-weight:700;}
-.momo-number{font-family:'Syne',sans-serif;font-size:28px;font-weight:900;color:var(--ink);letter-spacing:3px;}
-.momo-name-sm{font-size:12px;color:var(--muted);margin-top:5px;}
-.momo-copy-btn{
-  margin-top:12px;padding:9px 22px;
-  background:linear-gradient(135deg,#f59e0b,#d97706);
-  color:white;border:none;border-radius:9px;
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
-  box-shadow:0 2px 10px rgba(245,158,11,0.3);
-}
-
-.momo-ref-box{
-  background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;
-  padding:12px 16px;margin:14px 16px;
-}
-.momo-ref-label{font-size:11px;color:#b45309;font-weight:800;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px;}
-.momo-ref-code{font-family:monospace;font-size:18px;font-weight:700;color:var(--ink);letter-spacing:2px;}
-
-.momo-steps{padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1.5px solid #fde68a;}
-.momo-step{display:flex;align-items:flex-start;gap:11px;font-size:13px;line-height:1.55;color:#57534e;}
-.step-num{
-  width:22px;height:22px;border-radius:50%;
-  background:linear-gradient(135deg,#f59e0b,var(--orange));
-  color:white;display:grid;place-items:center;
-  font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px;
-}
-.momo-note{padding:12px 16px;font-size:12px;color:#b45309;background:#fffbeb;font-weight:500;}
-
-.btn-primary{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  width:100%;padding:16px;
-  background:linear-gradient(135deg,var(--orange),var(--orange-deep));
-  color:white;border:none;border-radius:var(--r);
-  font-family:'Syne',sans-serif;font-size:15px;font-weight:900;
-  text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;
-  letter-spacing:-0.3px;box-shadow:0 4px 16px rgba(249,115,22,0.35);
-}
-.btn-ghost{
-  display:block;width:100%;padding:14px;background:white;
-  border:2px solid var(--stone);color:var(--ink);border-radius:var(--r);
-  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
-  text-align:center;cursor:pointer;transition:border-color 0.15s;
-}
-.btn-ghost:hover{border-color:var(--orange);}
-
-/* ── SPINNER ── */
-.spinner{
-  width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);
-  border-top-color:white;border-radius:50%;
-  animation:spin 0.7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* ── OTP OVERLAY ── */
-.otp-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  z-index:500;display:none;align-items:flex-end;justify-content:center;
-  backdrop-filter:blur(4px);
-}
-.otp-overlay.show{display:flex;}
-.otp-box{
-  background:var(--paper);border-radius:22px 22px 0 0;
-  padding:28px 18px 44px;width:100%;max-width:480px;
-  animation:slideUp 0.3s cubic-bezier(0.34,1.2,0.64,1);
-}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.otp-title{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;margin-bottom:6px;letter-spacing:-0.5px;}
-.otp-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.65;}
-.otp-code-display{
-  background:linear-gradient(135deg,#fff7ed,#fffbeb);
-  border:2px solid var(--orange);border-radius:var(--r);
-  padding:18px;text-align:center;margin-bottom:18px;
-}
-.otp-code-label{font-size:10px;color:#c2410c;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px;}
-.otp-code-value{font-family:'Syne',sans-serif;font-size:34px;font-weight:900;color:var(--orange);letter-spacing:5px;}
-.otp-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
-.otp-step{display:flex;align-items:flex-start;gap:12px;background:white;border:1.5px solid var(--stone);border-radius:12px;padding:13px;}
-.otp-step-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--orange),var(--orange-deep));color:white;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
-.otp-step-text{font-size:13px;line-height:1.55;color:var(--ink);}
-.otp-wa-btn{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:16px;background:#25D366;color:white;border:none;
-  border-radius:var(--r);font-family:'Syne',sans-serif;
-  font-size:16px;font-weight:900;cursor:pointer;margin-bottom:10px;
-  text-decoration:none;letter-spacing:-0.3px;
-  box-shadow:0 4px 16px rgba(37,211,102,0.3);
-}
-.otp-verify-row{display:flex;gap:10px;margin-top:14px;}
-.otp-input{
-  flex:1;padding:14px;border:2px solid var(--stone);border-radius:12px;
-  font-size:20px;font-family:monospace;font-weight:700;
-  text-align:center;letter-spacing:5px;outline:none;
-}
-.otp-input:focus{border-color:var(--orange);}
-.otp-verify-btn{
-  padding:14px 18px;background:var(--ink);color:white;border:none;
-  border-radius:12px;font-family:'Syne',sans-serif;font-weight:800;
-  font-size:14px;cursor:pointer;white-space:nowrap;
-}
-.otp-verify-btn:disabled{opacity:0.5;}
-.otp-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;display:none;font-weight:600;}
-.otp-err.show{display:block;}
-.otp-manual-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.65;margin-top:12px;}
-
-.verified-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  background:var(--green-light);border:1px solid #bbf7d0;
-  color:var(--green);font-size:11px;font-weight:700;
-  padding:3px 9px;border-radius:20px;margin-left:6px;
-}
+.input-field.error{border-color:#dc2626;}
+.field-hint{font-size:11px;color:var(--muted);margin-top:4px;}
+.field-hint.err{color:#dc2626;}
+.phone-wrap{position:relative;}
+.phone-count{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:700;color:var(--muted);}
+.phone-count.valid{color:var(--green);}
+.pkg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.pkg-btn{background:white;border:1.5px solid var(--stone);border-radius:var(--r);padding:12px 10px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.pkg-btn.selected{border-color:var(--orange);background:#fff7ed;}
+.pkg-icon{font-size:22px;margin-bottom:4px;}
+.pkg-name{font-size:12px;font-weight:700;color:var(--ink);}
+.price-preview{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1.5px solid #fed7aa;border-radius:16px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.price-label{font-size:13px;color:var(--orange-d);font-weight:600;}
+.price-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:28px;color:var(--orange);letter-spacing:-1px;}
+.price-note{font-size:11px;color:var(--muted);margin-top:2px;}
+.pay-methods{background:white;border:1.5px solid var(--stone);border-radius:16px;padding:16px 18px;margin-bottom:16px;}
+.pay-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;}
+.pay-icons{display:flex;flex-wrap:wrap;gap:8px;}
+.pay-icon{background:#f9f6f2;border:1px solid var(--stone);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.pay-badge{background:rgba(22,163,74,0.1);border:1px solid rgba(22,163,74,0.2);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:800;color:var(--green);}
+.submit-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--orange),var(--orange-d));border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:17px;font-weight:900;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;}
+.submit-btn:active{opacity:0.9;}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.submit-btn.loading .spinner{display:block;}
+.submit-btn.loading .btn-text{display:none;}
+.security-note{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:var(--muted);justify-content:center;}
+#success-screen,#payment-screen{display:none;max-width:520px;margin:0 auto;padding:40px 20px;}
+.card{background:white;border:1.5px solid var(--stone);border-radius:20px;padding:32px 24px;text-align:center;}
+.success-icon{width:72px;height:72px;background:rgba(22,163,74,0.1);border-radius:50%;display:grid;place-items:center;font-size:32px;margin:0 auto 20px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:900;font-size:24px;margin-bottom:8px;letter-spacing:-0.5px;}
+.card-sub{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:24px;}
+.tracking-box{background:#f9f6f2;border:1.5px solid var(--stone);border-radius:var(--r);padding:16px;margin-bottom:20px;}
+.tracking-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.tracking-code{font-family:monospace;font-size:24px;font-weight:700;color:var(--orange);letter-spacing:2px;}
+.actions{display:flex;flex-direction:column;gap:10px;}
+.abtn{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:var(--r);font-size:14px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;border:none;}
+.abtn-primary{background:var(--orange);color:white;}
+.abtn-secondary{background:white;color:var(--ink);border:1.5px solid var(--stone);}
+.abtn-wa{background:#25D366;color:white;}
+.pay-btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;}
+.pay-btn-main{background:var(--orange);color:white;}
+.pay-btn-alt{background:white;color:var(--ink);border:1.5px solid var(--stone);font-size:14px;}
+.momo-box{background:#f9f6f2;border-radius:12px;padding:16px;margin-top:12px;text-align:left;display:none;}
 </style>
 </head>
 <body>
+<nav class="topbar">
+  <a href="https://zygoexpress.com" class="logo">
+    <div class="logo-mark">Z</div>
+    <div class="logo-name">Zygo<em>Express</em></div>
+  </a>
+  <span style="font-size:12px;color:rgba(255,255,255,0.4);">Wa, Ghana 🇬🇭</span>
+</nav>
 
-<!-- ══════════════════════════════════
-     BOOKING FORM SCREEN
-══════════════════════════════════ -->
-<div id="screen-form">
+<div class="hero-strip">
+  <h1>Book Your <em>Delivery</em></h1>
+  <p>Fill in the details below. Payment is collected securely after booking.<br>Average pickup: 28 minutes.</p>
+</div>
 
-  <div class="topbar">
-    <div class="logo">
-      <div class="logo-mark">ZE</div>
-      <div class="logo-name">Zygo<em>Express</em></div>
+<div class="progress-wrap">
+  <div class="step-dot active" id="step1"><div class="dot" id="dot1">1</div><span>Details</span></div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-dot" id="step2"><div class="dot" id="dot2">2</div><span>Payment</span></div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-dot" id="step3"><div class="dot" id="dot3">3</div><span>Confirmed</span></div>
+</div>
+
+<!-- FORM -->
+<div id="form-screen">
+<div class="form-wrap">
+  <div class="form-section">
+    <div class="section-label">👤 Sender Details</div>
+    <div class="input-group">
+      <div class="input-label">Your Name <span class="req">*</span></div>
+      <input class="input-field" type="text" id="sname" placeholder="e.g. Fatima Abdulai" autocomplete="name"/>
     </div>
-    <div class="topbar-badge">📍 Wa, Ghana</div>
-  </div>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-bg-1"></div>
-    <div class="hero-bg-2"></div>
-    <div class="hero-bg-3"></div>
-    <div class="hero-tag">⚡ Book in 60 seconds</div>
-    <div class="hero-title">
-      <span class="line1">Your parcel.</span>
-      <span class="line2">Delivered <span class="hl">fast.</span></span>
+    <div class="input-group">
+      <div class="input-label">Your Phone (WhatsApp) <span class="req">*</span></div>
+      <div class="phone-wrap">
+        <input class="input-field" type="tel" id="sphone" placeholder="e.g. 0244 123 456" inputmode="numeric" maxlength="13" oninput="cph(this,'sc')"/>
+        <span class="phone-count" id="sc">0/10</span>
+      </div>
+      <div class="field-hint" id="sphone-hint">Must be a valid Ghana number starting with 0</div>
     </div>
-    <div class="hero-sub">Same-day pickups across <strong>Wa & Upper West</strong>. Real-time tracking with every order.</div>
-  </div>
-
-  <!-- Zone pricing -->
-  <div class="zone-wrap">
-    <div class="zone-label">📦 Pricing Zones · Road Distance</div>
-    <div class="zone-row">
-      <div class="zone-card" id="zone-1">
-        <div class="zone-ghs">GHS</div>
-        <div class="zone-price">13</div>
-        <div class="zone-km">0–2 km</div>
-        <div class="zone-name">Zone 1</div>
-      </div>
-      <div class="zone-card" id="zone-2">
-        <div class="zone-ghs">GHS</div>
-        <div class="zone-price">16</div>
-        <div class="zone-km">2.1–4 km</div>
-        <div class="zone-name">Zone 2</div>
-      </div>
-      <div class="zone-card" id="zone-3">
-        <div class="zone-ghs">GHS</div>
-        <div class="zone-price">20</div>
-        <div class="zone-km">4.1–6 km</div>
-        <div class="zone-name">Zone 3</div>
-      </div>
-      <div class="zone-card" id="zone-4">
-        <div class="zone-ghs">GHS</div>
-        <div class="zone-price">30</div>
-        <div class="zone-km">6.1–9 km</div>
-        <div class="zone-name">Zone 4</div>
-      </div>
+    <div class="input-group">
+      <div class="input-label">Email (optional — for payment receipt)</div>
+      <input class="input-field" type="email" id="semail" placeholder="e.g. fatima@email.com"/>
     </div>
   </div>
-
-  <!-- Form -->
-  <div class="form-wrap">
-    <div class="form-card">
-
-      <div class="error-msg" id="error-box"></div>
-
-      <!-- SENDER -->
-      <div class="section-head">
-        <div class="section-icon amber">👤</div>
-        <div class="section-title">Your Details</div>
-        <span class="section-badge required">Required</span>
+  <div class="form-section">
+    <div class="section-label">📬 Recipient Details</div>
+    <div class="input-group">
+      <div class="input-label">Recipient Name <span class="req">*</span></div>
+      <input class="input-field" type="text" id="rname" placeholder="Who is receiving the parcel?"/>
+    </div>
+    <div class="input-group">
+      <div class="input-label">Recipient Phone <span class="req">*</span></div>
+      <div class="phone-wrap">
+        <input class="input-field" type="tel" id="rphone" placeholder="e.g. 0554 987 654" inputmode="numeric" maxlength="13" oninput="cph(this,'rc')"/>
+        <span class="phone-count" id="rc">0/10</span>
       </div>
-      <div class="input-grid">
-        <div class="input-wrap">
-          <label class="input-label">Full Name <span class="required-dot">*</span></label>
-          <input class="input-field" type="text" id="f-name" placeholder="Janet Musah" required autocomplete="name"/>
-        </div>
-        <div class="input-wrap" style="position:relative">
-          <label class="input-label">Phone Number <span class="required-dot">*</span></label>
-          <input class="input-field" type="tel" id="f-phone" placeholder="0244 123 456"
-            required maxlength="13" inputmode="tel" autocomplete="tel"
-            oninput="updateCounter(this,'phone-counter-1')"/>
-          <span class="phone-counter" id="phone-counter-1">0/10</span>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- ROUTE -->
-      <div class="section-head">
-        <div class="section-icon orange">📍</div>
-        <div class="section-title">Delivery Route</div>
-        <span class="section-badge required">Auto-priced</span>
-      </div>
-      <div class="route-group">
-        <div class="route-track-wrap">
-          <div class="route-dot route-dot-top"></div>
-          <div class="route-line"></div>
-          <div class="route-dot route-dot-bot"></div>
-        </div>
-        <div class="input-wrap">
-          <label class="input-label">Pickup Location <span class="required-dot">*</span></label>
-          <span class="input-icon">🟡</span>
-          <input class="input-field has-icon" type="text" id="f-pickup"
-            placeholder="e.g. Kpaguri, Wa Hospital" required autocomplete="off"/>
-          <div class="suggestions" id="pickup-suggestions"></div>
-        </div>
-        <div class="input-wrap" style="margin-top:10px">
-          <label class="input-label">Drop-off Location <span class="required-dot">*</span></label>
-          <span class="input-icon">🔴</span>
-          <input class="input-field has-icon" type="text" id="f-dropoff"
-            placeholder="e.g. Jahan, SSNIT, Dobile" required autocomplete="off"/>
-          <div class="suggestions" id="dropoff-suggestions"></div>
-        </div>
-      </div>
-
-      <!-- Price reveal -->
-      <div class="price-reveal" id="price-reveal">
-        <div class="price-top">
-          <div>
-            <div class="price-label">Estimated Cost</div>
-            <div class="price-zone" id="p-zone">Calculating…</div>
-            <div class="price-dist" id="p-dist"></div>
-          </div>
-          <div class="price-amount" id="p-amount">—</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- RECIPIENT -->
-      <div class="section-head">
-        <div class="section-icon green">👥</div>
-        <div class="section-title">Recipient Details</div>
-        <span class="section-badge required">Required</span>
-      </div>
-      <div class="input-grid">
-        <div class="input-wrap">
-          <label class="input-label">Recipient Name</label>
-          <input class="input-field" type="text" id="f-rec-name" placeholder="Who receives it?" autocomplete="off"/>
-        </div>
-        <div class="input-wrap" style="position:relative">
-          <label class="input-label">Recipient Phone <span class="required-dot">*</span></label>
-          <input class="input-field" type="tel" id="f-rec-phone"
-            placeholder="0244 000 000" required maxlength="13"
-            inputmode="tel"
-            oninput="updateCounter(this,'phone-counter-2')"/>
-          <span class="phone-counter" id="phone-counter-2">0/10</span>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- PARCEL -->
-      <div class="section-head">
-        <div class="section-icon purple">📦</div>
-        <div class="section-title">Parcel Details</div>
-        <span class="section-badge optional">Optional</span>
-      </div>
-      <div class="input-wrap">
-        <textarea class="input-field" id="f-details"
-          placeholder="Size, weight, fragile items, special instructions…"></textarea>
-      </div>
-
     </div>
   </div>
-
-  <!-- Submit -->
-  <div class="submit-section">
-    <div class="trust-grid">
-      <div class="trust-item">
-        <span class="t-icon">⚡</span>
-        <div class="t-label">Pickup</div>
-        <div class="t-val">Same Day</div>
-      </div>
-      <div class="trust-item">
-        <span class="t-icon">📍</span>
-        <div class="t-label">Tracking</div>
-        <div class="t-val">Live GPS</div>
-      </div>
-      <div class="trust-item">
-        <span class="t-icon">💰</span>
-        <div class="t-label">Price</div>
-        <div class="t-val">From GHS 13</div>
-      </div>
-      <div class="trust-item">
-        <span class="t-icon">🛡️</span>
-        <div class="t-label">Booking</div>
-        <div class="t-val">Secure</div>
-      </div>
+  <div class="form-section">
+    <div class="section-label">📍 Pickup & Drop-Off</div>
+    <div class="input-group">
+      <div class="input-label">Pickup Location <span class="req">*</span></div>
+      <input class="input-field" type="text" id="pickup" placeholder="e.g. Kpaguri, near the mosque"/>
+      <div class="field-hint">Be specific — include landmark and area name</div>
     </div>
-
-    <div style="display:flex;justify-content:center;margin-bottom:16px">
-      <div class="cf-turnstile"
-        data-sitekey="0x4AAAAAADonetaLeSDtIQU7"
-        data-callback="onTurnstileSuccess"
-        data-theme="light"></div>
+    <div class="input-group">
+      <div class="input-label">Drop-off Location <span class="req">*</span></div>
+      <input class="input-field" type="text" id="dropoff" placeholder="e.g. Jahan, behind the post office"/>
     </div>
-
-    <button class="submit-btn" id="submit-btn" onclick="submitBooking()">
-      Confirm Booking <span style="font-size:18px">→</span>
-    </button>
-    <div class="submit-note">No payment needed now · We'll contact you to confirm</div>
   </div>
-
-</div><!-- /screen-form -->
-
-
-<!-- ══════════════════════════════════
-     SUCCESS SCREEN
-══════════════════════════════════ -->
-<div id="screen-success">
-
-  <div class="topbar">
-    <div class="logo">
-      <div class="logo-mark">ZE</div>
-      <div class="logo-name">Zygo<em>Express</em></div>
+  <div class="form-section">
+    <div class="section-label">📦 What Are We Delivering?</div>
+    <div class="pkg-grid">
+      <div class="pkg-btn selected" onclick="sp(this,'Document')"><div class="pkg-icon">📄</div><div class="pkg-name">Document</div></div>
+      <div class="pkg-btn" onclick="sp(this,'Package')"><div class="pkg-icon">📦</div><div class="pkg-name">Package</div></div>
+      <div class="pkg-btn" onclick="sp(this,'Food')"><div class="pkg-icon">🍱</div><div class="pkg-name">Food</div></div>
+      <div class="pkg-btn" onclick="sp(this,'Medicine')"><div class="pkg-icon">💊</div><div class="pkg-name">Medicine</div></div>
     </div>
-    <div class="topbar-badge">✅ Confirmed</div>
   </div>
-
-  <div class="success-top">
-    <div class="confetti-wrap" id="confetti-wrap"></div>
-    <div class="success-ring">✓</div>
-    <div class="success-title">You're booked!</div>
-    <div class="success-sub">Your delivery is confirmed.<br><strong>We'll call you to arrange pickup.</strong></div>
+  <div class="form-section">
+    <div class="section-label">📝 Special Instructions</div>
+    <textarea class="input-field" id="notes" rows="3" placeholder="Any instructions for the rider? e.g. call before arriving, handle with care..."></textarea>
   </div>
-
-  <div class="success-body">
-
-    <!-- Tracking code -->
-    <div class="code-block">
-      <div class="code-label">Your Tracking ID</div>
-      <div class="code-value" id="s-code">ZGX-XXXXXX</div>
-      <div class="code-hint">Save this — use it to track & pay for your delivery</div>
-      <button class="copy-code-btn" onclick="copyCode()" id="copy-code-btn">📋 Copy Tracking ID</button>
-    </div>
-
-    <!-- Summary -->
-    <div class="summary-card">
-      <div class="summary-card-head">Order Summary</div>
-      <div id="s-summary"></div>
-    </div>
-
-    <!-- MoMo -->
-    <div class="momo-card">
-      <div class="momo-header">
-        <div class="momo-icon">📱</div>
-        <div>
-          <div class="momo-title">Pay via MTN MoMo</div>
-          <div class="momo-sub">Send payment to activate your delivery</div>
-        </div>
-      </div>
-      <div class="momo-number-wrap">
-        <div class="momo-label-sm">Send Payment To</div>
-        <div class="momo-number">0559382734</div>
-        <div class="momo-name-sm">Zygo Express</div>
-        <button class="momo-copy-btn" onclick="copyMomo()">Copy Number</button>
-      </div>
-      <div class="momo-ref-box">
-        <div class="momo-ref-label">📋 Use as MoMo Reference</div>
-        <div class="momo-ref-code" id="momo-ref-code">ZGX-XXXXXX</div>
-      </div>
-      <div class="momo-steps">
-        <div class="momo-step"><div class="step-num">1</div>Dial <strong>*170#</strong> on your MTN line</div>
-        <div class="momo-step"><div class="step-num">2</div>Select <strong>Transfer Money → MoMo User</strong></div>
-        <div class="momo-step"><div class="step-num">3</div>Send <strong id="momo-amount">GHS 13</strong> to <strong>0559382734</strong></div>
-        <div class="momo-step"><div class="step-num">4</div>Enter <strong id="momo-ref-step">your tracking ID</strong> as the reference</div>
-      </div>
-      <div class="momo-note">💡 Payment confirms your booking. We'll call once verified.</div>
-    </div>
-
-    <a href="https://zygo-express-hub.lovable.app/#track" class="btn-primary" id="track-link">
-      📍 Track My Parcel
-    </a>
-    <div class="btn-ghost" onclick="bookAnother()">+ Book Another Delivery</div>
-
+  <div class="price-preview">
+    <div><div class="price-label">Estimated delivery cost</div><div class="price-note">Exact price confirmed at dispatch</div></div>
+    <div><div class="price-amount">GHS 13–30</div></div>
   </div>
-</div><!-- /screen-success -->
+  <div class="pay-methods">
+    <div class="pay-title">💳 Accepted payment methods</div>
+    <div class="pay-icons">
+      <div class="pay-icon">📱 MTN MoMo <span class="pay-badge">Instant</span></div>
+      <div class="pay-icon">📱 Vodafone Cash <span class="pay-badge">Instant</span></div>
+      <div class="pay-icon">📱 AirtelTigo <span class="pay-badge">Instant</span></div>
+      <div class="pay-icon">💳 Visa / Mastercard</div>
+    </div>
+  </div>
+  <button class="submit-btn" id="sub-btn" onclick="doBook()">
+    <div class="spinner"></div>
+    <span class="btn-text">📦 Confirm &amp; Pay Securely →</span>
+  </button>
+  <div class="security-note">🔒 Payments secured by Paystack · SSL encrypted</div>
+</div>
+</div>
 
-
-<!-- ══════════════════════════════════
-     OTP OVERLAY (dormant)
-══════════════════════════════════ -->
-<div class="otp-overlay" id="otp-overlay">
-  <div class="otp-box">
-    <div class="otp-title">📱 Verify Your Number</div>
-    <div class="otp-sub">Verify your WhatsApp number to secure your booking. Free and takes 30 seconds.</div>
-    <div class="otp-code-display">
-      <div class="otp-code-label">Your Verification Code</div>
-      <div class="otp-code-value" id="otp-code-display">------</div>
-    </div>
-    <div class="otp-steps">
-      <div class="otp-step"><div class="otp-step-num">1</div><div class="otp-step-text">Tap below — WhatsApp opens with your code pre-filled.</div></div>
-      <div class="otp-step"><div class="otp-step-num">2</div><div class="otp-step-text">Send the message to <strong>0202858011</strong> (Zygo Express).</div></div>
-      <div class="otp-step"><div class="otp-step-num">3</div><div class="otp-step-text">Enter the 6-digit code to confirm.</div></div>
-    </div>
-    <a id="otp-wa-link" href="#" target="_blank" class="otp-wa-btn">
-      <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      Send Code via WhatsApp
-    </a>
-    <div class="otp-verify-row">
-      <input class="otp-input" type="text" id="otp-input" placeholder="000000" maxlength="6" inputmode="numeric"/>
-      <button class="otp-verify-btn" onclick="verifyOTP()" id="otp-verify-btn">Verify →</button>
-    </div>
-    <div class="otp-err" id="otp-err">Incorrect code. Please check and try again.</div>
-    <div class="otp-manual-note">
-      No WhatsApp? Call us: <a href="tel:0202858011" style="color:var(--orange);font-weight:700">0202858011</a>
+<!-- PAYMENT SCREEN -->
+<div id="payment-screen">
+<div class="card" style="margin:40px 20px;">
+  <div style="font-size:40px;margin-bottom:16px;">💳</div>
+  <div class="card-title">Complete Your Payment</div>
+  <div class="card-sub">Your booking <strong id="pay-code"></strong> is reserved.<br>Complete payment to confirm your delivery.</div>
+  <button class="pay-btn pay-btn-main" id="retry-btn" onclick="openPS()">Pay Now with Paystack →</button>
+  <button class="pay-btn pay-btn-alt" onclick="toggleMoMo()">Pay via MTN MoMo manually</button>
+  <div class="momo-box" id="momo-box">
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Manual MoMo Payment</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+      1. Dial <strong>*170#</strong> on your MTN line<br>
+      2. Select Transfer Money → MoMo User<br>
+      3. Send to: <strong>0240393582</strong> (Zygo Express)<br>
+      4. Amount: <strong id="momo-amt"></strong><br>
+      5. Reference: <strong id="momo-ref"></strong><br><br>
+      We confirm within 30 minutes.
     </div>
   </div>
 </div>
+</div>
 
+<!-- SUCCESS SCREEN -->
+<div id="success-screen">
+<div class="card" style="margin:40px 20px;">
+  <div class="success-icon">✅</div>
+  <div class="card-title">Delivery Booked!</div>
+  <div class="card-sub">Payment confirmed. A rider is being assigned now.<br>Average pickup: <strong>28 minutes</strong>.</div>
+  <div class="tracking-box">
+    <div class="tracking-label">Your Tracking Code</div>
+    <div class="tracking-code" id="s-code">ZGX-000000</div>
+  </div>
+  <div class="actions">
+    <button class="abtn abtn-wa" onclick="waShare()">💬 Share via WhatsApp</button>
+    <button class="abtn abtn-primary" onclick="doTrack()">📍 Track My Delivery</button>
+    <button class="abtn abtn-secondary" onclick="bookAgain()">+ Book Another Delivery</button>
+  </div>
+</div>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = "https://hdskkfdtosgfznjscemz.supabase.co";
-const SUPABASE_KEY = "sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET";
-let sb, currentCode = '';
-let turnstileToken = null;
+const SB_URL='https://hdskkfdtosgfznjscemz.supabase.co';
+const SB_KEY='sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET';
+// ⚠️ Replace pk_live_REPLACE_WITH_YOUR_ACTUAL_KEY with your real Paystack public key
+const PS_KEY='pk_live_ab02cb283f1d3f9ff856a2ae27db26beb0199e3b';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+let order=null,pkg='Document';
 
-function onTurnstileSuccess(token){ turnstileToken = token; }
+function sp(el,t){document.querySelectorAll('.pkg-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');pkg=t;}
+function cph(i,id){const d=i.value.replace(/\D/g,'');const c=document.getElementById(id);c.textContent=d.length+'/10';c.className='phone-count'+(d.length===10?' valid':'');}
+function vph(v){const d=v.replace(/\D/g,'');if(d.length!==10||!d.startsWith('0'))return false;return['020','024','025','026','027','028','029','050','054','055','056','057','058','059'].some(p=>d.startsWith(p));}
+function gid(){const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let r='ZGX-';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 
-// ── Phone counter ─────────────────────────────────────────────────────────────
-function updateCounter(input, counterId) {
-  const raw = input.value.replace(/[\s\-\(\)]/g,'');
-  const digits = raw.replace(/\D/g,'');
-  const counter = document.getElementById(counterId);
-  counter.textContent = digits.length + '/10';
-  counter.className = 'phone-counter ' + (digits.length === 10 ? 'ok' : digits.length > 0 ? 'err' : '');
-}
-
-// ── Strict Ghana phone validation — exactly 10 digits, valid prefix ───────────
-function validateGhanaPhone(raw) {
-  const clean = raw.replace(/[\s\-\(\)]/g,'');
-  return clean.length === 10 && /^0[2345679]\d{8}$/.test(clean);
-}
-
-// ── Wa Locations ──────────────────────────────────────────────────────────────
-const WA_LOCATIONS = [
-  "Kpaguri","Jahan","Ssnit","Dobile","Nakori","Kperisi","Sing","Kparimbo",
-  "Wa Polytechnic","Wa Technical Institute","Wa Central Market","Wa Bus Terminal",
-  "Wa Hospital","Wa Municipal Hospital","Fuo","Bamahu","Charia","Dobile Transit",
-  "Kpong","Kpongu","Tendamba","Busa","Funsi Road","Wa Town","Wa New Site",
-  "Kpoglu","Wa Fire Station","Wa Police Station","Wa Post Office","Wa Stadium",
-  "Catholic Hospital","Airstrip","Magazine Road","Real Spicy","Kumbehi",
-  "Lowcost","RST","Zongo","Mabia","Loho","Kambali","Nyanshegu","Tindama",
-  "Pirisi","Piriyiri","Dorimon Road","Wellembelle Road","UDS","Wa UDS",
-  "Wa Market","Wa Round About","Nkoranza","Bulenga","Sankana Road","VIP Terminal",
-  "STC Terminal","OA Travel Station","Konba","Kantu","Dobile Market","Chapari"
-];
-
-window.addEventListener('load', () => {
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  setupAutocomplete('f-pickup',  'pickup-suggestions');
-  setupAutocomplete('f-dropoff', 'dropoff-suggestions');
-  document.getElementById('f-pickup').addEventListener('blur',  () => setTimeout(estimatePrice, 300));
-  document.getElementById('f-dropoff').addEventListener('blur', () => setTimeout(estimatePrice, 300));
-});
-
-function setupAutocomplete(inputId, suggestId) {
-  const input = document.getElementById(inputId);
-  const box   = document.getElementById(suggestId);
-  input.addEventListener('input', () => {
-    const val = input.value.trim().toLowerCase();
-    box.innerHTML = '';
-    if (val.length < 1) { box.style.display='none'; return; }
-    const matches = WA_LOCATIONS.filter(l => l.toLowerCase().includes(val)).slice(0,6);
-    if (!matches.length) { box.style.display='none'; return; }
-    matches.forEach(loc => {
-      const item = document.createElement('div');
-      item.className = 'suggestion-item';
-      item.innerHTML = `<span class="sug-icon">📍</span>${loc}, Wa`;
-      item.addEventListener('mousedown', () => {
-        input.value = loc + ', Wa';
-        box.style.display = 'none';
-        setTimeout(estimatePrice, 200);
-      });
-      box.appendChild(item);
-    });
-    box.style.display = 'block';
+async function doBook(){
+  const sn=document.getElementById('sname').value.trim();
+  const sp2=document.getElementById('sphone').value.trim();
+  const se=document.getElementById('semail').value.trim();
+  const rn=document.getElementById('rname').value.trim();
+  const rp=document.getElementById('rphone').value.trim();
+  const pu=document.getElementById('pickup').value.trim();
+  const dr=document.getElementById('dropoff').value.trim();
+  const no=document.getElementById('notes').value.trim();
+  let ok=true;
+  document.querySelectorAll('.input-field').forEach(f=>f.classList.remove('error'));
+  if(!sn||sn.length<2){document.getElementById('sname').classList.add('error');ok=false;}
+  if(!vph(sp2)){document.getElementById('sphone').classList.add('error');ok=false;}
+  if(!rn||rn.length<2){document.getElementById('rname').classList.add('error');ok=false;}
+  if(!vph(rp)){document.getElementById('rphone').classList.add('error');ok=false;}
+  if(!pu||pu.length<4){document.getElementById('pickup').classList.add('error');ok=false;}
+  if(!dr||dr.length<4){document.getElementById('dropoff').classList.add('error');ok=false;}
+  if(!ok){document.querySelector('.error')?.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  const btn=document.getElementById('sub-btn');
+  btn.classList.add('loading');btn.disabled=true;
+  const tc=gid();
+  const ref=tc+'_'+Date.now();
+  const price=13;
+  const{error}=await sb.from('quote_requests').insert({
+    tracking_code:tc,name:sn,phone:sp2.replace(/\D/g,''),
+    recipient_name:rn,recipient_phone:rp.replace(/\D/g,''),
+    pickup:pu,dropoff:dr,package_type:pkg,notes:no||null,
+    price:price,status:'pending',payment_status:'pending',
+    payment_method:'paystack',payment_reference:ref,
+    created_at:new Date().toISOString()
   });
-  input.addEventListener('blur', () => setTimeout(() => { box.style.display='none'; }, 200));
+  btn.classList.remove('loading');btn.disabled=false;
+  if(error){alert('Booking failed. Please WhatsApp us on 0202858011.');console.error(error);return;}
+  order={tc,price,ref,name:sn,phone:sp2,email:se,rn,rp};
+  document.getElementById('pay-code').textContent=tc;
+  document.getElementById('momo-amt').textContent='GHS '+price;
+  document.getElementById('momo-ref').textContent=tc;
+  setStep(2);
+  document.getElementById('form-screen').style.display='none';
+  document.getElementById('payment-screen').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(openPS,400);
 }
 
-// ── Zone pricing ──────────────────────────────────────────────────────────────
-function getZone(km) {
-  if (km <= 2.0) return { price:13, name:'Zone 1 · 0–2 km',    id:'zone-1' };
-  if (km <= 4.0) return { price:16, name:'Zone 2 · 2.1–4 km',  id:'zone-2' };
-  if (km <= 6.0) return { price:20, name:'Zone 3 · 4.1–6 km',  id:'zone-3' };
-  return          { price:30, name:'Zone 4 · 6.1–9 km',         id:'zone-4' };
-}
-
-function highlightZone(id) {
-  document.querySelectorAll('.zone-card').forEach(c => c.classList.remove('active'));
-  const el = document.getElementById(id);
-  if (el) el.classList.add('active');
-}
-
-async function estimatePrice() {
-  const pickup  = document.getElementById('f-pickup').value.trim();
-  const dropoff = document.getElementById('f-dropoff').value.trim();
-  if (!pickup || !dropoff || pickup.length < 2 || dropoff.length < 2) return;
-
-  const reveal = document.getElementById('price-reveal');
-  const pAmt   = document.getElementById('p-amount');
-  const pZone  = document.getElementById('p-zone');
-  const pDist  = document.getElementById('p-dist');
-
-  reveal.style.display='block';
-  pAmt.textContent='…';
-  pZone.textContent='Calculating route…';
-  pDist.textContent='';
-
-  try {
-    const geoBase='https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh';
-    const [pRes,dRes] = await Promise.all([
-      fetch(`${geoBase}&q=${encodeURIComponent(pickup+', Wa, Upper West, Ghana')}`,{headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
-      fetch(`${geoBase}&q=${encodeURIComponent(dropoff+', Wa, Upper West, Ghana')}`,{headers:{'User-Agent':'ZygoExpress/1.0'}}).then(r=>r.json()),
-    ]);
-    if (pRes.length && dRes.length) {
-      const oLat=parseFloat(pRes[0].lat),oLng=parseFloat(pRes[0].lon);
-      const dLat=parseFloat(dRes[0].lat),dLng=parseFloat(dRes[0].lon);
-      const routeRes=await fetch(
-        `https://router.project-osrm.org/route/v1/driving/${oLng},${oLat};${dLng},${dLat}?overview=false`
-      ).then(r=>r.json());
-      if (routeRes.code==='Ok'&&routeRes.routes?.[0]) {
-        const km=routeRes.routes[0].distance/1000;
-        const zone=getZone(km);
-        pAmt.textContent='GHS '+zone.price;
-        pZone.textContent=zone.name;
-        pDist.textContent='Road distance: '+km.toFixed(2)+' km';
-        highlightZone(zone.id);
-        return;
-      }
-    }
-    // Fallback
-    pAmt.textContent='GHS 13';
-    pZone.textContent='Zone 1 (minimum — enter full location names for accuracy)';
-    highlightZone('zone-1');
-  } catch {
-    pAmt.textContent='GHS 13';
-    pZone.textContent='Zone 1 (minimum)';
-    highlightZone('zone-1');
-  }
-}
-
-function generateCode() {
-  const arr=new Uint8Array(5);
-  crypto.getRandomValues(arr);
-  return 'ZGX-'+Array.from(arr,b=>b.toString(36)).join('').substring(0,6).toUpperCase();
-}
-
-// ── Main submit ───────────────────────────────────────────────────────────────
-async function submitBooking() {
-  const name    = document.getElementById('f-name').value.trim();
-  const phone   = document.getElementById('f-phone').value.trim();
-  const pickup  = document.getElementById('f-pickup').value.trim();
-  const dropoff = document.getElementById('f-dropoff').value.trim();
-  const details = document.getElementById('f-details').value.trim();
-  const recName = document.getElementById('f-rec-name').value.trim();
-  const recPhone= document.getElementById('f-rec-phone').value.trim();
-
-  const errBox = document.getElementById('error-box');
-  errBox.classList.remove('show');
-
-  // ── Validation ──────────────────────────────────────────────────────────────
-  if (!name || name.length < 2) {
-    return showErr('Please enter your full name.');
-  }
-
-  if (!validateGhanaPhone(phone)) {
-    return showErr('Sender phone must be exactly 10 digits starting with 0 (e.g. 0244 123 456).');
-  }
-
-  if (!pickup)  return showErr('Please enter a pickup location.');
-  if (!dropoff) return showErr('Please enter a drop-off location.');
-
-  if (!recPhone) {
-    return showErr('Recipient phone number is required before booking.');
-  }
-  if (!validateGhanaPhone(recPhone)) {
-    return showErr('Recipient phone must be exactly 10 digits starting with 0 (e.g. 0244 000 000).');
-  }
-
-  if (!turnstileToken) {
-    return showErr('Please complete the verification check above before booking.');
-  }
-
-  // ── Snap price ──────────────────────────────────────────────────────────────
-  const priceText  = document.getElementById('p-amount').textContent;
-  const priceNum   = parseFloat((priceText.match(/[\d.]+/)||['13'])[0]);
-  const validPrices= [13,16,20,30];
-  const finalPrice = validPrices.includes(priceNum) ? priceNum :
-    validPrices.reduce((p,c)=>Math.abs(c-priceNum)<Math.abs(p-priceNum)?c:p);
-
-  await processBooking({ name, phone, pickup, dropoff, details, recName, recPhone, finalPrice });
-}
-
-async function processBooking(payload) {
-  const { name, phone, pickup, dropoff, details, recName, recPhone, finalPrice } = payload;
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner"></div>&nbsp;Booking…';
-
-  const code = generateCode();
-  currentCode = code;
-
-  const sx = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-  try {
-    const { error } = await sb.from('quote_requests').insert({
-      tracking_code:   code,
-      status:          'pending',
-      name,phone,pickup,dropoff,
-      details:         details||null,
-      source:          'Website',
-      price:           finalPrice,
-      currency:        'GHS',
-      recipient_name:  recName||null,
-      recipient_phone: recPhone||null,
-      created_at:      new Date().toISOString(),
-    });
-
-    if (error) {
-      showErr('Booking failed: '+(error.message||'Please try again.'));
-      btn.disabled=false;
-      btn.innerHTML='Confirm Booking <span style="font-size:18px">→</span>';
-      return;
-    }
-
-    // Show success
-    document.getElementById('screen-form').style.display='none';
-    document.getElementById('screen-success').style.display='block';
-
-    document.getElementById('s-code').textContent        = code;
-    document.getElementById('momo-ref-code').textContent = code;
-    document.getElementById('momo-ref-step').textContent = code;
-    document.getElementById('momo-amount').textContent   = 'GHS '+finalPrice;
-    document.getElementById('track-link').href           = 'https://zygo-express-hub.lovable.app/#track?code='+code;
-
-    document.getElementById('s-summary').innerHTML = `
-      <div class="summary-row"><span class="summary-key">Customer</span><span class="summary-val">${sx(name)}</span></div>
-      <div class="summary-row"><span class="summary-key">Sender Phone</span><span class="summary-val">${sx(phone)}</span></div>
-      <div class="summary-row"><span class="summary-key">Pickup</span><span class="summary-val">${sx(pickup)}</span></div>
-      <div class="summary-row"><span class="summary-key">Drop-off</span><span class="summary-val">${sx(dropoff)}</span></div>
-      <div class="summary-row"><span class="summary-key">Delivery Cost</span><span class="summary-val price">GHS ${finalPrice}</span></div>
-      ${recName  ? `<div class="summary-row"><span class="summary-key">Recipient</span><span class="summary-val">${sx(recName)}</span></div>` : ''}
-      <div class="summary-row"><span class="summary-key">Recipient Phone</span><span class="summary-val">${sx(recPhone)}</span></div>
-    `;
-
-    spawnConfetti();
-    window.scrollTo(0,0);
-
-  } catch(err) {
-    showErr('Something went wrong. Check your connection and try again.');
-    btn.disabled=false;
-    btn.innerHTML='Confirm Booking <span style="font-size:18px">→</span>';
-  }
-}
-
-function showErr(msg) {
-  const b = document.getElementById('error-box');
-  b.textContent = msg;
-  b.classList.add('show');
-  b.scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-// ── Confetti on success ───────────────────────────────────────────────────────
-function spawnConfetti() {
-  const wrap = document.getElementById('confetti-wrap');
-  if (!wrap) return;
-  const colors = ['#f97316','#f59e0b','#ffffff','#fcd34d','#fdba74'];
-  for (let i=0;i<30;i++) {
-    const dot = document.createElement('div');
-    dot.className = 'confetti-dot';
-    const size = 4 + Math.random()*8;
-    Object.assign(dot.style, {
-      left: Math.random()*100+'%',
-      top: '-20px',
-      width: size+'px',
-      height: size+'px',
-      background: colors[Math.floor(Math.random()*colors.length)],
-      animationDuration: (1.5+Math.random()*2)+'s',
-      animationDelay: Math.random()*1+'s',
-      transform: `rotate(${Math.random()*360}deg)`,
-      borderRadius: Math.random()>0.5 ? '50%' : '2px',
-    });
-    wrap.appendChild(dot);
-  }
-}
-
-function copyCode() {
-  const code = document.getElementById('s-code').textContent;
-  navigator.clipboard.writeText(code).catch(()=>{
-    const el=document.createElement('input');el.value=code;
-    document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
+function openPS(){
+  if(!order)return;
+  const h=PaystackPop.setup({
+    key:PS_KEY,
+    email:order.email||order.phone.replace(/\D/g,'')+'@zygoexpress.com',
+    amount:order.price*100,
+    currency:'GHS',
+    ref:order.ref,
+    label:'Zygo Express — '+order.tc,
+    metadata:{
+      tracking_code:order.tc,
+      customer_name:order.name,
+      customer_phone:order.phone,
+      custom_fields:[
+        {display_name:'Tracking Code',variable_name:'tracking_code',value:order.tc},
+        {display_name:'Customer Phone',variable_name:'customer_phone',value:order.phone}
+      ]
+    },
+    channels:['mobile_money','card','ussd'],
+    callback:function(r){onPaid(r.reference);},
+    onClose:function(){document.getElementById('retry-btn').textContent='Try Payment Again →';}
   });
-  const btn=document.getElementById('copy-code-btn');
-  btn.textContent='✅ Copied!';
-  setTimeout(()=>btn.innerHTML='📋 Copy Tracking ID',2000);
+  h.openIframe();
 }
 
-function copyMomo() {
-  navigator.clipboard.writeText('0559382734').catch(()=>{});
-  const btn=document.querySelector('.momo-copy-btn');
-  btn.textContent='✅ Copied!';
-  setTimeout(()=>btn.textContent='Copy Number',2000);
+async function onPaid(ref){
+  await sb.from('quote_requests').update({
+    payment_status:'paid',payment_reference:ref,
+    status:'confirmed',paid_at:new Date().toISOString()
+  }).eq('tracking_code',order.tc);
+  try{
+    const h=JSON.parse(localStorage.getItem('zygo_tracking_history')||'[]');
+    if(!h.includes(order.tc))h.unshift(order.tc);
+    localStorage.setItem('zygo_tracking_history',JSON.stringify(h.slice(0,10)));
+  }catch(e){}
+  document.getElementById('s-code').textContent=order.tc;
+  document.getElementById('payment-screen').style.display='none';
+  document.getElementById('success-screen').style.display='block';
+  setStep(3);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-// ── OTP (dormant) ─────────────────────────────────────────────────────────────
-let currentOTP=null,phoneVerified=false,pendingBookingData=null;
-function generateOTP(){const arr=new Uint8Array(3);crypto.getRandomValues(arr);return arr.map(b=>b%10).join('').padStart(6,'0').substring(0,6);}
-function startPhoneVerification(phone,bookingData){
-  currentOTP=generateOTP();pendingBookingData=bookingData;
-  sb.from('phone_verifications').insert({phone,otp:currentOTP,context:'booking',expires_at:new Date(Date.now()+30*60*1000).toISOString()}).then(()=>{});
-  document.getElementById('otp-code-display').textContent=currentOTP;
-  const msg='ZYGO VERIFY '+phone+' '+currentOTP;
-  document.getElementById('otp-wa-link').href='https://wa.me/233202858011?text='+encodeURIComponent(msg);
-  document.getElementById('otp-input').value='';
-  document.getElementById('otp-err').classList.remove('show');
-  document.getElementById('otp-overlay').classList.add('show');
+function toggleMoMo(){
+  const b=document.getElementById('momo-box');
+  b.style.display=b.style.display==='none'||!b.style.display?'block':'none';
+  if(order)sb.from('quote_requests').update({payment_method:'momo_manual'}).eq('tracking_code',order.tc);
 }
-function verifyOTP(){
-  const entered=document.getElementById('otp-input').value.trim();
-  const err=document.getElementById('otp-err');
-  if(entered.length<6){err.textContent='Enter the full 6-digit code.';err.classList.add('show');return;}
-  if(entered===currentOTP){
-    phoneVerified=true;
-    document.getElementById('otp-overlay').classList.remove('show');
-    sb.from('phone_verifications').update({verified:true,verified_at:new Date().toISOString()}).eq('otp',currentOTP).then(()=>{});
-    if(pendingBookingData)processBooking(pendingBookingData);
-  } else {
-    err.textContent='Incorrect code. Check your WhatsApp and try again.';err.classList.add('show');
-    document.getElementById('otp-input').value='';document.getElementById('otp-input').focus();
+
+function waShare(){
+  if(!order)return;
+  const m='✅ *Zygo Express Booking Confirmed*\n\nTracking Code: *'+order.tc+'*\nTrack: https://zygoexpress.com/#track\n\nQuestions? Call 0202858011 🧡';
+  window.open('https://wa.me/?text='+encodeURIComponent(m));
+}
+function doTrack(){if(order)window.location.href='https://zygoexpress.com/#track?code='+order.tc;}
+function bookAgain(){order=null;document.getElementById('success-screen').style.display='none';document.getElementById('form-screen').style.display='block';document.querySelectorAll('input,textarea').forEach(f=>f.value='');setStep(1);window.scrollTo({top:0,behavior:'smooth'});}
+
+function setStep(n){
+  for(let i=1;i<=3;i++){
+    const d=document.getElementById('dot'+i),s=document.getElementById('step'+i);
+    if(i<n){d.textContent='✓';s.className='step-dot done';}
+    else if(i===n){d.textContent=i;s.className='step-dot active';}
+    else{d.textContent=i;s.className='step-dot';}
+    if(i<3){const l=document.getElementById('line'+i);l.className='step-line'+(i<n?' done':'');}
   }
-}
-
-document.addEventListener('DOMContentLoaded',function(){
-  const otpInput=document.getElementById('otp-input');
-  if(otpInput)otpInput.addEventListener('keydown',function(e){if(e.key==='Enter')verifyOTP();});
-});
-
-function bookAnother(){
-  document.getElementById('screen-form').style.display='block';
-  document.getElementById('screen-success').style.display='none';
-  ['f-name','f-phone','f-pickup','f-dropoff','f-details','f-rec-name','f-rec-phone'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.value='';
-  });
-  document.getElementById('price-reveal').style.display='none';
-  document.querySelectorAll('.zone-card').forEach(c=>c.classList.remove('active'));
-  ['phone-counter-1','phone-counter-2'].forEach(id=>{
-    const el=document.getElementById(id);if(el){el.textContent='0/10';el.className='phone-counter';}
-  });
-  window.scrollTo(0,0);
 }
 </script>
 </body>

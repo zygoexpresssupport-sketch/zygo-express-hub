@@ -271,7 +271,7 @@ async function doBook(){
   const{error}=await sb.from('quote_requests').insert({
     tracking_code:tc,name:sn,phone:sp2.replace(/\D/g,''),
     recipient_name:rn,recipient_phone:rp.replace(/\D/g,''),
-    pickup:pu,dropoff:dr,package_type:pkg,notes:no||null,
+    pickup:pu,dropoff:dr,details:pkg,delivery_notes:no||null,source:'web',payment_provider:'paystack',
     price:price,status:'pending',payment_status:'pending',
     payment_method:'paystack',payment_reference:ref,
     created_at:new Date().toISOString()

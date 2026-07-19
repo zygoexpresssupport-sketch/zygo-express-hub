@@ -210,6 +210,68 @@ a{text-decoration:none;}
 }
 .time-ago{font-size:11px;color:rgba(255,255,255,0.25);}
 
+
+/* ── SOUND TOGGLE ── */
+.sound-btn{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;
+  color:rgba(255,255,255,0.7);cursor:pointer;display:flex;align-items:center;gap:5px;
+}
+.sound-btn.on{background:rgba(249,115,22,0.15);border-color:rgba(249,115,22,0.3);color:var(--orange);}
+/* ── PAYMENT BADGE ── */
+.pay-badge-ps{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(22,163,74,0.15);border:1px solid rgba(22,163,74,0.3);
+  color:#4ade80;font-size:10px;font-weight:800;
+  padding:2px 8px;border-radius:20px;margin-left:6px;
+}
+.pay-badge-momo{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);
+  color:#fbbf24;font-size:10px;font-weight:800;
+  padding:2px 8px;border-radius:20px;margin-left:6px;
+}
+.pay-badge-pending{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);
+  color:#f87171;font-size:10px;font-weight:800;
+  padding:2px 8px;border-radius:20px;margin-left:6px;
+}
+/* ── NEW ORDER PULSE ── */
+@keyframes newOrderPulse{
+  0%{box-shadow:0 0 0 0 rgba(249,115,22,0.7);}
+  70%{box-shadow:0 0 0 12px rgba(249,115,22,0);}
+  100%{box-shadow:0 0 0 0 rgba(249,115,22,0);}
+}
+.order-card.new-order{animation:newOrderPulse 1.5s ease 3;}
+
+
+/* ── TRACKING COPY SECTION ── */
+.track-msg-box{
+  background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);
+  border-radius:10px;padding:12px 14px;margin-top:10px;
+}
+.track-msg-label{
+  font-size:10px;font-weight:800;color:rgba(255,255,255,0.3);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.track-msg-text{
+  font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6;
+  white-space:pre-wrap;word-break:break-word;
+}
+.track-copy-row{display:flex;gap:7px;margin-top:10px;}
+.track-copy-btn{
+  flex:1;padding:9px 10px;border:none;border-radius:8px;
+  font-size:11px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all 0.15s;font-family:'Inter',sans-serif;
+}
+.track-copy-btn:active{transform:scale(0.97);}
+.tbtn-copy{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.1);}
+.tbtn-copy.done{background:rgba(22,163,74,0.2);color:#4ade80;border-color:rgba(22,163,74,0.3);}
+.tbtn-sms{background:rgba(29,78,216,0.2);color:#93c5fd;border:1px solid rgba(29,78,216,0.3);}
+
 /* ── SPINNER ── */
 .spinner{
   width:20px;height:20px;border:2.5px solid rgba(255,255,255,0.2);
@@ -255,6 +317,7 @@ a{text-decoration:none;}
     </div>
     <div class="topbar-right">
       <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      <button class="sound-btn on" id="sound-btn" onclick="toggleSound()">🔔 Sound</button>
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </div>
@@ -309,6 +372,150 @@ const WA_NUMBER = "233202858011"; // Zygo Express WhatsApp
 let sb, allOrders = [], currentFilter = 'all';
 let msgTab = {}; // tracks sender/recipient tab per order
 
+
+/* ── SOUND SYSTEM ────────────────────────────────────────────────── */
+let soundEnabled = localStorage.getItem('zygo_sound') !== 'off';
+let audioCtx = null;
+let lastOrderCount = 0;
+let knownOrders = new Set();
+
+function updateSoundBtn(){
+  const btn = document.getElementById('sound-btn');
+  if(!btn) return;
+  btn.className = 'sound-btn' + (soundEnabled ? ' on' : '');
+  btn.textContent = soundEnabled ? '🔔 Sound' : '🔕 Sound';
+}
+
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('zygo_sound', soundEnabled ? 'on' : 'off');
+  updateSoundBtn();
+  if(soundEnabled) playTone('confirm');
+}
+
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(type){
+  if(!soundEnabled) return;
+  try{
+    const ctx = getAudioCtx();
+    
+    if(type === 'new_order'){
+      // Urgent triple beep for new order
+      [0, 0.15, 0.30].forEach((delay, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime + delay);
+        osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + delay + 0.1);
+        gain.gain.setValueAtTime(0.4, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.2);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.2);
+      });
+    }
+    
+    if(type === 'payment'){
+      // Pleasant rising chord for payment confirmed
+      [523, 659, 784].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.1);
+        gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.1 + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.4);
+        osc.start(ctx.currentTime + i * 0.1);
+        osc.stop(ctx.currentTime + i * 0.1 + 0.4);
+      });
+    }
+    
+    if(type === 'confirm'){
+      // Short confirm beep
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = 660;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.2);
+    }
+    
+    if(type === 'delivered'){
+      // Celebratory rising arpeggio for delivery
+      [523, 659, 784, 1047].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.3);
+        osc.start(ctx.currentTime + i * 0.08);
+        osc.stop(ctx.currentTime + i * 0.08 + 0.3);
+      });
+    }
+  } catch(e){ console.warn('Audio error:', e); }
+}
+
+function checkForNewOrders(orders){
+  // Initialize on first load
+  if(knownOrders.size === 0 && orders.length > 0){
+    orders.forEach(o => knownOrders.add(o.tracking_code + '_' + o.status));
+    return;
+  }
+  
+  let hasNewOrder = false;
+  let hasNewPayment = false;
+  let hasDelivery = false;
+  
+  orders.forEach(o => {
+    const key = o.tracking_code + '_' + o.status;
+    if(!knownOrders.has(key)){
+      knownOrders.add(key);
+      
+      // Brand new order
+      if(o.status === 'pending'){
+        hasNewOrder = true;
+        // Flash the card
+        setTimeout(() => {
+          const card = document.getElementById('card-' + o.tracking_code);
+          if(card) card.classList.add('new-order');
+        }, 500);
+      }
+      
+      // Payment confirmed
+      if(o.payment_status === 'paid'){
+        hasNewPayment = true;
+      }
+      
+      // Delivery completed
+      if(o.status === 'delivered'){
+        hasDelivery = true;
+      }
+    }
+  });
+  
+  // Play appropriate sound
+  if(hasDelivery)     { playTone('delivered'); }
+  else if(hasNewPayment) { playTone('payment'); }
+  else if(hasNewOrder)   { playTone('new_order'); }
+}
+
+// Initialize sound button
+updateSoundBtn();
+
 // ── AUTH ─────────────────────────────────────────────────────────────────────
 function login() {
   const pin = document.getElementById('pin-input').value.trim().toUpperCase();
@@ -353,6 +560,7 @@ async function loadOrders() {
       .limit(100);
     if (error) throw error;
     allOrders = data || [];
+    checkForNewOrders(allOrders);
     updateStats();
     renderOrders();
   } catch(e) {
@@ -559,6 +767,21 @@ function timeAgo(ts) {
   return Math.floor(h/24) + 'd ago';
 }
 
+
+function paymentBadge(order){
+  const ps = order.payment_status || 'pending';
+  const pm = order.payment_method || 'momo_manual';
+  if(ps === 'paid' && pm === 'paystack')
+    return '<span class="pay-badge-ps">✅ Paystack Paid</span>';
+  if(ps === 'paid' && pm === 'momo_manual')
+    return '<span class="pay-badge-momo">✅ MoMo Paid</span>';
+  if(ps === 'paid')
+    return '<span class="pay-badge-ps">✅ Paid</span>';
+  if(pm === 'paystack')
+    return '<span class="pay-badge-pending">⏳ Paystack Pending</span>';
+  return '<span class="pay-badge-momo">⏳ MoMo Pending</span>';
+}
+
 function buildCard(o) {
   const code    = o.tracking_code || '';
   const status  = o.status || 'pending';
@@ -622,6 +845,22 @@ function buildCard(o) {
       </button>
     </div>
 
+    <div class="track-msg-box">
+      <div class="track-msg-label">
+        <span>📋 Tracking Message — for non-WhatsApp customers</span>
+      </div>
+      <div class="track-msg-text" id="tmsg-${code}">${buildTrackingMessage(o).replace(/\n/g, '<br>')}</div>
+      <div class="track-copy-row">
+        <button class="track-copy-btn tbtn-copy" id="tcopy-${code}"
+          onclick="copyTrackMsg('${code}','tcopy-${code}')">
+          📋 Copy Tracking Msg
+        </button>
+        <button class="track-copy-btn tbtn-sms"
+          onclick="smsTrack('${code}')">
+          💬 Send as SMS
+        </button>
+      </div>
+    </div>
     <div class="notified-row">
       <label class="notified-check">
         <input type="checkbox" ${notified?'checked':''}
@@ -657,6 +896,7 @@ function openWA(code) {
   const phone = ((tab === 'recipient' ? o.recipient_phone : o.phone) || '').replace(/[\s\-\(\)]/g,'').replace(/^0/,'233');
   if (!phone) { alert('No phone number available.'); return; }
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  playTone('confirm');
   // Auto-mark as notified after opening WA
   setTimeout(() => {
     if (!isNotified(code, o.status)) {

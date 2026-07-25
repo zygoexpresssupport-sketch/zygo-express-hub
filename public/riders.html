@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#f97316"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Zygo Rider"/>
+<title>Zygo Partner Rider App</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --o:#f97316;--od:#c2410c;--ink:#0f0f0f;--ink2:#1c1917;
+  --paper:#fafaf9;--stone:#e8e4dc;--muted:#78716c;
+  --green:#16a34a;--red:#dc2626;--amber:#f59e0b;--blue:#1d4ed8;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:var(--ink);}
+body{font-family:'Inter',sans-serif;color:white;}
+a{color:inherit;text-decoration:none;}
+button{font-family:'Inter',sans-serif;cursor:pointer;}
+input,textarea,select{font-family:'Inter',sans-serif;}
+
+/* ── SCREENS ── */
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  background:var(--ink);overflow:hidden;
+  transition:transform 0.3s cubic-bezier(0.4,0,0.2,1),opacity 0.3s;
+}
+.screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none;}
+.screen.slide-left{transform:translateX(-100%);opacity:0;pointer-events:none;}
+
+/* ── LOGIN ── */
+#login{align-items:center;justify-content:center;padding:32px 24px;}
+.login-logo{width:72px;height:72px;background:var(--o);border-radius:20px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:30px;color:white;margin-bottom:20px;
+  box-shadow:0 0 40px rgba(249,115,22,0.3);}
+.login-title{font-family:'Syne',sans-serif;font-weight:900;font-size:26px;
+  letter-spacing:-1px;margin-bottom:6px;text-align:center;}
+.login-sub{color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:36px;text-align:center;}
+.login-card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:24px;width:100%;max-width:380px;}
+.field-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:block;}
+.field-input{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:var(--r);padding:14px 16px;font-size:16px;color:white;
+  outline:none;transition:border-color 0.2s;margin-bottom:14px;}
+.field-input:focus{border-color:var(--o);}
+.field-input::placeholder{color:rgba(255,255,255,0.2);}
+.field-input.err{border-color:var(--red);}
+.btn-primary{width:100%;padding:15px;background:linear-gradient(135deg,var(--o),var(--od));
+  border:none;border-radius:var(--r);font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:900;color:white;letter-spacing:-0.3px;
+  transition:opacity 0.2s;}
+.btn-primary:active{opacity:0.85;}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.err-msg{color:#f87171;font-size:13px;text-align:center;margin-top:10px;display:none;}
+
+/* ── TOPBAR ── */
+.topbar{background:#111;border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;}
+.topbar-logo{display:flex;align-items:center;gap:8px;}
+.topbar-mark{width:30px;height:30px;background:var(--o);border-radius:8px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:12px;}
+.topbar-name{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:-0.3px;}
+.topbar-name em{color:var(--o);font-style:normal;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.availability-toggle{
+  display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);border-radius:999px;padding:7px 14px;
+  font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);border:none;
+}
+.availability-toggle.online{background:rgba(22,163,74,0.15);
+  border:1px solid rgba(22,163,74,0.3);color:#4ade80;}
+.avail-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.3);}
+.availability-toggle.online .avail-dot{background:#4ade80;
+  box-shadow:0 0 6px #4ade80;animation:pulse-dot 1.5s ease infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ── SCROLLABLE CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:16px;padding-bottom:90px;}
+.content::-webkit-scrollbar{display:none;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  background:#111;border-top:1px solid rgba(255,255,255,0.07);
+  padding:8px 0 max(8px,env(safe-area-inset-bottom));
+  display:flex;align-items:center;
+  flex-shrink:0;z-index:50;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:6px 0;cursor:pointer;transition:all 0.15s;border:none;background:none;}
+.nav-icon{font-size:20px;transition:transform 0.15s;}
+.nav-label{font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);
+  text-transform:uppercase;letter-spacing:0.5px;}
+.nav-item.active .nav-icon{transform:scale(1.15);}
+.nav-item.active .nav-label{color:var(--o);}
+
+/* ── CARDS ── */
+.card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:16px;margin-bottom:12px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.card-title{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;}
+.badge-orange{background:rgba(249,115,22,0.15);color:var(--o);border:1px solid rgba(249,115,22,0.25);}
+.badge-green{background:rgba(22,163,74,0.15);color:#4ade80;border:1px solid rgba(22,163,74,0.25);}
+.badge-amber{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);}
+.badge-red{background:rgba(220,38,38,0.15);color:#f87171;border:1px solid rgba(220,38,38,0.25);}
+.badge-blue{background:rgba(29,78,216,0.15);color:#93c5fd;border:1px solid rgba(29,78,216,0.25);}
+.badge-muted{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.08);}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:14px 12px;text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:900;font-size:24px;color:var(--o);letter-spacing:-1px;}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;}
+
+/* ── JOB CARDS ── */
+.job-card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;overflow:hidden;margin-bottom:12px;}
+.job-card.new-job{border-color:rgba(249,115,22,0.4);
+  animation:job-pulse 0.8s ease 3;}
+@keyframes job-pulse{0%,100%{border-color:rgba(249,115,22,0.4);}
+  50%{border-color:var(--o);box-shadow:0 0 0 3px rgba(249,115,22,0.15);}}
+.job-top{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.job-code{font-family:monospace;font-size:14px;font-weight:700;color:var(--o);letter-spacing:1px;}
+.job-price{font-family:'Syne',sans-serif;font-weight:900;font-size:20px;color:white;}
+.job-price span{font-size:12px;color:rgba(255,255,255,0.4);font-weight:400;}
+.job-route{padding:10px 16px;background:rgba(0,0,0,0.2);
+  display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,0.6);}
+.route-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.route-dot.pickup{background:var(--amber);}
+.route-dot.drop{background:var(--o);}
+.route-arrow{color:rgba(255,255,255,0.2);font-size:10px;}
+.job-actions{padding:12px 16px;display:flex;gap:8px;}
+.btn-accept{flex:1;padding:12px;background:linear-gradient(135deg,var(--o),var(--od));
+  border:none;border-radius:10px;font-weight:700;font-size:14px;color:white;}
+.btn-decline{padding:12px 16px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+  font-weight:700;font-size:13px;color:rgba(255,255,255,0.5);}
+.btn-accept:active{opacity:0.85;}
+.btn-decline:active{opacity:0.7;}
+
+/* Active job */
+.active-job-card{background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(196,65,12,0.05));
+  border:1.5px solid rgba(249,115,22,0.3);border-radius:16px;padding:16px;margin-bottom:16px;}
+.active-job-label{font-size:10px;font-weight:800;color:var(--o);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;}
+.active-job-label::before{content:'';width:7px;height:7px;border-radius:50%;
+  background:var(--o);animation:pulse-dot 1.5s ease infinite;}
+.active-job-code{font-family:monospace;font-size:18px;font-weight:700;color:white;margin-bottom:4px;}
+.active-job-route{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:14px;}
+.status-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.status-btn{padding:12px 10px;border:none;border-radius:10px;font-size:12px;
+  font-weight:700;color:white;display:flex;align-items:center;justify-content:center;gap:6px;}
+.sbtn-pickup{background:var(--amber);}
+.sbtn-deliver{background:var(--green);}
+.sbtn-fail{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);
+  border:1px solid rgba(255,255,255,0.1);font-size:11px;}
+.sbtn-nav{background:var(--blue);}
+
+/* ── CUSTOMER CARDS ── */
+.customer-card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:14px 16px;margin-bottom:10px;
+  display:flex;align-items:center;gap:12px;}
+.cust-avatar{width:42px;height:42px;border-radius:50%;
+  background:rgba(249,115,22,0.15);display:grid;place-items:center;
+  font-weight:900;font-size:16px;color:var(--o);flex-shrink:0;}
+.cust-info{flex:1;min-width:0;}
+.cust-name{font-size:14px;font-weight:700;color:white;margin-bottom:2px;}
+.cust-phone{font-size:12px;color:rgba(255,255,255,0.4);font-family:monospace;}
+.cust-meta{font-size:11px;color:rgba(255,255,255,0.25);margin-top:3px;}
+.cust-actions{display:flex;gap:7px;}
+.cust-btn{width:34px;height:34px;border:none;border-radius:10px;
+  display:grid;place-items:center;font-size:16px;}
+.cbtn-wa{background:#25D366;}
+.cbtn-call{background:rgba(255,255,255,0.08);}
+.cbtn-del{background:rgba(249,115,22,0.12);}
+
+/* ── EARNINGS ── */
+.earnings-big{text-align:center;padding:24px 0;}
+.earn-label{font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:6px;}
+.earn-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:42px;
+  color:var(--o);letter-spacing:-2px;}
+.earn-period{font-size:12px;color:rgba(255,255,255,0.25);margin-top:4px;}
+.earn-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.earn-box{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:14px;text-align:center;}
+.earn-box-num{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;
+  letter-spacing:-0.5px;}
+.earn-box-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  letter-spacing:0.5px;margin-top:3px;}
+
+/* ── PROFILE ── */
+.profile-header{text-align:center;padding:24px 16px 16px;}
+.profile-avatar{width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--o),var(--od));
+  display:grid;place-items:center;font-family:'Syne',sans-serif;
+  font-weight:900;font-size:28px;color:white;margin:0 auto 12px;
+  box-shadow:0 0 30px rgba(249,115,22,0.3);}
+.profile-name{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;
+  letter-spacing:-0.5px;margin-bottom:6px;}
+.profile-level{display:inline-flex;align-items:center;gap:6px;
+  background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.25);
+  border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;color:var(--o);}
+.qr-block{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:20px;text-align:center;margin-top:16px;}
+.qr-label{font-size:11px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:14px;}
+.qr-code{width:130px;height:130px;background:white;border-radius:12px;
+  margin:0 auto 12px;display:grid;place-items:center;font-size:10px;color:#333;padding:10px;}
+.qr-sub{font-size:11px;color:rgba(255,255,255,0.3);}
+.profile-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.7);
+  display:flex;align-items:flex-end;z-index:200;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{
+  background:#1a1a1a;border-radius:24px 24px 0 0;
+  padding:20px 20px max(20px,env(safe-area-inset-bottom));
+  width:100%;transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.15);
+  border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:900;font-size:18px;
+  margin-bottom:16px;letter-spacing:-0.5px;}
+
+/* ── PHOTO CAPTURE ── */
+.photo-area{background:rgba(0,0,0,0.3);border:2px dashed rgba(255,255,255,0.15);
+  border-radius:16px;height:200px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;margin-bottom:14px;
+  cursor:pointer;position:relative;overflow:hidden;}
+.photo-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:14px;}
+.photo-placeholder{text-align:center;color:rgba(255,255,255,0.3);}
+.photo-placeholder .icon{font-size:40px;margin-bottom:8px;}
+.photo-placeholder p{font-size:13px;}
+#photo-input{display:none;}
+
+/* ── ADD CUSTOMER FORM ── */
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px;}
+.form-input{width:100%;background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--r);
+  padding:12px 14px;font-size:14px;color:white;outline:none;
+  transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--o);}
+.form-input::placeholder{color:rgba(255,255,255,0.2);}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-icon{font-size:44px;margin-bottom:12px;opacity:0.5;}
+.empty-title{font-size:15px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:6px;}
+.empty-sub{font-size:13px;color:rgba(255,255,255,0.25);line-height:1.6;}
+
+/* ── FAB ── */
+.fab{
+  position:absolute;right:20px;bottom:80px;
+  width:54px;height:54px;border-radius:50%;
+  background:var(--o);border:none;color:white;
+  font-size:24px;display:grid;place-items:center;
+  box-shadow:0 4px 20px rgba(249,115,22,0.4);z-index:40;
+}
+
+/* ── SPINNER ── */
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);
+  border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading .spinner{display:inline-block;}
+.loading .btn-text{display:none;}
+
+/* ── TOAST ── */
+.toast{
+  position:absolute;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);
+  border-radius:999px;padding:10px 20px;font-size:13px;font-weight:600;
+  white-space:nowrap;z-index:300;transition:transform 0.3s;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:rgba(22,163,74,0.4);color:#4ade80;}
+.toast.error{border-color:rgba(220,38,38,0.4);color:#f87171;}
+
+/* ── SECTION TAG ── */
+.section-tag{font-size:11px;font-weight:800;color:var(--o);
+  text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:block;}
+
+/* Level progress */
+.level-bar-wrap{background:rgba(255,255,255,0.06);border-radius:999px;height:6px;margin:10px 0;}
+.level-bar{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--o),var(--amber));
+  transition:width 0.6s ease;}
+</style>
+</head>
+<body>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div class="screen" id="login">
+  <div class="login-logo">Z</div>
+  <div class="login-title">Zygo Partner<br>Rider App</div>
+  <div class="login-sub">Wa's verified delivery network</div>
+  <div class="login-card">
+    <label class="field-label">Your Phone Number</label>
+    <input class="field-input" type="tel" id="login-phone"
+      placeholder="e.g. 0244 123 456" inputmode="numeric" maxlength="13"/>
+    <label class="field-label">PIN</label>
+    <input class="field-input" type="password" id="login-pin"
+      placeholder="Enter your 4-digit PIN" inputmode="numeric" maxlength="6"/>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">
+      <span class="btn-text">Access My Dashboard →</span>
+      <div class="spinner"></div>
+    </button>
+    <div class="err-msg" id="login-err">❌ Incorrect credentials. Contact 0202858011.</div>
+    <div style="text-align:center;margin-top:16px;font-size:12px;color:rgba(255,255,255,0.25);">
+      Not yet a partner? WhatsApp <a href="https://wa.me/233202858011" style="color:var(--o);">0202858011</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MAIN APP ══════════════════ -->
+<div class="screen hidden" id="main-app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-mark">Z</div>
+      <div class="topbar-name">Zygo<em>Rider</em></div>
+    </div>
+    <div class="topbar-right">
+      <button class="availability-toggle" id="avail-btn" onclick="toggleAvailability()">
+        <div class="avail-dot"></div>
+        <span id="avail-label">Offline</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tab content -->
+  <div class="content" id="tab-home">
+    <!-- Active job (if any) -->
+    <div id="active-job-section" style="display:none;">
+      <div class="active-job-card" id="active-job-card">
+        <div class="active-job-label">Active Job</div>
+        <div class="active-job-code" id="aj-code">ZGX-000000</div>
+        <div class="active-job-route" id="aj-route">— → —</div>
+        <div class="status-btns">
+          <button class="status-btn sbtn-nav" onclick="openNav()">🗺️ Navigate</button>
+          <button class="status-btn sbtn-fail" onclick="openFailModal()">⚠ Can't Deliver</button>
+          <button class="status-btn sbtn-pickup" id="btn-pickup" onclick="openPhotoModal('pickup')">📷 Proof of Pickup</button>
+          <button class="status-btn sbtn-deliver" id="btn-deliver" onclick="openPhotoModal('deliver')" style="display:none">✅ Proof of Delivery</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <span class="section-tag">Today's Performance</span>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="stat-today-jobs">0</div>
+        <div class="stat-lbl">Jobs Done</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-today-earn" style="font-size:18px">GHS 0</div>
+        <div class="stat-lbl">Earned</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-rating">—</div>
+        <div class="stat-lbl">Rating</div>
+      </div>
+    </div>
+
+    <!-- Available jobs -->
+    <span class="section-tag">Available Zygo Jobs</span>
+    <div id="available-jobs-list">
+      <div class="empty-state">
+        <div class="empty-icon">🏍️</div>
+        <div class="empty-title">No jobs right now</div>
+        <div class="empty-sub">Go online to start receiving<br>Zygo delivery requests.</div>
+      </div>
+    </div>
+
+    <!-- Recent completed -->
+    <span class="section-tag" style="margin-top:8px;">Completed Today</span>
+    <div id="completed-jobs-list">
+      <div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:13px;">
+        No completed jobs yet today.
+      </div>
+    </div>
+  </div>
+
+  <!-- MY CUSTOMERS TAB -->
+  <div class="content hidden" id="tab-customers">
+    <span class="section-tag">My Private Customers</span>
+    <div id="customers-list">
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <div class="empty-title">No customers yet</div>
+        <div class="empty-sub">Add your regular customers<br>to manage deliveries and build<br>your digital delivery record.</div>
+      </div>
+    </div>
+    <button class="fab" onclick="openAddCustomer()">+</button>
+  </div>
+
+  <!-- EARNINGS TAB -->
+  <div class="content hidden" id="tab-earnings">
+    <div class="earnings-big">
+      <div class="earn-label">This Month</div>
+      <div class="earn-amount" id="earn-month">GHS 0</div>
+      <div class="earn-period">July 2026</div>
+    </div>
+    <div class="earn-grid">
+      <div class="earn-box">
+        <div class="earn-box-num" id="earn-zygo-jobs" style="color:var(--o)">0</div>
+        <div class="earn-box-lbl">Zygo Jobs</div>
+      </div>
+      <div class="earn-box">
+        <div class="earn-box-num" id="earn-private-jobs" style="color:var(--amber)">0</div>
+        <div class="earn-box-lbl">Private Jobs</div>
+      </div>
+      <div class="earn-box">
+        <div class="earn-box-num" id="earn-zygo-total" style="color:var(--o);font-size:16px">GHS 0</div>
+        <div class="earn-box-lbl">From Zygo</div>
+      </div>
+      <div class="earn-box">
+        <div class="earn-box-num" id="earn-private-total" style="color:var(--amber);font-size:16px">GHS 0</div>
+        <div class="earn-box-lbl">From Private</div>
+      </div>
+    </div>
+
+    <span class="section-tag">Job History</span>
+    <div id="earnings-history">
+      <div style="text-align:center;padding:30px;color:rgba(255,255,255,0.2);font-size:13px;">
+        No job history yet this month.
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div class="content hidden" id="tab-profile">
+    <div class="profile-header">
+      <div class="profile-avatar" id="profile-avatar">Z</div>
+      <div class="profile-name" id="profile-name">Partner Rider</div>
+      <div style="margin-bottom:12px">
+        <div class="profile-level" id="profile-level">⭐ Level 1 — Registered Partner</div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.3);" id="profile-phone">0244 *** ***</div>
+    </div>
+
+    <!-- Level progress -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Level Progress</div>
+        <div class="badge badge-orange" id="level-badge">Level 1</div>
+      </div>
+      <div id="level-desc" style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:10px;">
+        Complete 10 Zygo jobs with 4.0★+ rating to reach Level 2 (Verified Partner).
+      </div>
+      <div class="level-bar-wrap">
+        <div class="level-bar" id="level-bar" style="width:5%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;
+        color:rgba(255,255,255,0.25);margin-top:6px;">
+        <span id="level-progress-text">0 / 10 jobs</span>
+        <span>Next: Verified Partner</span>
+      </div>
+    </div>
+
+    <!-- QR code -->
+    <div class="qr-block">
+      <div class="qr-label">Your Verification QR Code</div>
+      <div class="qr-code" id="qr-display">
+        <div style="font-size:10px;color:#999;text-align:center;line-height:1.6;">
+          QR code<br>generates at<br>Level 2<br>verification
+        </div>
+      </div>
+      <div class="qr-sub">Customers scan this to verify your identity</div>
+    </div>
+
+    <!-- Profile stats -->
+    <div class="profile-stat-row">
+      <div class="stat-box">
+        <div class="stat-num" id="prof-total-jobs">0</div>
+        <div class="stat-lbl">Total Jobs</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="prof-rating">—</div>
+        <div class="stat-lbl">Rating</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="prof-customers">0</div>
+        <div class="stat-lbl">Customers</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="card" style="margin-top:16px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <a href="https://wa.me/233202858011" target="_blank"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(255,255,255,0.04);border-radius:10px;font-size:14px;font-weight:600;">
+          💬 Contact Zygo Express Support
+        </a>
+        <a href="https://zygoexpress.com" target="_blank"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(255,255,255,0.04);border-radius:10px;font-size:14px;font-weight:600;">
+          🌐 zygoexpress.com
+        </a>
+        <button onclick="doLogout()"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.15);
+          border-radius:10px;font-size:14px;font-weight:600;color:#f87171;width:100%;">
+          🚪 Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home',this)">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('customers',this)">
+      <div class="nav-icon">👥</div>
+      <div class="nav-label">Customers</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('earnings',this)">
+      <div class="nav-icon">💰</div>
+      <div class="nav-label">Earnings</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('profile',this)">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Profile</div>
+    </button>
+  </div>
+</div>
+
+<!-- ══ MODAL: PROOF PHOTO ══ -->
+<div class="modal-overlay" id="photo-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="photo-modal-title">📷 Proof of Pickup</div>
+    <div class="photo-area" onclick="triggerCamera()" id="photo-area">
+      <div class="photo-placeholder">
+        <div class="icon">📷</div>
+        <p>Tap to take photo</p>
+      </div>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment"
+      onchange="handlePhotoCapture(event)"/>
+    <button class="btn-primary" id="photo-submit-btn" onclick="submitProofPhoto()" disabled
+      style="opacity:0.4;margin-bottom:10px;">
+      <span class="btn-text" id="photo-submit-text">Submit Proof Photo</span>
+      <div class="spinner"></div>
+    </button>
+    <button onclick="closeModal('photo-modal')"
+      style="width:100%;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--r);color:rgba(255,255,255,0.4);font-size:14px;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- ══ MODAL: ADD CUSTOMER ══ -->
+<div class="modal-overlay" id="add-customer-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👤 Add Private Customer</div>
+    <div class="form-group">
+      <label class="form-label">Customer Name *</label>
+      <input class="form-input" type="text" id="nc-name" placeholder="e.g. Aisha Mohammed"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone Number *</label>
+      <input class="form-input" type="tel" id="nc-phone" placeholder="e.g. 0244 123 456" inputmode="numeric"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Area / Location</label>
+      <input class="form-input" type="text" id="nc-area" placeholder="e.g. Kpaguri, near school"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Usual Delivery Price (GHS)</label>
+      <input class="form-input" type="number" id="nc-price" placeholder="e.g. 15" inputmode="numeric"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" type="text" id="nc-notes" placeholder="e.g. Works at the hospital, mornings only"/>
+    </div>
+    <button class="btn-primary" onclick="saveCustomer()" style="margin-bottom:10px;">
+      Save Customer
+    </button>
+    <button onclick="closeModal('add-customer-modal')"
+      style="width:100%;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--r);color:rgba(255,255,255,0.4);font-size:14px;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- ══ MODAL: FAIL DELIVERY ══ -->
+<div class="modal-overlay" id="fail-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚠️ Report Delivery Failure</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;line-height:1.6;">
+      Only report failure after 3 genuine attempts to reach the recipient.
+      The parcel must be returned to the Dispatch Centre.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Reason</label>
+      <select class="form-input" id="fail-reason">
+        <option value="">Select reason...</option>
+        <option value="unreachable">Recipient unreachable after 3 attempts</option>
+        <option value="wrong_address">Address does not exist</option>
+        <option value="refused">Recipient refused delivery</option>
+        <option value="unsafe">Location unsafe or inaccessible</option>
+        <option value="other">Other — explain below</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" type="text" id="fail-notes" placeholder="Additional details..."/>
+    </div>
+    <button class="btn-primary" style="background:linear-gradient(135deg,#dc2626,#991b1b);margin-bottom:10px;"
+      onclick="submitFailure()">Report Failure — Return to DC</button>
+    <button onclick="closeModal('fail-modal')"
+      style="width:100%;padding:12px;background:none;border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--r);color:rgba(255,255,255,0.4);font-size:14px;">
+      Cancel — Keep Trying
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SB_URL = 'https://hdskkfdtosgfznjscemz.supabase.co';
+const SB_KEY = 'sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET';
+const DISPATCHER_PHONE = '233202858011';
+// DEMO PIN — in production, validate against partner_riders table
+const DEMO_RIDERS = {
+  '0244123456': { pin: '1234', name: 'Kofi Mensah', level: 1, id: 'ZGX-PRN-0001' },
+  '0554987654': { pin: '5678', name: 'Amina Ibrahim', level: 2, id: 'ZGX-PRN-0002' },
+};
+
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let rider = null;
+let isOnline = false;
+let activeJob = null;
+let photoMode = null;
+let capturedPhoto = null;
+let customers = JSON.parse(localStorage.getItem('zygo_my_customers') || '[]');
+let jobHistory = JSON.parse(localStorage.getItem('zygo_job_history') || '[]');
+let refreshInterval = null;
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim().replace(/\s/g,'');
+  const pin   = document.getElementById('login-pin').value.trim();
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+
+  err.style.display = 'none';
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  await new Promise(r => setTimeout(r, 800)); // UX delay
+
+  // Check demo riders
+  const riderData = DEMO_RIDERS[phone];
+  if (riderData && riderData.pin === pin) {
+    rider = { ...riderData, phone };
+    localStorage.setItem('zygo_rider_session', JSON.stringify(rider));
+    showMain();
+  } else {
+    // In production: check partner_riders table in Supabase
+    try {
+      const { data, error } = await sb
+        .from('partner_riders')
+        .select('*')
+        .eq('phone', phone.replace(/^0/,'233'))
+        .eq('pin', pin)
+        .single();
+
+      if (data && !error) {
+        rider = { name: data.name, level: data.level || 1, id: data.partner_id, phone };
+        localStorage.setItem('zygo_rider_session', JSON.stringify(rider));
+        showMain();
+      } else {
+        err.style.display = 'block';
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    } catch(e) {
+      err.style.display = 'block';
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+}
+
+function showMain() {
+  document.getElementById('login').classList.add('slide-left');
+  document.getElementById('main-app').classList.remove('hidden');
+  loadProfile();
+  loadDashboard();
+  refreshInterval = setInterval(checkForNewJobs, 30000);
+}
+
+function doLogout() {
+  localStorage.removeItem('zygo_rider_session');
+  rider = null;
+  isOnline = false;
+  activeJob = null;
+  if (refreshInterval) clearInterval(refreshInterval);
+  document.getElementById('main-app').classList.add('hidden');
+  document.getElementById('login').classList.remove('slide-left');
+}
+
+// Check saved session
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('zygo_rider_session');
+  if (saved) {
+    rider = JSON.parse(saved);
+    showMain();
+  }
+});
+
+// Login on Enter
+document.getElementById('login-pin').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ── AVAILABILITY ──────────────────────────────────────────────────────────────
+function toggleAvailability() {
+  isOnline = !isOnline;
+  const btn = document.getElementById('avail-btn');
+  const lbl = document.getElementById('avail-label');
+  if (isOnline) {
+    btn.classList.add('online');
+    lbl.textContent = 'Online';
+    showToast('You are now online — jobs will appear here', 'success');
+    checkForNewJobs();
+  } else {
+    btn.classList.remove('online');
+    lbl.textContent = 'Offline';
+    showToast('You are now offline');
+  }
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name, navEl) {
+  ['home','customers','earnings','profile'].forEach(t => {
+    document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== name);
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  navEl.classList.add('active');
+
+  if (name === 'earnings') loadEarnings();
+  if (name === 'customers') renderCustomers();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  if (!rider) return;
+
+  // Today's stats from localStorage
+  const today = new Date().toDateString();
+  const todayJobs = jobHistory.filter(j => new Date(j.completedAt).toDateString() === today);
+  const todayEarn = todayJobs.reduce((s,j) => s + (parseFloat(j.earnings)||0), 0);
+
+  document.getElementById('stat-today-jobs').textContent = todayJobs.length;
+  document.getElementById('stat-today-earn').textContent = `GHS ${todayEarn.toFixed(0)}`;
+
+  // Rating from Supabase if available
+  try {
+    const { data } = await sb.from('quote_requests')
+      .select('rider_rating')
+      .eq('assigned_rider', rider.id || rider.name)
+      .not('rider_rating', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (data && data.length >= 3) {
+      const avg = data.reduce((s,r) => s + (r.rider_rating||0), 0) / data.length;
+      document.getElementById('stat-rating').textContent = avg.toFixed(1) + '★';
+      document.getElementById('prof-rating').textContent = avg.toFixed(1) + '★';
+    }
+  } catch(e) {}
+
+  // Check for active job in localStorage
+  const savedJob = localStorage.getItem('zygo_active_job');
+  if (savedJob) {
+    activeJob = JSON.parse(savedJob);
+    showActiveJob(activeJob);
+  }
+
+  updateProfileStats();
+}
+
+// ── JOBS FROM SUPABASE ─────────────────────────────────────────────────────────
+async function checkForNewJobs() {
+  if (!isOnline || !rider) return;
+
+  try {
+    const { data } = await sb.from('quote_requests')
+      .select('*')
+      .eq('status', 'confirmed')
+      .is('assigned_rider', null)
+      .order('created_at', { ascending: false })
+      .limit(5);
+
+    renderAvailableJobs(data || []);
+  } catch(e) {}
+}
+
+function renderAvailableJobs(jobs) {
+  const list = document.getElementById('available-jobs-list');
+
+  if (!jobs.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🏍️</div>
+      <div class="empty-title">No jobs right now</div>
+      <div class="empty-sub">You'll be notified when a job<br>is available near you.</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = jobs.map(j => `
+    <div class="job-card new-job" id="job-${j.tracking_code}">
+      <div class="job-top">
+        <div>
+          <div class="job-code">${j.tracking_code}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:3px;">${j.package_type||j.details||'Package'}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="job-price">GHS ${(parseFloat(j.price||13)-2).toFixed(0)}<span>/GHS ${j.price||13}</span></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.2);margin-top:2px;">Your cut / Total</div>
+        </div>
+      </div>
+      <div class="job-route">
+        <div class="route-dot pickup"></div>
+        <span style="color:rgba(255,255,255,0.8);font-weight:600;">${(j.pickup||'').split(',')[0]}</span>
+        <span class="route-arrow">→</span>
+        <div class="route-dot drop"></div>
+        <span style="color:rgba(255,255,255,0.8);font-weight:600;">${(j.dropoff||'').split(',')[0]}</span>
+      </div>
+      <div class="job-actions">
+        <button class="btn-accept" onclick="acceptJob(${JSON.stringify(j).replace(/"/g,'&quot;')})">
+          Accept — GHS ${(parseFloat(j.price||13)-2).toFixed(0)}
+        </button>
+        <button class="btn-decline" onclick="declineJob('${j.tracking_code}')">
+          Skip
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function acceptJob(job) {
+  if (activeJob) {
+    showToast('Complete your current job first', 'error');
+    return;
+  }
+
+  try {
+    const { error } = await sb.from('quote_requests')
+      .update({ status: 'rider_assigned', assigned_rider: rider.name || rider.id })
+      .eq('tracking_code', job.tracking_code)
+      .is('assigned_rider', null);
+
+    if (error) { showToast('Job already taken', 'error'); return; }
+
+    activeJob = job;
+    activeJob.myEarnings = parseFloat(job.price||13) - 2;
+    activeJob.jobPhase = 'to_pickup';
+    localStorage.setItem('zygo_active_job', JSON.stringify(activeJob));
+    showActiveJob(activeJob);
+    playJobAcceptSound();
+    showToast('Job accepted! Head to pickup location.', 'success');
+
+    // Notify dispatcher via WhatsApp
+    const msg = encodeURIComponent(
+      `🏍️ RIDER ACCEPTED\n\nTracking: ${job.tracking_code}\nRider: ${rider.name}\nPickup: ${job.pickup}`
+    );
+
+  } catch(e) {
+    showToast('Error accepting job', 'error');
+  }
+}
+
+function declineJob(code) {
+  document.getElementById(`job-${code}`)?.remove();
+}
+
+function showActiveJob(job) {
+  document.getElementById('active-job-section').style.display = 'block';
+  document.getElementById('aj-code').textContent = job.tracking_code;
+  document.getElementById('aj-route').textContent =
+    `${(job.pickup||'').split(',')[0]} → ${(job.dropoff||'').split(',')[0]}`;
+
+  const isPickedUp = job.jobPhase === 'picked_up';
+  document.getElementById('btn-pickup').style.display = isPickedUp ? 'none' : 'block';
+  document.getElementById('btn-deliver').style.display = isPickedUp ? 'block' : 'none';
+}
+
+function openNav() {
+  if (!activeJob) return;
+  const dest = encodeURIComponent(activeJob.jobPhase === 'picked_up' ? activeJob.dropoff : activeJob.pickup);
+  window.open(`https://maps.google.com?q=${dest}&travelmode=driving`);
+}
+
+// ── PROOF PHOTOS ──────────────────────────────────────────────────────────────
+function openPhotoModal(mode) {
+  photoMode = mode;
+  capturedPhoto = null;
+  const title = mode === 'pickup' ? '📷 Proof of Pickup' : '✅ Proof of Delivery';
+  document.getElementById('photo-modal-title').textContent = title;
+  document.getElementById('photo-submit-text').textContent =
+    mode === 'pickup' ? 'Submit & Mark as Picked Up' : 'Submit & Mark as Delivered';
+  document.getElementById('photo-submit-btn').disabled = true;
+  document.getElementById('photo-submit-btn').style.opacity = '0.4';
+
+  // Reset photo area
+  const area = document.getElementById('photo-area');
+  area.innerHTML = `<div class="photo-placeholder">
+    <div class="icon">📷</div>
+    <p>Tap to take photo</p>
+  </div>`;
+
+  openModal('photo-modal');
+}
+
+function triggerCamera() {
+  document.getElementById('photo-input').click();
+}
+
+function handlePhotoCapture(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  capturedPhoto = file;
+  const url = URL.createObjectURL(file);
+  const area = document.getElementById('photo-area');
+  area.innerHTML = `<img src="${url}" alt="Proof photo"/>`;
+
+  const btn = document.getElementById('photo-submit-btn');
+  btn.disabled = false;
+  btn.style.opacity = '1';
+}
+
+async function submitProofPhoto() {
+  if (!capturedPhoto || !activeJob) return;
+
+  const btn = document.getElementById('photo-submit-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    // Upload to Supabase Storage
+    const fileName = `${activeJob.tracking_code}_${photoMode}_${Date.now()}.jpg`;
+    const { data: uploadData, error: uploadErr } = await sb.storage
+      .from('delivery-proofs')
+      .upload(fileName, capturedPhoto, { contentType: 'image/jpeg' });
+
+    const photoUrl = uploadErr ? null :
+      `${SB_URL}/storage/v1/object/public/delivery-proofs/${fileName}`;
+
+    // Update order status
+    const isPickup = photoMode === 'pickup';
+    const updateData = isPickup
+      ? { status: 'picked_up', pickup_photo: photoUrl, picked_up_at: new Date().toISOString() }
+      : { status: 'delivered', delivery_photo: photoUrl, delivered_at: new Date().toISOString() };
+
+    await sb.from('quote_requests')
+      .update(updateData)
+      .eq('tracking_code', activeJob.tracking_code);
+
+    if (isPickup) {
+      activeJob.jobPhase = 'picked_up';
+      localStorage.setItem('zygo_active_job', JSON.stringify(activeJob));
+      showActiveJob(activeJob);
+      showToast('Picked up! Head to delivery address.', 'success');
+    } else {
+      // Job complete
+      const completed = {
+        ...activeJob,
+        completedAt: new Date().toISOString(),
+        earnings: activeJob.myEarnings,
+        type: 'zygo'
+      };
+      jobHistory.unshift(completed);
+      if (jobHistory.length > 100) jobHistory = jobHistory.slice(0, 100);
+      localStorage.setItem('zygo_job_history', JSON.stringify(jobHistory));
+
+      activeJob = null;
+      localStorage.removeItem('zygo_active_job');
+      document.getElementById('active-job-section').style.display = 'none';
+      showToast('✅ Delivery complete! GHS ' + completed.earnings + ' earned.', 'success');
+      playDeliveredSound();
+      loadDashboard();
+    }
+
+    closeModal('photo-modal');
+  } catch(e) {
+    showToast('Upload failed — try again', 'error');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+async function submitFailure() {
+  const reason = document.getElementById('fail-reason').value;
+  const notes  = document.getElementById('fail-notes').value;
+
+  if (!reason) { showToast('Please select a reason', 'error'); return; }
+  if (!activeJob) return;
+
+  await sb.from('quote_requests').update({
+    status: 'failed',
+    delivery_notes: `Rider failed: ${reason}. ${notes}. Parcel at Dispatch Centre.`
+  }).eq('tracking_code', activeJob.tracking_code);
+
+  const msg = encodeURIComponent(
+    `⚠️ DELIVERY FAILED\n\nTracking: ${activeJob.tracking_code}\nRider: ${rider.name}\nReason: ${reason}\n${notes}\n\nParcel being returned to Dispatch Centre.`
+  );
+  window.open(`https://wa.me/${DISPATCHER_PHONE}?text=${msg}`);
+
+  activeJob = null;
+  localStorage.removeItem('zygo_active_job');
+  document.getElementById('active-job-section').style.display = 'none';
+  closeModal('fail-modal');
+  showToast('Failure reported. Return parcel to DC.', 'error');
+}
+
+// ── CUSTOMERS ─────────────────────────────────────────────────────────────────
+function openAddCustomer() {
+  ['nc-name','nc-phone','nc-area','nc-price','nc-notes']
+    .forEach(id => document.getElementById(id).value = '');
+  openModal('add-customer-modal');
+}
+
+function saveCustomer() {
+  const name  = document.getElementById('nc-name').value.trim();
+  const phone = document.getElementById('nc-phone').value.trim();
+  const area  = document.getElementById('nc-area').value.trim();
+  const price = document.getElementById('nc-price').value.trim();
+  const notes = document.getElementById('nc-notes').value.trim();
+
+  if (!name || !phone) { showToast('Name and phone are required', 'error'); return; }
+
+  customers.unshift({
+    id: Date.now(),
+    name, phone, area, price, notes,
+    deliveries: 0,
+    addedAt: new Date().toISOString()
+  });
+  localStorage.setItem('zygo_my_customers', JSON.stringify(customers));
+  renderCustomers();
+  closeModal('add-customer-modal');
+  showToast(`${name} added to your customers`, 'success');
+  document.getElementById('prof-customers').textContent = customers.length;
+}
+
+function renderCustomers() {
+  const list = document.getElementById('customers-list');
+  if (!customers.length) {
+    list.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">👥</div>
+      <div class="empty-title">No customers yet</div>
+      <div class="empty-sub">Add your regular customers to build<br>your private delivery business.</div>
+    </div>`;
+    return;
+  }
+  list.innerHTML = customers.map(c => `
+    <div class="customer-card">
+      <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
+      <div class="cust-info">
+        <div class="cust-name">${c.name}</div>
+        <div class="cust-phone">${c.phone}</div>
+        <div class="cust-meta">${c.area||''}${c.price ? ' · GHS '+c.price : ''}${c.notes ? ' · '+c.notes : ''}</div>
+      </div>
+      <div class="cust-actions">
+        <button class="cust-btn cbtn-wa" onclick="waCustomer('${c.phone}')">💬</button>
+        <button class="cust-btn cbtn-call" onclick="callCustomer('${c.phone}')">📞</button>
+        <button class="cust-btn cbtn-del" onclick="deleteCustomer(${c.id})">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function waCustomer(phone) {
+  const msg = encodeURIComponent('Hi, this is your Zygo Express delivery rider. How can I help you today?');
+  window.open(`https://wa.me/233${phone.replace(/^0/,'')}?text=${msg}`);
+}
+function callCustomer(phone) { window.open(`tel:${phone}`); }
+function deleteCustomer(id) {
+  customers = customers.filter(c => c.id !== id);
+  localStorage.setItem('zygo_my_customers', JSON.stringify(customers));
+  renderCustomers();
+  document.getElementById('prof-customers').textContent = customers.length;
+}
+
+// ── EARNINGS ──────────────────────────────────────────────────────────────────
+function loadEarnings() {
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+
+  const monthJobs = jobHistory.filter(j => {
+    const d = new Date(j.completedAt);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+
+  const zygoJobs    = monthJobs.filter(j => j.type === 'zygo');
+  const privateJobs = monthJobs.filter(j => j.type === 'private');
+  const zygoTotal   = zygoJobs.reduce((s,j)=>s+(parseFloat(j.earnings)||0),0);
+  const privTotal   = privateJobs.reduce((s,j)=>s+(parseFloat(j.earnings)||0),0);
+  const total       = zygoTotal + privTotal;
+
+  document.getElementById('earn-month').textContent    = `GHS ${total.toFixed(0)}`;
+  document.getElementById('earn-zygo-jobs').textContent   = zygoJobs.length;
+  document.getElementById('earn-private-jobs').textContent = privateJobs.length;
+  document.getElementById('earn-zygo-total').textContent   = `GHS ${zygoTotal.toFixed(0)}`;
+  document.getElementById('earn-private-total').textContent = `GHS ${privTotal.toFixed(0)}`;
+
+  const hist = document.getElementById('earnings-history');
+  if (!monthJobs.length) {
+    hist.innerHTML = '<div style="text-align:center;padding:30px;color:rgba(255,255,255,0.2);font-size:13px;">No job history this month.</div>';
+    return;
+  }
+  hist.innerHTML = monthJobs.map(j => `
+    <div style="display:flex;align-items:center;justify-content:space-between;
+      padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <div>
+        <div style="font-family:monospace;font-size:13px;font-weight:700;color:var(--o);">${j.tracking_code||'Private'}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;">
+          ${new Date(j.completedAt).toLocaleDateString('en-GB')} · ${j.type==='zygo'?'Zygo Job':'Private Job'}
+        </div>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:16px;
+        color:${j.type==='zygo'?'var(--o)':'var(--amber)'};">
+        GHS ${parseFloat(j.earnings||0).toFixed(0)}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── PROFILE ───────────────────────────────────────────────────────────────────
+function loadProfile() {
+  if (!rider) return;
+  const init = (rider.name||'R').charAt(0).toUpperCase();
+  document.getElementById('profile-avatar').textContent = init;
+  document.getElementById('profile-name').textContent = rider.name || 'Partner Rider';
+  document.getElementById('profile-phone').textContent = rider.phone||'';
+
+  const level = rider.level || 1;
+  const levels = ['','Registered Partner','Verified Partner','Trusted Partner','Business Partner'];
+  const colors = ['','badge-muted','badge-orange','badge-amber','badge-green'];
+  document.getElementById('profile-level').textContent = `⭐ Level ${level} — ${levels[level]}`;
+  document.getElementById('level-badge').textContent = `Level ${level}`;
+  document.getElementById('level-badge').className = `badge ${colors[level]}`;
+
+  // Level progress
+  const totalJobs = jobHistory.filter(j=>j.type==='zygo').length;
+  const milestones = [0,10,50,200,500];
+  const next = milestones[Math.min(level, 4)];
+  const prev = milestones[Math.max(level-1, 0)];
+  const pct  = next > 0 ? Math.min(((totalJobs-prev)/(next-prev))*100, 100) : 100;
+  document.getElementById('level-bar').style.width = pct + '%';
+  document.getElementById('level-progress-text').textContent = `${totalJobs} / ${next} jobs`;
+  document.getElementById('prof-total-jobs').textContent = totalJobs;
+  document.getElementById('prof-customers').textContent = customers.length;
+
+  if (level >= 2) {
+    const qr = document.getElementById('qr-display');
+    qr.innerHTML = `<div style="font-size:10px;color:#333;text-align:center;line-height:1.8;font-family:monospace;">
+      ZGX PARTNER<br>${rider.id||'ZGX-PRN-0001'}<br>
+      <div style="border:3px solid #333;padding:8px;margin-top:6px;display:inline-block;">
+        <div style="width:80px;height:80px;background:repeating-conic-gradient(#333 0% 25%, white 0% 50%) 0 0/8px 8px;"></div>
+      </div><br>zygoexpress.com/verify
+    </div>`;
+  }
+}
+
+function updateProfileStats() {
+  const totalJobs = jobHistory.filter(j=>j.type==='zygo').length;
+  document.getElementById('prof-total-jobs').textContent = totalJobs;
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+function openAddCustomer() { openModal('add-customer-modal'); }
+function openFailModal() { openModal('fail-modal'); }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// ── SOUND ─────────────────────────────────────────────────────────────────────
+function playSound(freqs, type='sine') {
+  try {
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach(([freq, start, dur]) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + start);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur);
+    });
+  } catch(e) {}
+}
+function playJobAcceptSound() {
+  playSound([[440,0,0.1],[550,0.1,0.15],[660,0.25,0.2]]);
+}
+function playDeliveredSound() {
+  playSound([[523,0,0.1],[659,0.1,0.1],[784,0.2,0.1],[1047,0.3,0.3]]);
+}
+function playNewJobSound() {
+  playSound([[880,0,0.1],[880,0.15,0.1],[880,0.3,0.1]]);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── CHECK SESSION ─────────────────────────────────────────────────────────────
+// Auto-refresh jobs when online
+setInterval(() => { if (isOnline) checkForNewJobs(); }, 30000);
+</script>
+</body>
+</html>

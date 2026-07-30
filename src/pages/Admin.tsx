@@ -52,11 +52,11 @@ export default function Admin() {
               <tbody>
                 {documents.map((document, index) => (
                   <tr
-                    key={`${document.plate_number ?? "vehicle"}-${document.document_type ?? "document"}-${index}`}
+                    key={`${document.plate_number ?? "vehicle"}-${document.document_type_code ?? "document"}-${index}`}
                     className="border-b last:border-0"
                   >
                     <td className="px-4 py-3">
-                      {document.vehicle ?? "—"}
+                      {document.vehicle_name ?? "—"}
                     </td>
 
                     <td className="px-4 py-3">
@@ -64,7 +64,9 @@ export default function Admin() {
                     </td>
 
                     <td className="px-4 py-3">
-                      {document.document_type ?? "—"}
+                      {document.document_type_name ??
+                        document.document_type_code ??
+                        "—"}
                     </td>
 
                     <td className="px-4 py-3">

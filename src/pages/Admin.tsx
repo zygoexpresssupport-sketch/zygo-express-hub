@@ -1,20 +1,96 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { useVraistaCurrentDocuments } from "@/hooks/use-vraista";
 
 export default function Admin() {
+  const navigate = useNavigate();
+  const [authChecking, setAuthChecking] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!mounted) return;
+
+      if (!session) {
+        navigate("/auth", { replace: true });
+        return;
+      }
+
+      setAuthenticated(true);
+      setAuthChecking(false);
+    };
+
+    checkSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+
+      if (!session) {
+        navigate("/auth", { replace: true });
+        return;
+      }
+
+      setAuthenticated(true);
+      setAuthChecking(false);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
   const {
     data: documents = [],
     isLoading,
     isError,
+    error,
   } = useVraistaCurrentDocuments();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth", { replace: true });
+  };
+
+  if (authChecking || !authenticated) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="mx-auto max-w-7xl">
+          <div className="rounded-lg border p-6 text-sm">
+            Checking administrator session…
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold">Vraista Compliance</h1>
-          <p className="text-sm text-muted-foreground">
-            Current vehicle document compliance status
-          </p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Vraista Compliance</h1>
+            <p className="text-sm text-muted-foreground">
+              Current vehicle document compliance status
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted"
+          >
+            Sign out
+          </button>
         </div>
 
         {isLoading && (
@@ -25,7 +101,19 @@ export default function Admin() {
 
         {isError && (
           <div className="rounded-lg border p-6 text-sm">
-            Unable to load Vraista compliance records.
+            <p className="font-medium">
+              Unable to load Vraista compliance records.
+            </p>
+
+            <p className="mt-2 text-muted-foreground">
+              Your account may not have administrator permissions.
+            </p>
+
+            {error instanceof Error && (
+              <p className="mt-2 break-words text-xs text-muted-foreground">
+                {error.message}
+              </p>
+            )}
           </div>
         )}
 

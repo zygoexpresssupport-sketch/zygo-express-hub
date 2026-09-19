@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#f97316"/>
+<title>Zygo Fleet — Owner Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--o:#f97316;--od:#c2410c;--ink:#0f0f0f;--paper:#fafaf9;--stone:#e8e4dc;
+  --muted:#78716c;--green:#16a34a;--red:#dc2626;--amber:#f59e0b;--r:14px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--ink);font-family:'Inter',sans-serif;color:white;overflow-x:hidden;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--ink);overflow-y:auto;}
+.screen.hidden{transform:translateX(100%);pointer-events:none;}
+.topbar{background:#111;border-bottom:1px solid rgba(255,255,255,0.07);padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-logo{display:flex;align-items:center;gap:8px;}
+.tb-mark{width:30px;height:30px;background:var(--o);border-radius:8px;display:grid;
+  place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:12px;}
+.tb-name{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.tb-name em{color:var(--o);font-style:normal;}
+.content{padding:16px;padding-bottom:80px;}
+.section-tag{font-size:11px;font-weight:800;color:var(--o);text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:12px;display:block;}
+.card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;margin-bottom:12px;}
+.btn-main{width:100%;padding:15px;background:linear-gradient(135deg,var(--o),var(--od));border:none;
+  border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:900;color:white;cursor:pointer;}
+.field-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:7px;display:block;}
+.field-in{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:var(--r);padding:13px 16px;font-size:15px;color:white;outline:none;
+  margin-bottom:14px;font-family:'Inter',sans-serif;}
+.field-in:focus{border-color:var(--o);}
+.field-in::placeholder{color:rgba(255,255,255,0.2);}
+
+/* Stats */
+.stats-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stats-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:14px;}
+.stat{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:14px;
+  padding:14px 10px;text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:900;font-size:20px;color:var(--o);letter-spacing:-0.5px;}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;}
+
+/* Keke card */
+.keke-card{background:linear-gradient(135deg,rgba(249,115,22,0.06),rgba(0,0,0,0));
+  border:1px solid rgba(249,115,22,0.15);border-radius:16px;padding:16px;margin-bottom:12px;}
+.keke-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.keke-code{font-family:monospace;font-size:16px;font-weight:700;color:var(--o);letter-spacing:1px;}
+.keke-status{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.ks-active{background:rgba(22,163,74,0.15);color:#4ade80;border:1px solid rgba(22,163,74,0.25);}
+.ks-maintenance{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);}
+.ks-inactive{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.08);}
+.keke-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.keke-info-item .lbl{font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:2px;}
+.keke-info-item .val{font-size:13px;font-weight:600;color:white;}
+.keke-map{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;height:160px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:rgba(255,255,255,0.2);margin-bottom:12px;position:relative;overflow:hidden;}
+.keke-actions{display:flex;gap:8px;}
+.kaction{flex:1;padding:10px;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;}
+.ka-maint{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+.ka-history{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.08);}
+.ka-contact{background:rgba(37,211,102,0.12);color:#4ade80;border:1px solid rgba(37,211,102,0.2);}
+
+/* Earnings chart */
+.earnings-bar{display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:8px;}
+.e-bar{flex:1;border-radius:4px 4px 0 0;background:rgba(249,115,22,0.2);
+  transition:height 0.5s ease;position:relative;min-height:4px;}
+.e-bar.today{background:var(--o);}
+.e-bar-lbl{font-size:9px;color:rgba(255,255,255,0.25);text-align:center;margin-top:4px;}
+.earnings-row{display:flex;justify-content:space-between;font-size:11px;
+  color:rgba(255,255,255,0.3);margin-top:4px;}
+
+/* Payout card */
+.payout-card{background:linear-gradient(135deg,rgba(22,163,74,0.08),rgba(15,120,60,0.04));
+  border:1.5px solid rgba(22,163,74,0.2);border-radius:16px;padding:16px;margin-bottom:14px;}
+.payout-title{font-size:11px;font-weight:800;color:#4ade80;text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:10px;}
+.payout-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:36px;
+  color:#4ade80;letter-spacing:-1.5px;margin-bottom:4px;}
+.payout-sub{font-size:12px;color:rgba(255,255,255,0.35);}
+.payout-breakdown{background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;margin-top:12px;}
+.pb-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;}
+.pb-row:last-child{margin-bottom:0;border-top:1px solid rgba(255,255,255,0.06);
+  padding-top:6px;margin-top:6px;}
+.pb-row .lbl{color:rgba(255,255,255,0.35);}
+.pb-row .val{font-weight:700;color:white;}
+.pb-row.deduction .val{color:#f87171;}
+.pb-row.total .val{color:#4ade80;font-size:14px;}
+
+/* Maintenance history */
+.maint-item{padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.maint-item:last-child{border-bottom:none;}
+.maint-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.maint-type{font-size:13px;font-weight:700;color:white;}
+.maint-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;}
+.mb-completed{background:rgba(22,163,74,0.12);color:#4ade80;}
+.mb-progress{background:rgba(245,158,11,0.12);color:#fbbf24;}
+.mb-reported{background:rgba(220,38,38,0.12);color:#f87171;}
+.maint-detail{font-size:11px;color:rgba(255,255,255,0.3);}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#111;
+  border-top:1px solid rgba(255,255,255,0.07);padding:8px 0;
+  display:flex;z-index:50;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:6px 0;cursor:pointer;border:none;background:none;}
+.nav-icon{font-size:20px;}
+.nav-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;}
+.nav-item.active .nav-lbl{color:var(--o);}
+
+/* Login */
+#login{align-items:center;justify-content:center;padding:32px 24px;}
+.login-logo{text-align:center;margin-bottom:28px;}
+.logo-mark{width:72px;height:72px;background:var(--o);border-radius:18px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;
+  font-size:30px;color:white;margin:0 auto 14px;}
+.logo-title{font-family:'Syne',sans-serif;font-weight:900;font-size:24px;}
+.logo-sub{font-size:13px;color:rgba(255,255,255,0.35);margin-top:4px;}
+.login-card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:24px;width:100%;max-width:380px;}
+.err-msg{color:#f87171;font-size:13px;text-align:center;margin-top:10px;display:none;}
+
+/* Toast */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:999px;
+  padding:10px 20px;font-size:13px;font-weight:600;white-space:nowrap;z-index:300;
+  transition:transform 0.3s;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:rgba(22,163,74,0.4);color:#4ade80;}
+.toast.error{border-color:rgba(220,38,38,0.4);color:#f87171;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- ════ LOGIN ════ -->
+<div class="screen" id="login">
+  <div class="login-logo">
+    <div class="logo-mark">Z</div>
+    <div class="logo-title">Zygo Fleet</div>
+    <div class="logo-sub">Owner Portal</div>
+  </div>
+  <div class="login-card">
+    <label class="field-lbl">Phone Number</label>
+    <input class="field-in" type="tel" id="l-phone" placeholder="0244 123 456" inputmode="numeric"/>
+    <label class="field-lbl">PIN</label>
+    <input class="field-in" type="password" id="l-pin" placeholder="Your 4-digit PIN" inputmode="numeric" maxlength="4"/>
+    <label class="field-lbl">PIN</label>
+    <input class="field-in" type="password" id="l-pin"
+      placeholder="Your 4-digit PIN" inputmode="numeric" maxlength="4"
+      style="margin-bottom:14px;"/>
+    <button class="btn-main" onclick="doLogin()">Sign In as Owner →</button>
+    <div class="err-msg" id="l-err">Incorrect credentials. Call 0202858011.</div>
+  </div>
+</div>
+
+<!-- ════ MAIN APP ════ -->
+<div class="screen hidden" id="main">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-mark">Z</div>
+      <div class="tb-name">Zygo<em>Fleet</em></div>
+    </div>
+    <span style="font-size:12px;color:rgba(255,255,255,0.35);" id="owner-name-tb">Owner</span>
+  </div>
+
+  <!-- TAB: OVERVIEW -->
+  <div id="tab-overview" class="content">
+    <span class="section-tag">My Fleet Overview</span>
+    <div class="stats-4">
+      <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-lbl">Keke</div></div>
+      <div class="stat"><div class="stat-num" id="s-active" style="color:#4ade80;">0</div><div class="stat-lbl">Active</div></div>
+      <div class="stat"><div class="stat-num" id="s-maint" style="color:var(--amber);">0</div><div class="stat-lbl">Repair</div></div>
+      <div class="stat"><div class="stat-num" id="s-issues" style="color:#f87171;">0</div><div class="stat-lbl">Issues</div></div>
+    </div>
+
+    <div class="payout-card">
+      <div class="payout-title">Next Weekly Payout</div>
+      <div class="payout-amount" id="payout-amount">GHS 0</div>
+      <div class="payout-sub">Expected <span id="payout-date">this Friday</span></div>
+      <div class="payout-breakdown">
+        <div class="pb-row"><span class="lbl">Gross collected from rider</span><span class="val" id="pb-gross">GHS 0</span></div>
+        <div class="pb-row deduction"><span class="lbl">Zygo management fee</span><span class="val">— GHS 75</span></div>
+        <div class="pb-row deduction"><span class="lbl">Tracker repayment</span><span class="val" id="pb-tracker">— GHS 25</span></div>
+        <div class="pb-row deduction"><span class="lbl">Maintenance deductions</span><span class="val" id="pb-maint">— GHS 0</span></div>
+        <div class="pb-row total"><span class="lbl">Net to your MoMo</span><span class="val" id="pb-net">GHS 0</span></div>
+      </div>
+    </div>
+
+    <span class="section-tag">This Week's Earnings</span>
+    <div class="card">
+      <div class="earnings-bar" id="earn-bars">
+        <!-- Populated by JS -->
+      </div>
+      <div class="earnings-row">
+        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+        <span>Fri</span><span>Sat</span><span>Sun</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:14px;">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">Week Total</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:20px;color:var(--o);" id="week-total">GHS 0</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">Daily Target</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:20px;color:white;">GHS 35</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: MY KEKE -->
+  <div id="tab-keke" class="content hidden">
+    <span class="section-tag">My Tricycles</span>
+    <div id="keke-list">
+      <div style="text-align:center;padding:40px;color:rgba(255,255,255,0.2);font-size:13px;">
+        Loading your tricycles...
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: MAINTENANCE -->
+  <div id="tab-maintenance" class="content hidden">
+    <span class="section-tag">Maintenance History</span>
+    <div class="stats-2" style="margin-bottom:16px;">
+      <div class="stat"><div class="stat-num" id="m-open" style="color:#f87171;">0</div><div class="stat-lbl">Open Jobs</div></div>
+      <div class="stat"><div class="stat-num" id="m-month" style="color:var(--amber);">GHS 0</div><div class="stat-lbl">This Month Cost</div></div>
+    </div>
+    <div class="card" id="maint-list">
+      <div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:13px;">No maintenance records yet.</div>
+    </div>
+    <div style="background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);
+      border-radius:var(--r);padding:14px;margin-top:4px;">
+      <div style="font-size:12px;font-weight:700;color:var(--o);margin-bottom:6px;">🔧 Zygo Mechanic</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.7;">
+        Our full-time mechanic handles all repairs at the Zygo depot.<br/>
+        Repair costs are deducted from your weekly payout.<br/>
+        You receive full transparency on parts and labour.
+      </div>
+      <button onclick="callMechanic()"
+        style="margin-top:10px;width:100%;padding:10px;background:#25D366;
+        border:none;border-radius:var(--r);font-size:13px;font-weight:700;color:white;cursor:pointer;">
+        💬 WhatsApp Mechanic
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB: ACCOUNT -->
+  <div id="tab-account" class="content hidden">
+    <span class="section-tag">My Account</span>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+        <div style="width:52px;height:52px;background:rgba(249,115,22,0.15);border-radius:50%;
+          display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;
+          font-size:20px;color:var(--o);" id="owner-avatar">O</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;" id="owner-name-card">Owner</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.35);" id="owner-code-card">ZFO-XXXX</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;
+          padding:10px;background:rgba(255,255,255,0.04);border-radius:10px;">
+          <span style="color:rgba(255,255,255,0.4);">Monthly Management Fee</span>
+          <span style="font-weight:700;color:var(--o);">GHS 300</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;
+          padding:10px;background:rgba(255,255,255,0.04);border-radius:10px;">
+          <span style="color:rgba(255,255,255,0.4);">Deduction Method</span>
+          <span style="font-weight:700;">GHS 75 / week</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;
+          padding:10px;background:rgba(255,255,255,0.04);border-radius:10px;">
+          <span style="color:rgba(255,255,255,0.4);">Payout Day</span>
+          <span style="font-weight:700;">Every Friday</span>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:4px;">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Quick Contact</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="https://wa.me/233202858011"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.15);
+          border-radius:10px;font-size:13px;font-weight:600;color:#4ade80;text-decoration:none;">
+          💬 WhatsApp Zygo Express
+        </a>
+        <a href="tel:0202858011"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(255,255,255,0.04);border-radius:10px;
+          font-size:13px;font-weight:600;color:white;text-decoration:none;">
+          📞 Call 0202858011
+        </a>
+        <button onclick="exportPayoutHistory()"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(29,78,216,0.08);border:1px solid rgba(29,78,216,0.15);
+          border-radius:10px;font-size:13px;font-weight:600;color:#93c5fd;
+          width:100%;cursor:pointer;">
+          📊 Download Payout History (CSV)
+        </button>
+        <button onclick="doSignout()"
+          style="display:flex;align-items:center;gap:10px;padding:12px;
+          background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.15);
+          border-radius:10px;font-size:13px;font-weight:600;color:#f87171;
+          width:100%;cursor:pointer;">
+          🚪 Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('overview',this)">
+      <div class="nav-icon">📊</div><div class="nav-lbl">Overview</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('keke',this)">
+      <div class="nav-icon">🛺</div><div class="nav-lbl">My Keke</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('maintenance',this)">
+      <div class="nav-icon">🔧</div><div class="nav-lbl">Repairs</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('account',this)">
+      <div class="nav-icon">👤</div><div class="nav-lbl">Account</div>
+    </button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://hdskkfdtosgfznjscemz.supabase.co';
+const SB_KEY = 'sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+let owner = null;
+
+async function doLogin() {
+  const phone = document.getElementById('l-phone').value.trim().replace(/\s/g,'');
+  const pin   = (document.getElementById('l-pin') || {}).value?.trim() || '';
+  document.getElementById('l-err').style.display = 'none';
+  if (!phone) { document.getElementById('l-err').style.display = 'block'; return; }
+  try {
+    const { data } = await sb.from('fleet_owners').select('*')
+      .eq('phone', phone).eq('status','active').single();
+    if (!data || (data.pin && data.pin !== pin)) {
+      document.getElementById('l-err').style.display = 'block'; return;
+    }
+    owner = data;
+    localStorage.setItem('zygo_fleet_owner', JSON.stringify({ phone, id: data.id, name: data.full_name, code: data.owner_code }));
+    showApp();
+  } catch(e) { document.getElementById('l-err').style.display = 'block'; }
+}
+
+function showApp() {
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_owner') || '{}');
+  document.getElementById('owner-name-tb').textContent = saved.name?.split(' ')[0] || 'Owner';
+  document.getElementById('owner-name-card').textContent = saved.name || 'Owner';
+  document.getElementById('owner-code-card').textContent = saved.code || 'ZFO-XXXX';
+  document.getElementById('owner-avatar').textContent = (saved.name || 'O').charAt(0).toUpperCase();
+  loadOverview();
+  loadKeke();
+}
+
+function doSignout() {
+  localStorage.removeItem('zygo_fleet_owner');
+  owner = null;
+  document.getElementById('main').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('zygo_fleet_owner');
+  if (saved) { owner = JSON.parse(saved); showApp(); }
+});
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(name, el) {
+  ['overview','keke','maintenance','account'].forEach(t => {
+    document.getElementById('tab-'+t).classList.toggle('hidden', t !== name);
+  });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  if (name === 'maintenance') loadMaintenance();
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────────
+async function loadOverview() {
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_owner') || '{}');
+  if (!saved.id) return;
+  try {
+    const { data: keke } = await sb.from('fleet_tricycles')
+      .select('*,fleet_daily_logs(*)')
+      .eq('owner_id', saved.id);
+    const all = keke || [];
+    const active = all.filter(k => k.status === 'active');
+    const maint  = all.filter(k => k.status === 'maintenance');
+
+    document.getElementById('s-total').textContent  = all.length;
+    document.getElementById('s-active').textContent = active.length;
+    document.getElementById('s-maint').textContent  = maint.length;
+    document.getElementById('s-issues').textContent = '0';
+
+    // Weekly earnings chart — REAL DATA from Supabase
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1);
+    weekStart.setHours(0,0,0,0);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    weekEnd.setHours(23,59,59,999);
+
+    const { data: weekLogs } = await sb.from('fleet_daily_logs')
+      .select('log_date, daily_amount_paid, tricycle_id, fleet_tricycles!inner(owner_id)')
+      .gte('log_date', weekStart.toISOString().split('T')[0])
+      .lte('log_date', weekEnd.toISOString().split('T')[0])
+      .eq('fleet_tricycles.owner_id', saved.id);
+
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const dayData = days.map((_, i) => {
+      const d = new Date(weekStart);
+      d.setDate(d.getDate() + i);
+      const dateStr = d.toISOString().split('T')[0];
+      return (weekLogs || [])
+        .filter(l => l.log_date === dateStr)
+        .reduce((s, l) => s + (parseFloat(l.daily_amount_paid) || 0), 0);
+    });
+    const maxVal = Math.max(...dayData, 1);
+    const today = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+    document.getElementById('earn-bars').innerHTML = dayData.map((v, i) =>
+      `<div class="e-bar ${i===today?'today':''}"
+        style="height:${Math.max((v/maxVal)*100,4)}%"
+        title="${days[i]}: GHS ${v.toFixed(0)}"></div>`
+    ).join('');
+    const total = dayData.reduce((s,v)=>s+v,0);
+    document.getElementById('week-total').textContent = `GHS ${total.toFixed(0)}`;
+
+    // Payout calculation
+    const gross = all.length * 35 * 7;
+    const net   = gross - 75 - 25;
+    document.getElementById('payout-amount').textContent = `GHS ${Math.max(net,0)}`;
+    document.getElementById('pb-gross').textContent = `GHS ${gross}`;
+    document.getElementById('pb-net').textContent   = `GHS ${Math.max(net,0)}`;
+
+    const friday = new Date();
+    const daysToFriday = (5 - friday.getDay() + 7) % 7 || 7;
+    friday.setDate(friday.getDate() + daysToFriday);
+    document.getElementById('payout-date').textContent =
+      friday.toLocaleDateString('en-GH', {weekday:'long', month:'short', day:'numeric'});
+
+  } catch(e) { console.error(e); }
+}
+
+// ── KEKE LIST ─────────────────────────────────────────────────────────────────
+async function loadKeke() {
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_owner') || '{}');
+  if (!saved.id) return;
+  const list = document.getElementById('keke-list');
+  try {
+    const { data } = await sb.from('fleet_overview').select('*').eq('owner_id', saved.id).limit(20);
+    const keke = data || [];
+    if (!keke.length) {
+      list.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.2);font-size:13px;">No tricycles registered yet. Contact Zygo to onboard your keke.</div>';
+      return;
+    }
+    list.innerHTML = keke.map(k => `
+      <div class="keke-card">
+        <div class="keke-header">
+          <div>
+            <div class="keke-code">${k.unit_code}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">
+              ${k.brand?.toUpperCase()||'Keke'} · ${k.reg_number||'No Reg'}
+            </div>
+          </div>
+          <span class="keke-status ${k.tricycle_status==='active'?'ks-active':k.tricycle_status==='maintenance'?'ks-maintenance':'ks-inactive'}">
+            ${k.tricycle_status||'unknown'}
+          </span>
+        </div>
+
+        <div class="keke-info">
+          <div class="keke-info-item">
+            <div class="lbl">Current Rider</div>
+            <div class="val">${k.rider_name||'Not Assigned'}</div>
+          </div>
+          <div class="keke-info-item">
+            <div class="lbl">Daily Target</div>
+            <div class="val" style="color:var(--o);">GHS ${k.daily_target_ghs||35}</div>
+          </div>
+          <div class="keke-info-item">
+            <div class="lbl">Today Paid</div>
+            <div class="val" style="color:${k.today_payment==='paid'?'#4ade80':'#f87171'};">
+              ${k.today_payment==='paid'?'✅ GHS '+(k.today_paid_ghs||35):'❌ Unpaid'}
+            </div>
+          </div>
+          <div class="keke-info-item">
+            <div class="lbl">This Week</div>
+            <div class="val">GHS ${k.week_collected_ghs||0}</div>
+          </div>
+        </div>
+
+        <!-- Live location preview -->
+        <div class="keke-map" id="map-${k.id}">
+          ${k.last_lat ? `
+            <div style="text-align:center;">
+              <div style="font-size:20px;margin-bottom:4px;">📍</div>
+              <div style="font-size:12px;color:rgba(255,255,255,0.5);">
+                ${k.engine_on ? '🟢 Engine On' : '🔴 Engine Off'} ·
+                ${k.last_speed_kmh ? k.last_speed_kmh+'km/h' : 'Stopped'}
+              </div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px;">
+                Last seen: ${k.last_ping ? new Date(k.last_ping).toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit'}) : 'Unknown'}
+              </div>
+              <a href="https://maps.google.com?q=${k.last_lat},${k.last_lng}"
+                target="_blank"
+                style="display:inline-block;margin-top:8px;padding:6px 16px;background:var(--o);
+                border-radius:8px;font-size:12px;font-weight:700;color:white;text-decoration:none;">
+                View on Map →
+              </a>
+            </div>
+          ` : '<div style="text-align:center;"><div style="font-size:24px;margin-bottom:6px;">📡</div><div style="font-size:11px;">Tracker not active</div></div>'}
+        </div>
+
+        <div class="keke-actions">
+          <button class="kaction ka-maint" onclick="showToast('Contact Zygo to log maintenance','')">🔧 Maintenance</button>
+          <button class="kaction ka-contact" onclick="waRider('${k.rider_phone}','${k.rider_name}')">💬 Rider</button>
+          <button class="kaction ka-history" onclick="showToast('Full history coming soon','')">📋 History</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { list.innerHTML = '<div style="text-align:center;padding:20px;color:#f87171;font-size:13px;">Failed to load. Check connection.</div>'; }
+}
+
+// ── MAINTENANCE ───────────────────────────────────────────────────────────────
+async function loadMaintenance() {
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_owner') || '{}');
+  const list = document.getElementById('maint-list');
+  try {
+    const { data } = await sb.from('fleet_maintenance')
+      .select('*, fleet_tricycles(unit_code)')
+      .eq('fleet_tricycles.owner_id', saved.id)
+      .order('created_at', { ascending: false })
+      .limit(15);
+    const records = data || [];
+    const open  = records.filter(r => !['completed','cancelled'].includes(r.status));
+    const mCost = records.filter(r => r.status==='completed').reduce((s,r)=>s+(r.total_cost_ghs||0),0);
+    document.getElementById('m-open').textContent  = open.length;
+    document.getElementById('m-month').textContent = `GHS ${mCost}`;
+    if (!records.length) { list.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.2);font-size:13px;">No maintenance records yet.</div>'; return; }
+    list.innerHTML = records.map(r => `
+      <div class="maint-item">
+        <div class="maint-top">
+          <div class="maint-type">${r.category?.replace('_',' ')?.toUpperCase()||'Maintenance'}</div>
+          <span class="maint-badge ${r.status==='completed'?'mb-completed':r.status==='in_progress'?'mb-progress':'mb-reported'}">
+            ${r.status}
+          </span>
+        </div>
+        <div class="maint-detail">
+          ${r.fleet_tricycles?.unit_code||'Keke'} ·
+          ${r.description?.substring(0,50)||''} ·
+          ${r.total_cost_ghs ? 'GHS '+r.total_cost_ghs : 'Cost TBD'}
+        </div>
+      </div>`).join('');
+  } catch(e) { list.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.2);font-size:13px;">No records.</div>'; }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function waRider(phone, name) {
+  if (!phone) { showToast('Rider phone not available','error'); return; }
+  const msg = encodeURIComponent(`Hi ${name||'Rider'}, this is your keke owner calling via Zygo Fleet. Please check in with the dispatcher. Thank you.`);
+  window.open(`https://wa.me/233${phone.replace(/^0/,'')}?text=${msg}`);
+}
+
+function callMechanic() {
+  window.open('https://wa.me/233202858011?text=' + encodeURIComponent('Hi Zygo, I need the mechanic for my keke. Please arrange.'));
+}
+
+let toastT;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.getElementById('l-pin').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+// ── PAYOUT HISTORY EXPORT ─────────────────────────────────────────────────────
+async function exportPayoutHistory() {
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_owner') || '{}');
+  if (!saved.id) { showToast('Sign in first', 'error'); return; }
+  try {
+    const { data } = await sb.from('fleet_payouts')
+      .select('*, fleet_tricycles(unit_code)')
+      .eq('owner_id', saved.id)
+      .order('week_start', { ascending: false })
+      .limit(52);
+    if (!data?.length) { showToast('No payout history found', ''); return; }
+
+    const rows = [
+      ['Week Start','Week End','Keke','Gross Collected','Mgmt Fee',
+       'Tracker Repay','Maintenance','Net Payout','Status','Paid At','Ref'].join(','),
+      ...data.map(p => [
+        p.week_start, p.week_end,
+        p.fleet_tricycles?.unit_code || '',
+        p.gross_collected, p.management_fee,
+        p.tracker_repayment, p.maintenance_deduction,
+        p.net_payout, p.payout_status,
+        p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-GH') : '',
+        p.payment_ref || ''
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([rows], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `zygo-fleet-payouts-${saved.name?.replace(/ /g,'-') || 'owner'}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('✅ CSV downloaded!', 'success');
+  } catch(e) { showToast('Export failed', 'error'); }
+}
+</script>
+</body>
+</html>

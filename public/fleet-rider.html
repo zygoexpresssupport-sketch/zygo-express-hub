@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#f97316"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Zygo Fleet Rider"/>
+<title>Zygo Fleet — Rider App</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--o:#f97316;--od:#c2410c;--ink:#0f0f0f;--paper:#fafaf9;
+  --stone:#e8e4dc;--muted:#78716c;--green:#16a34a;--red:#dc2626;
+  --amber:#f59e0b;--r:14px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--ink);font-family:'Inter',sans-serif;color:white;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  background:var(--ink);overflow-y:auto;transition:transform 0.3s,opacity 0.3s;}
+.screen.hidden{transform:translateX(100%);opacity:0;pointer-events:none;}
+
+/* LOGIN */
+#login{align-items:center;justify-content:center;padding:32px 24px;gap:0;}
+.logo-block{text-align:center;margin-bottom:32px;}
+.logo-mark{width:72px;height:72px;background:var(--o);border-radius:18px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;
+  font-size:30px;color:white;margin:0 auto 14px;box-shadow:0 0 40px rgba(249,115,22,0.3);}
+.logo-title{font-family:'Syne',sans-serif;font-weight:900;font-size:24px;letter-spacing:-0.5px;}
+.logo-sub{font-size:13px;color:rgba(255,255,255,0.35);margin-top:4px;}
+.login-card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:20px;padding:24px;width:100%;max-width:380px;}
+.field-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;display:block;}
+.field-in{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:var(--r);padding:14px 16px;font-size:16px;color:white;
+  outline:none;margin-bottom:14px;font-family:'Inter',sans-serif;}
+.field-in:focus{border-color:var(--o);}
+.field-in::placeholder{color:rgba(255,255,255,0.2);}
+.btn-main{width:100%;padding:15px;background:linear-gradient(135deg,var(--o),var(--od));
+  border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:16px;
+  font-weight:900;color:white;cursor:pointer;}
+.btn-main:active{opacity:0.85;}
+.btn-main:disabled{opacity:0.5;}
+.err-msg{color:#f87171;font-size:13px;text-align:center;margin-top:10px;display:none;}
+
+/* DASHBOARD */
+#dashboard{padding:0 0 60px;}
+.topbar{background:#111;border-bottom:1px solid rgba(255,255,255,0.07);
+  padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;}
+.tb-logo{display:flex;align-items:center;gap:8px;}
+.tb-mark{width:30px;height:30px;background:var(--o);border-radius:8px;
+  display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:900;font-size:12px;}
+.tb-name{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;}
+.tb-name em{color:var(--o);font-style:normal;}
+.tb-rider{font-size:12px;color:rgba(255,255,255,0.4);}
+
+.content{padding:16px;}
+.section-tag{font-size:11px;font-weight:800;color:var(--o);text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:12px;display:block;}
+.card{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:16px;margin-bottom:12px;}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:14px 10px;text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-weight:900;font-size:22px;
+  color:var(--o);letter-spacing:-0.5px;}
+.stat-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  letter-spacing:0.5px;margin-top:3px;}
+
+/* STATUS CARD */
+.status-card{background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(196,65,12,0.05));
+  border:1.5px solid rgba(249,115,22,0.25);border-radius:16px;padding:16px;margin-bottom:16px;}
+.status-label{font-size:10px;font-weight:800;color:var(--o);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--o);
+  animation:pdot 1.5s ease infinite;}
+@keyframes pdot{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.status-unit{font-family:monospace;font-size:20px;font-weight:700;color:white;margin-bottom:4px;}
+.status-time{font-size:12px;color:rgba(255,255,255,0.4);}
+
+/* BIG ACTION BUTTONS */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.action-btn{padding:18px 12px;border:none;border-radius:14px;font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:900;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;gap:8px;transition:all 0.15s;}
+.action-btn:active{transform:scale(0.97);}
+.action-btn .icon{font-size:28px;}
+.abtn-checkin{background:linear-gradient(135deg,var(--green),#15803d);color:white;}
+.abtn-checkout{background:linear-gradient(135deg,var(--amber),#d97706);color:white;}
+.abtn-report{background:rgba(220,38,38,0.15);color:#f87171;
+  border:1px solid rgba(220,38,38,0.2);}
+.abtn-waiver{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.6);
+  border:1px solid rgba(255,255,255,0.08);}
+.abtn-disabled{opacity:0.4;cursor:not-allowed;}
+
+/* PHOTO AREA */
+.photo-area{background:rgba(0,0,0,0.3);border:2px dashed rgba(255,255,255,0.12);
+  border-radius:var(--r);height:160px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;cursor:pointer;margin-bottom:12px;
+  position:relative;overflow:hidden;}
+.photo-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.photo-ph{text-align:center;color:rgba(255,255,255,0.25);}
+.photo-ph .icon{font-size:32px;margin-bottom:6px;}
+.photo-ph p{font-size:12px;}
+
+/* MODAL */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.7);
+  display:flex;align-items:flex-end;z-index:200;opacity:0;pointer-events:none;
+  transition:opacity 0.3s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{background:#1a1a1a;border-radius:24px 24px 0 0;
+  padding:20px 20px 32px;width:100%;transform:translateY(100%);
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+.modal-overlay.open .modal-sheet{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.15);
+  border-radius:2px;margin:0 auto 20px;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:900;font-size:18px;
+  margin-bottom:16px;}
+.form-lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);
+  text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px;}
+.form-in{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:var(--r);padding:12px 14px;font-size:14px;color:white;
+  outline:none;margin-bottom:12px;font-family:'Inter',sans-serif;}
+.form-in:focus{border-color:var(--o);}
+.form-in::placeholder{color:rgba(255,255,255,0.2);}
+
+/* HISTORY */
+.history-item{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.hist-left .date{font-size:13px;font-weight:700;color:white;}
+.hist-left .detail{font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;}
+.hist-badge{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.badge-paid{background:rgba(22,163,74,0.15);color:#4ade80;border:1px solid rgba(22,163,74,0.25);}
+.badge-unpaid{background:rgba(220,38,38,0.12);color:#f87171;border:1px solid rgba(220,38,38,0.2);}
+.badge-waived{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);}
+
+/* PAYMENT CONFIRM */
+.pay-confirm{background:linear-gradient(135deg,rgba(22,163,74,0.12),rgba(15,163,74,0.05));
+  border:1.5px solid rgba(22,163,74,0.25);border-radius:var(--r);
+  padding:14px;text-align:center;margin-bottom:12px;}
+.pay-confirm .amount{font-family:'Syne',sans-serif;font-weight:900;
+  font-size:32px;color:#4ade80;letter-spacing:-1px;}
+.pay-confirm .lbl{font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;}
+
+/* TOAST */
+.toast{position:absolute;top:80px;left:50%;transform:translateX(-50%) translateY(-100px);
+  background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:999px;
+  padding:10px 20px;font-size:13px;font-weight:600;white-space:nowrap;z-index:300;
+  transition:transform 0.3s;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:rgba(22,163,74,0.4);color:#4ade80;}
+.toast.error{border-color:rgba(220,38,38,0.4);color:#f87171;}
+
+input[type="file"]{display:none;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div class="screen" id="login">
+  <div class="logo-block">
+    <div class="logo-mark">Z</div>
+    <div class="logo-title">Zygo Fleet</div>
+    <div class="logo-sub">Rider Check-in App</div>
+  </div>
+  <div class="login-card">
+    <label class="field-lbl">Phone Number</label>
+    <input class="field-in" type="tel" id="login-phone"
+      placeholder="e.g. 0244 123 456" inputmode="numeric" maxlength="13"/>
+    <label class="field-lbl">PIN</label>
+    <input class="field-in" type="password" id="login-pin"
+      placeholder="Your 4-digit PIN" inputmode="numeric" maxlength="4"/>
+    <button class="btn-main" id="login-btn" onclick="doLogin()">
+      Sign In →
+    </button>
+    <div class="err-msg" id="login-err">Incorrect credentials. Call 0202858011.</div>
+  </div>
+</div>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div class="screen hidden" id="dashboard">
+  <div class="topbar">
+    <div class="tb-logo">
+      <div class="tb-mark">Z</div>
+      <div class="tb-name">Zygo<em>Fleet</em></div>
+    </div>
+    <div class="tb-rider" id="tb-rider-name">Rider</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Active status card -->
+    <div class="status-card" id="status-card">
+      <div class="status-label">
+        <div class="status-dot"></div>
+        <span id="status-text">Not Checked In Today</span>
+      </div>
+      <div class="status-unit" id="status-unit">—</div>
+      <div class="status-time" id="status-time"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num" id="stat-target">GHS 0</div>
+        <div class="stat-lbl">Daily Target</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-paid" style="color:#4ade80;">GHS 0</div>
+        <div class="stat-lbl">Paid Today</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num" id="stat-week" style="color:var(--amber);">0</div>
+        <div class="stat-lbl">Days This Wk</div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <span class="section-tag">Today's Actions</span>
+    <div class="action-grid">
+      <button class="action-btn abtn-checkin" id="btn-checkin" onclick="openCheckin()">
+        <div class="icon">🟢</div>
+        Check In
+      </button>
+      <button class="action-btn abtn-checkout" id="btn-checkout" onclick="openCheckout()">
+        <div class="icon">🔴</div>
+        Check Out & Pay
+      </button>
+      <button class="action-btn abtn-report" onclick="openReport()">
+        <div class="icon">⚠️</div>
+        Report Issue
+      </button>
+      <button class="action-btn abtn-waiver" onclick="openWaiver()">
+        <div class="icon">🌧️</div>
+        Request Waiver
+      </button>
+    </div>
+
+    <!-- Payment box (shows when checkout needed) -->
+    <div id="pay-box" style="display:none;">
+      <span class="section-tag">Payment Due</span>
+      <div class="pay-confirm">
+        <div class="lbl">Daily Amount Owed to Zygo</div>
+        <div class="amount" id="pay-amount">GHS 0</div>
+        <div class="lbl">Pay via MoMo to: <strong>0240393582</strong></div>
+      </div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:12px;">
+        Send exactly GHS <span id="pay-amount-small">0</span> to 0240393582 (Zygo Express)<br/>
+        Reference: <strong id="pay-ref">ZFK-XXXX</strong>
+      </div>
+    </div>
+
+    <!-- Recent history -->
+    <span class="section-tag" style="margin-top:8px;">Recent Log</span>
+    <div class="card" id="history-list">
+      <div style="text-align:center;padding:20px;color:rgba(255,255,255,0.2);font-size:13px;">
+        No history yet.
+      </div>
+    </div>
+
+    <!-- Sign out -->
+    <button onclick="doSignout()"
+      style="width:100%;padding:12px;background:none;border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--r);color:rgba(255,255,255,0.25);font-size:13px;margin-top:8px;">
+      Sign Out
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: CHECK IN -->
+<div class="modal-overlay" id="checkin-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🟢 Morning Check-In</div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;">
+      Take a clear photo of your keke before you start. This protects you from damage claims.
+    </p>
+    <label class="form-lbl">Tricycle Photo (front view)</label>
+    <div class="photo-area" onclick="triggerPhoto('ci-photo')" id="ci-photo-area">
+      <div class="photo-ph">
+        <div class="icon">📷</div>
+        <p>Tap to take photo</p>
+      </div>
+    </div>
+    <input type="file" id="ci-photo" accept="image/*" capture="environment"
+      onchange="handlePhoto(event,'ci-photo-area','ci-photo-data')"/>
+    <label class="form-lbl">Odometer Reading (km) — Optional</label>
+    <input class="form-in" type="number" id="ci-odometer" placeholder="e.g. 12450" inputmode="numeric"/>
+    <button class="btn-main" onclick="submitCheckin()">Confirm Check-In →</button>
+    <button onclick="closeModal('checkin-modal')" style="width:100%;padding:12px;background:none;
+      border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);
+      color:rgba(255,255,255,0.3);font-size:13px;margin-top:10px;">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: CHECK OUT -->
+<div class="modal-overlay" id="checkout-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔴 End of Day — Check Out</div>
+    <label class="form-lbl">Tricycle Photo (end of day)</label>
+    <div class="photo-area" onclick="triggerPhoto('co-photo')" id="co-photo-area">
+      <div class="photo-ph"><div class="icon">📷</div><p>Tap to take photo</p></div>
+    </div>
+    <input type="file" id="co-photo" accept="image/*" capture="environment"
+      onchange="handlePhoto(event,'co-photo-area','co-photo-data')"/>
+    <label class="form-lbl">Odometer Reading (km)</label>
+    <input class="form-in" type="number" id="co-odometer" placeholder="e.g. 12587" inputmode="numeric"/>
+    <button onclick="openPaystackForDaily()"
+  style="width:100%;padding:13px;background:linear-gradient(135deg,#f97316,#c2410c);
+  border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;
+  font-weight:900;color:white;cursor:pointer;margin-bottom:12px;display:flex;
+  align-items:center;justify-content:center;gap:8px;">
+  💳 Pay GHS <span id="ps-amount">35</span> via Paystack Now →
+</button>
+<div style="text-align:center;font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:12px;">
+  — OR enter MoMo reference if already paid manually —
+</div>
+<label class="form-lbl">MoMo Payment Reference</label>
+    <input class="form-in" type="text" id="co-momo-ref"
+      placeholder="MoMo confirmation code" style="font-family:monospace;"/>
+    <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);
+      border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;
+      color:rgba(255,255,255,0.5);">
+      Send <strong style="color:var(--o);" id="co-pay-amount">GHS 35</strong> to
+      <strong style="color:white;">0240393582</strong> (Zygo Express)<br/>
+      Use reference: <strong style="color:var(--o);" id="co-pay-ref">ZFK-XXXX</strong>
+    </div>
+    <button class="btn-main" onclick="submitCheckout()">Submit & Complete Day →</button>
+    <button onclick="closeModal('checkout-modal')" style="width:100%;padding:12px;background:none;
+      border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);
+      color:rgba(255,255,255,0.3);font-size:13px;margin-top:10px;">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: REPORT ISSUE -->
+<div class="modal-overlay" id="report-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚠️ Report Issue</div>
+    <label class="form-lbl">Issue Type</label>
+    <select class="form-in" id="report-type">
+      <option value="">Select...</option>
+      <option value="breakdown">Breakdown / Won't Start</option>
+      <option value="accident">Accident</option>
+      <option value="tyres">Tyre Problem</option>
+      <option value="brakes">Brake Problem</option>
+      <option value="engine">Engine Problem</option>
+      <option value="body">Body Damage</option>
+      <option value="electrical">Electrical / Lights</option>
+      <option value="theft_attempt">Theft Attempt</option>
+      <option value="other">Other</option>
+    </select>
+    <label class="form-lbl">Description</label>
+    <input class="form-in" type="text" id="report-desc" placeholder="Describe the problem..."/>
+    <label class="form-lbl">Photo (optional)</label>
+    <div class="photo-area" onclick="triggerPhoto('rpt-photo')" id="rpt-photo-area" style="height:120px;">
+      <div class="photo-ph"><div class="icon">📷</div><p>Tap to take photo</p></div>
+    </div>
+    <input type="file" id="rpt-photo" accept="image/*" capture="environment"
+      onchange="handlePhoto(event,'rpt-photo-area','rpt-photo-data')"/>
+    <button class="btn-main" style="margin-top:12px;" onclick="submitReport()">Submit Report</button>
+    <button onclick="closeModal('report-modal')" style="width:100%;padding:12px;background:none;
+      border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);
+      color:rgba(255,255,255,0.3);font-size:13px;margin-top:10px;">Cancel</button>
+  </div>
+</div>
+
+<!-- MODAL: WAIVER REQUEST -->
+<div class="modal-overlay" id="waiver-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🌧️ Request Daily Waiver</div>
+    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:16px;">
+      A waiver reduces or cancels today's payment due to weather or low activity.
+      Zygo verifies all waiver requests before approval.
+    </p>
+    <label class="form-lbl">Reason</label>
+    <select class="form-in" id="waiver-reason">
+      <option value="">Select reason...</option>
+      <option value="heavy_rain">Heavy Rain — Roads Flooded</option>
+      <option value="light_rain">Light Rain — Low Customers</option>
+      <option value="harmattan">Harmattan / Dust Storm</option>
+      <option value="public_holiday">Public Holiday — Low Activity</option>
+      <option value="funeral">Funeral / Community Event</option>
+      <option value="tricycle_repair">Tricycle in Repair</option>
+      <option value="medical">Personal Medical Emergency</option>
+    </select>
+    <label class="form-lbl">Additional Notes</label>
+    <input class="form-in" type="text" id="waiver-notes"
+      placeholder="Any extra information..."/>
+    <button class="btn-main" onclick="submitWaiver()">Submit Waiver Request</button>
+    <p style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;margin-top:10px;">
+      Zygo admin will review and respond within 2 hours.
+    </p>
+    <button onclick="closeModal('waiver-modal')" style="width:100%;padding:12px;background:none;
+      border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);
+      color:rgba(255,255,255,0.3);font-size:13px;margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://hdskkfdtosgfznjscemz.supabase.co';
+const SB_KEY = 'sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET';
+const ZYGO_MOMO = '0240393582';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let rider = null;
+let tricycle = null;
+let todayLog = null;
+const photoData = {};
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim().replace(/\s/g,'');
+  const pin   = document.getElementById('login-pin').value.trim();
+  const btn   = document.getElementById('login-btn');
+  const err   = document.getElementById('login-err');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Checking...';
+
+  try {
+    const { data, error } = await sb.rpc('fleet_rider_checkin', {
+      p_rider_phone: phone, p_rider_pin: pin
+    });
+    // Attempt login validation first
+    const { data: rows } = await sb
+      .from('fleet_riders')
+      .select('*, fleet_tricycles!current_rider_id(*)')
+      .eq('phone', phone)
+      .eq('status', 'active')
+      .single();
+
+    if (!rows) { err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Sign In →'; return; }
+
+    rider = rows;
+    tricycle = rows.fleet_tricycles || null;
+    localStorage.setItem('zygo_fleet_rider', JSON.stringify({ phone, name: rider.full_name, rider_code: rider.rider_code }));
+
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadDashboard();
+  } catch(e) {
+    err.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+
+function doSignout() {
+  localStorage.removeItem('zygo_fleet_rider');
+  rider = null; tricycle = null; todayLog = null;
+  document.getElementById('dashboard').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+  document.getElementById('login-phone').value = '';
+  document.getElementById('login-pin').value = '';
+}
+
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('zygo_fleet_rider');
+  if (saved) {
+    const s = JSON.parse(saved);
+    document.getElementById('tb-rider-name').textContent = s.name?.split(' ')[0] || 'Rider';
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    loadDashboard();
+  }
+});
+
+// ── LOAD DASHBOARD ────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  const saved = JSON.parse(localStorage.getItem('zygo_fleet_rider') || '{}');
+  document.getElementById('tb-rider-name').textContent = saved.name?.split(' ')[0] || 'Rider';
+
+  // Load today's log from localStorage first
+  const todayKey = `fleet_log_${new Date().toDateString()}`;
+  const localLog = JSON.parse(localStorage.getItem(todayKey) || 'null');
+
+  if (localLog) {
+    todayLog = localLog;
+    updateStatusCard(localLog);
+    updateStats(localLog);
+  }
+
+  // Load history
+  loadHistory();
+}
+
+function updateStatusCard(log) {
+  const su = document.getElementById('status-unit');
+  const st = document.getElementById('status-text');
+  const stm = document.getElementById('status-time');
+
+  if (!log) {
+    st.textContent = 'Not Checked In Today';
+    su.textContent = '—';
+    return;
+  }
+
+  if (log.checkin_time && !log.checkout_time) {
+    st.textContent = 'On Duty';
+    su.textContent = tricycle?.unit_code || log.unit_code || 'ZFK-XXXX';
+    stm.textContent = 'Checked in: ' + new Date(log.checkin_time).toLocaleTimeString('en-GH', {hour:'2-digit',minute:'2-digit'});
+    document.getElementById('btn-checkin').classList.add('abtn-disabled');
+    document.getElementById('pay-box').style.display = 'block';
+    document.getElementById('pay-amount').textContent = `GHS ${log.daily_amount_due || 35}`;
+    document.getElementById('pay-amount-small').textContent = log.daily_amount_due || 35;
+    document.getElementById('pay-ref').textContent = log.unit_code || 'ZFK-XXXX';
+    document.getElementById('co-pay-amount').textContent = `GHS ${log.daily_amount_due || 35}`;
+    document.getElementById('co-pay-ref').textContent = log.unit_code || 'ZFK-XXXX';
+  }
+
+  if (log.checkout_time) {
+    st.textContent = 'Day Complete';
+    su.textContent = log.payment_status === 'paid' ? '✅ Paid' : '⏳ Payment Pending';
+    stm.textContent = 'Checked out: ' + new Date(log.checkout_time).toLocaleTimeString('en-GH', {hour:'2-digit',minute:'2-digit'});
+  }
+}
+
+function updateStats(log) {
+  document.getElementById('stat-target').textContent = `GHS ${log?.daily_amount_due || 35}`;
+  document.getElementById('stat-paid').textContent = `GHS ${log?.daily_amount_paid || 0}`;
+  const history = JSON.parse(localStorage.getItem('fleet_history') || '[]');
+  const thisWeek = history.filter(h => {
+    const d = new Date(h.date);
+    const now = new Date();
+    const weekStart = new Date(now.setDate(now.getDate() - now.getDay() + 1));
+    return d >= weekStart;
+  });
+  document.getElementById('stat-week').textContent = thisWeek.length;
+}
+
+function loadHistory() {
+  const history = JSON.parse(localStorage.getItem('fleet_history') || '[]');
+  const list = document.getElementById('history-list');
+  if (!history.length) {
+    list.innerHTML = '<div style="text-align:center;padding:16px;color:rgba(255,255,255,0.2);font-size:13px;">No history yet.</div>';
+    return;
+  }
+  list.innerHTML = history.slice(0,7).map(h => `
+    <div class="history-item">
+      <div class="hist-left">
+        <div class="date">${h.date}</div>
+        <div class="detail">${h.km || '—'} km · ${h.trips || '—'} est. trips</div>
+      </div>
+      <span class="hist-badge ${h.paid ? 'badge-paid' : h.waived ? 'badge-waived' : 'badge-unpaid'}">
+        ${h.paid ? '✅ GHS '+h.paid_amount : h.waived ? '🌧️ Waived' : '⏳ Unpaid'}
+      </span>
+    </div>
+  `).join('');
+}
+
+// ── CHECK IN ──────────────────────────────────────────────────────────────────
+function openCheckin() { openModal('checkin-modal'); }
+
+async function submitCheckin() {
+  const photo = photoData['ci-photo-data'] || null;
+  const odo   = document.getElementById('ci-odometer').value;
+
+  // Capture GPS location at check-in
+  const gpsLoc = await captureGPS();
+  if (gpsLoc) {
+    showToast(`📍 Location captured (${gpsLoc.accuracy.toFixed(0)}m accuracy)`, 'success');
+  }
+
+  const log = {
+    unit_code:       tricycle?.unit_code || 'ZFK-XXXX',
+    checkin_time:    new Date().toISOString(),
+    checkout_time:   null,
+    daily_amount_due: tricycle?.daily_target_ghs || 35,
+    daily_amount_paid: 0,
+    payment_status:  'unpaid',
+    checkin_photo:   photo,
+    checkin_odometer: odo || null,
+    checkin_lat: gpsLoc?.lat || null,
+    checkin_lng: gpsLoc?.lng || null,
+  };
+
+  const todayKey = `fleet_log_${new Date().toDateString()}`;
+  localStorage.setItem(todayKey, JSON.stringify(log));
+  todayLog = log;
+
+  try {
+    await sb.rpc('fleet_rider_checkin', {
+      p_rider_phone:   JSON.parse(localStorage.getItem('zygo_fleet_rider') || '{}').phone || '',
+      p_rider_pin:     '0000',
+      p_checkin_photo: photo,
+      p_odometer:      odo ? parseFloat(odo) : null
+    });
+  } catch(e) {}
+
+  updateStatusCard(log);
+  updateStats(log);
+  closeModal('checkin-modal');
+  showToast('✅ Checked in! Have a safe day.', 'success');
+}
+
+// ── CHECK OUT ──────────────────────────────────────────────────────────────────
+function openCheckout() {
+  if (!todayLog?.checkin_time) { showToast('Check in first!', 'error'); return; }
+  const amount = todayLog?.daily_amount_due || 35;
+  const psEl = document.getElementById('ps-amount');
+  if (psEl) psEl.textContent = amount;
+  openModal('checkout-modal');
+}
+
+async function submitCheckout() {
+  const photo   = photoData['co-photo-data'] || null;
+  const odo     = document.getElementById('co-odometer').value;
+  const momoRef = document.getElementById('co-momo-ref').value.trim();
+  const amount  = todayLog?.daily_amount_due || 35;
+
+  const todayKey = `fleet_log_${new Date().toDateString()}`;
+  const log = { ...todayLog,
+    checkout_time:    new Date().toISOString(),
+    checkout_photo:   photo,
+    checkout_odometer: odo || null,
+    km_driven:        odo && todayLog?.checkin_odometer
+                        ? parseFloat(odo) - parseFloat(todayLog.checkin_odometer) : null,
+    payment_ref:      momoRef || null,
+    payment_status:   momoRef ? 'paid' : 'unpaid',
+    daily_amount_paid: momoRef ? amount : 0,
+  };
+
+  localStorage.setItem(todayKey, JSON.stringify(log));
+
+  const history = JSON.parse(localStorage.getItem('fleet_history') || '[]');
+  history.unshift({
+    date:       new Date().toLocaleDateString('en-GH'),
+    km:         log.km_driven?.toFixed(1),
+    trips:      log.km_driven ? Math.round(log.km_driven / 2.5) : null,
+    paid:       log.payment_status === 'paid',
+    paid_amount: momoRef ? amount : 0,
+    waived:     false,
+  });
+  localStorage.setItem('fleet_history', JSON.stringify(history.slice(0,30)));
+
+  try {
+    await sb.rpc('fleet_rider_checkout', {
+      p_rider_phone:    JSON.parse(localStorage.getItem('zygo_fleet_rider') || '{}').phone || '',
+      p_checkout_photo: photo,
+      p_odometer:       odo ? parseFloat(odo) : null,
+      p_actual_income:  null,
+      p_payment_ref:    momoRef || null,
+    });
+  } catch(e) {}
+
+  todayLog = log;
+  updateStatusCard(log);
+  updateStats(log);
+  loadHistory();
+  closeModal('checkout-modal');
+  showToast(momoRef ? '✅ Day complete! Payment received.' : 'Day recorded. Pay GHS '+amount+' to 0240393582.', momoRef ? 'success' : '');
+}
+
+// ── REPORT ────────────────────────────────────────────────────────────────────
+function openReport() { openModal('report-modal'); }
+async function submitReport() {
+  const type  = document.getElementById('report-type').value;
+  const desc  = document.getElementById('report-desc').value.trim();
+  if (!type || !desc) { showToast('Fill in all fields', 'error'); return; }
+
+  try {
+    await sb.from('fleet_incidents').insert({
+      tricycle_id:   tricycle?.id || null,
+      rider_id:      rider?.id || null,
+      incident_type: type,
+      severity:      'medium',
+      description:   desc,
+      reported_at:   new Date().toISOString()
+    });
+  } catch(e) {}
+
+  closeModal('report-modal');
+  showToast('⚠️ Report submitted. Zygo will contact you.', 'success');
+  const waLink = encodeURIComponent(`⚠️ FLEET INCIDENT REPORT\n\nRider: ${rider?.full_name || 'Unknown'}\nKeke: ${tricycle?.unit_code || 'Unknown'}\nType: ${type}\nDescription: ${desc}\nTime: ${new Date().toLocaleString()}`);
+  window.open(`https://wa.me/233202858011?text=${waLink}`);
+}
+
+// ── WAIVER ────────────────────────────────────────────────────────────────────
+function openWaiver() { openModal('waiver-modal'); }
+async function submitWaiver() {
+  const reason = document.getElementById('waiver-reason').value;
+  const notes  = document.getElementById('waiver-notes').value.trim();
+  if (!reason) { showToast('Select a reason', 'error'); return; }
+
+  const todayKey = `fleet_log_${new Date().toDateString()}`;
+  const log = { ...(todayLog || {}), waiver_requested: true, waiver_reason: reason };
+  localStorage.setItem(todayKey, JSON.stringify(log));
+
+  const waLink = encodeURIComponent(`🌧️ WAIVER REQUEST\n\nRider: ${rider?.full_name || 'Unknown'}\nKeke: ${tricycle?.unit_code || 'Unknown'}\nReason: ${reason}\n${notes ? 'Notes: '+notes : ''}\nDate: ${new Date().toLocaleDateString()}`);
+  window.open(`https://wa.me/233202858011?text=${waLink}`);
+  closeModal('waiver-modal');
+  showToast('🌧️ Waiver request sent.', 'success');
+}
+
+// ── PHOTO CAPTURE ─────────────────────────────────────────────────────────────
+function triggerPhoto(inputId) { document.getElementById(inputId).click(); }
+function handlePhoto(event, areaId, dataKey) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const area = document.getElementById(areaId);
+  area.innerHTML = `<img src="${url}" alt="Photo"/>`;
+  photoData[dataKey] = url;
+}
+
+// ── MODALS ────────────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+let toastT;
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+
+// ── GPS LOCATION CAPTURE ──────────────────────────────────────────────────────
+let currentLocation = null;
+
+function captureGPS() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) { resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        currentLocation = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+          timestamp: new Date().toISOString()
+        };
+        resolve(currentLocation);
+      },
+      () => resolve(null),
+      { timeout: 8000, enableHighAccuracy: true }
+    );
+  });
+}
+
+// ── IN-APP PAYSTACK PAYMENT FOR DAILY AMOUNT ──────────────────────────────────
+const PS_KEY = 'pk_live_ab02cb283f1d3f9ff856a2ae27db26beb0199e3b';
+
+async function openPaystackForDaily() {
+  if (!todayLog) { showToast('Check in first', 'error'); return; }
+  const amount  = todayLog.daily_amount_due || 35;
+  const saved   = JSON.parse(localStorage.getItem('zygo_fleet_rider') || '{}');
+  const phone   = (saved.phone || '').replace(/\D/g,'');
+  const ref     = (todayLog.unit_code || 'ZFK') + '_' + Date.now();
+
+  closeModal('checkout-modal');
+
+  const handler = PaystackPop.setup({
+    key:      PS_KEY,
+    email:    phone + '@zygofleet.com',
+    amount:   amount * 100,
+    currency: 'GHS',
+    ref,
+    label:    'Zygo Fleet Daily — ' + (todayLog.unit_code || ''),
+    metadata: {
+      unit_code: todayLog.unit_code,
+      rider_name: saved.name,
+      payment_type: 'fleet_daily'
+    },
+    channels: ['mobile_money', 'card', 'ussd'],
+    callback: async function(response) {
+      document.getElementById('co-momo-ref').value = response.reference;
+      showToast('✅ Payment confirmed! Completing checkout...', 'success');
+      await submitCheckout();
+    },
+    onClose: function() {
+      openModal('checkout-modal');
+      showToast('Payment cancelled — enter MoMo ref manually', '');
+    }
+  });
+  handler.openIframe();
+}
+
+// ── OFFLINE SUPPORT ───────────────────────────────────────────────────────────
+window.addEventListener('online',  () => showToast('🟢 Back online', 'success'));
+window.addEventListener('offline', () => showToast('🔴 Offline — data saved locally', 'error'));
+
+function isOnline() { return navigator.onLine; }
+
+document.getElementById('login-pin').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>

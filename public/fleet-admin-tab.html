@@ -1,0 +1,337 @@
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     ZYGO EXPRESS — FLEET ADMIN TAB
+     Add this HTML into the Lovable admin dashboard as a new "Fleet" tab.
+     This shows the dispatcher a live view of all keke activity.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+
+<style>
+.fleet-admin{font-family:'Inter',sans-serif;padding:16px;}
+.fa-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.fa-stat{background:#1a1a1a;border:1px solid rgba(255,255,255,0.08);border-radius:12px;
+  padding:14px;text-align:center;}
+.fa-num{font-family:'Syne',sans-serif;font-weight:900;font-size:24px;color:#f97316;}
+.fa-lbl{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;
+  letter-spacing:0.5px;margin-top:3px;}
+.fa-section{font-size:11px;font-weight:800;color:#f97316;text-transform:uppercase;
+  letter-spacing:1.5px;margin-bottom:12px;display:block;}
+.fa-table{width:100%;border-collapse:collapse;font-size:12px;}
+.fa-table th{background:#111;color:rgba(255,255,255,0.4);font-size:10px;
+  font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+  padding:10px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06);}
+.fa-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);
+  color:rgba(255,255,255,0.8);}
+.fa-table tr:hover td{background:rgba(255,255,255,0.02);}
+.status-pill{display:inline-block;padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:800;}
+.sp-active{background:rgba(22,163,74,0.15);color:#4ade80;}
+.sp-maint{background:rgba(245,158,11,0.15);color:#fbbf24;}
+.sp-inactive{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.3);}
+.pay-pill{display:inline-block;padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:800;}
+.pp-paid{background:rgba(22,163,74,0.12);color:#4ade80;}
+.pp-unpaid{background:rgba(220,38,38,0.12);color:#f87171;}
+.pp-waived{background:rgba(245,158,11,0.12);color:#fbbf24;}
+.fa-btn{padding:6px 12px;border:none;border-radius:8px;font-size:11px;
+  font-weight:700;cursor:pointer;margin-right:4px;}
+.btn-kill{background:rgba(220,38,38,0.15);color:#f87171;border:1px solid rgba(220,38,38,0.2);}
+.btn-map{background:rgba(29,78,216,0.15);color:#93c5fd;border:1px solid rgba(29,78,216,0.2);}
+.btn-wa{background:rgba(37,211,102,0.12);color:#4ade80;border:1px solid rgba(37,211,102,0.2);}
+.fa-alert{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.15);
+  border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;
+  align-items:center;gap:10px;font-size:12px;color:#f87171;}
+.payout-row{display:flex;align-items:center;justify-content:space-between;
+  padding:12px;background:#1a1a1a;border:1px solid rgba(255,255,255,0.06);
+  border-radius:10px;margin-bottom:8px;}
+.payout-info .name{font-size:13px;font-weight:700;color:white;}
+.payout-info .detail{font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px;}
+.payout-amount{font-family:'Syne',sans-serif;font-weight:900;font-size:18px;color:#4ade80;}
+.btn-pay-now{padding:8px 14px;background:#25D366;border:none;border-radius:8px;
+  font-size:12px;font-weight:700;color:white;cursor:pointer;}
+</style>
+
+<div class="fleet-admin" id="fleet-admin">
+
+  <!-- KPIs -->
+  <div class="fa-stats">
+    <div class="fa-stat"><div class="fa-num" id="fa-total">0</div><div class="fa-lbl">Total Keke</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-active" style="color:#4ade80;">0</div><div class="fa-lbl">Active Today</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-paid" style="color:#4ade80;">0</div><div class="fa-lbl">Paid Today</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-unpaid" style="color:#f87171;">0</div><div class="fa-lbl">Unpaid Today</div></div>
+  </div>
+  <div class="fa-stats">
+    <div class="fa-stat"><div class="fa-num" id="fa-week-rev" style="font-size:16px;">GHS 0</div><div class="fa-lbl">Week Revenue</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-maintenance" style="color:var(--amber);">0</div><div class="fa-lbl">In Repair</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-alerts" style="color:#f87171;">0</div><div class="fa-lbl">Route Alerts</div></div>
+    <div class="fa-stat"><div class="fa-num" id="fa-payouts-due" style="color:#4ade80;font-size:16px;">GHS 0</div><div class="fa-lbl">Payouts Due</div></div>
+  </div>
+
+  <!-- Alerts -->
+  <div id="fa-alerts-list"></div>
+
+  <!-- Live Fleet Table -->
+  <span class="fa-section">Live Fleet Status</span>
+<div style="display:flex;gap:8px;margin-bottom:12px;">
+  <input type="text" id="fleet-search" placeholder="Search unit code, rider, owner..."
+    oninput="filterFleetTable()"
+    style="flex:1;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);
+    border-radius:10px;padding:10px 14px;font-size:13px;color:white;outline:none;
+    font-family:Inter,sans-serif;"/>
+  <button onclick="exportFleetCSV()"
+    style="padding:10px 16px;background:rgba(29,78,216,0.15);border:1px solid rgba(29,78,216,0.2);
+    border-radius:10px;font-size:12px;font-weight:700;color:#93c5fd;cursor:pointer;white-space:nowrap;">
+    📊 Export CSV
+  </button>
+  <button onclick="loadFleet()"
+    style="padding:10px 14px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.2);
+    border-radius:10px;font-size:12px;font-weight:700;color:#f97316;cursor:pointer;">
+    ↺ Refresh
+  </button>
+</div>
+  <div style="overflow-x:auto;margin-bottom:24px;">
+    <table class="fa-table">
+      <thead>
+        <tr>
+          <th>Unit</th><th>Brand</th><th>Rider</th><th>Owner</th>
+          <th>Status</th><th>Today</th><th>Speed</th><th>Fuel</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fleet-table-body">
+        <tr><td colspan="9" style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;">Loading fleet...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Weekly Payouts -->
+  <span class="fa-section">Pending Payouts — This Week</span>
+  <div id="payouts-list">
+    <div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:20px;">
+      No pending payouts.
+    </div>
+  </div>
+
+  <!-- Parts Low Stock -->
+  <span class="fa-section" style="margin-top:20px;">Parts Low Stock Alert</span>
+  <div id="parts-alert-list"></div>
+
+</div>
+
+<script>
+(function(){
+  const SB_URL = 'https://hdskkfdtosgfznjscemz.supabase.co';
+  const SB_KEY = 'sb_publishable_2L0x5Jl2Jjh5tEbloAUNxA_aYHVeBET';
+  const sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY)
+    : null;
+
+  async function sbFetch(path, opts = {}) {
+    const res = await fetch(SB_URL + '/rest/v1' + path, {
+      ...opts,
+      headers: {
+        'Content-Type':'application/json',
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        ...(opts.headers||{})
+      }
+    });
+    return res.json();
+  }
+
+  async function loadFleet() {
+    try {
+      // Fleet overview
+      const keke = await sbFetch(
+        '/fleet_overview?select=*&order=tricycle_status.asc'
+      );
+      const all = keke || [];
+
+      // Stats
+      document.getElementById('fa-total').textContent  = all.length;
+      document.getElementById('fa-active').textContent = all.filter(k=>k.tricycle_status==='active').length;
+      document.getElementById('fa-paid').textContent   = all.filter(k=>k.today_payment==='paid').length;
+      document.getElementById('fa-unpaid').textContent = all.filter(k=>k.today_payment==='unpaid').length;
+      document.getElementById('fa-maintenance').textContent = all.filter(k=>k.tricycle_status==='maintenance').length;
+
+      const weekRev = all.reduce((s,k)=>s+(parseFloat(k.week_collected_ghs)||0),0);
+      document.getElementById('fa-week-rev').textContent = 'GHS ' + weekRev.toFixed(0);
+
+      // Alerts
+      const alerts = await sbFetch('/fleet_zone_alerts?select=*&acknowledged=eq.false&order=triggered_at.desc&limit=5');
+      document.getElementById('fa-alerts').textContent = (alerts||[]).length;
+      const alertsDiv = document.getElementById('fa-alerts-list');
+      if (alerts && alerts.length) {
+        alertsDiv.innerHTML = alerts.map(a => `
+          <div class="fa-alert">
+            ⚠️ <strong>${a.alert_type?.replace(/_/g,' ')?.toUpperCase()}</strong>
+            — triggered ${new Date(a.triggered_at).toLocaleTimeString('en-GH',{hour:'2-digit',minute:'2-digit'})}
+            <button onclick="acknowledgeAlert('${a.id}')" style="margin-left:auto;padding:4px 10px;
+              background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.2);
+              border-radius:6px;font-size:10px;font-weight:700;color:#f87171;cursor:pointer;">
+              Acknowledge
+            </button>
+          </div>
+        `).join('');
+      } else { alertsDiv.innerHTML = ''; }
+
+      // Fleet table
+      const tbody = document.getElementById('fleet-table-body');
+      window._fleetData = all;
+      if (!all.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;">No keke registered yet.</td></tr>';
+      } else {
+        tbody.innerHTML = all.map(k => `
+          <tr>
+            <td><strong style="color:#f97316;font-family:monospace;">${k.unit_code}</strong></td>
+            <td>${k.brand?.toUpperCase()||'—'}</td>
+            <td>${k.rider_name||'<span style="color:rgba(255,255,255,0.2);">Unassigned</span>'}</td>
+            <td style="color:rgba(255,255,255,0.5);">${k.owner_name?.split(' ')[0]||'—'}</td>
+            <td><span class="status-pill ${k.tricycle_status==='active'?'sp-active':k.tricycle_status==='maintenance'?'sp-maint':'sp-inactive'}">${k.tricycle_status||'inactive'}</span></td>
+            <td><span class="pay-pill ${k.today_payment==='paid'?'pp-paid':k.today_payment==='waived'?'pp-waived':'pp-unpaid'}">${k.today_payment||'not checked in'}</span></td>
+            <td>${k.last_speed_kmh != null ? k.last_speed_kmh+'km/h' : '—'}</td>
+            <td>${k.fuel_level_pct != null ? k.fuel_level_pct+'%' : '—'}</td>
+            <td>
+              ${k.last_lat ? `<button class="fa-btn btn-map" onclick="openMap(${k.last_lat},${k.last_lng},'${k.unit_code}')">📍 Map</button>` : ''}
+              ${k.rider_phone ? `<button class="fa-btn btn-wa" onclick="waRider('${k.rider_phone}','${k.rider_name||'Rider'}','${k.unit_code}')">💬</button>` : ''}
+              <button class="fa-btn btn-kill" onclick="confirmKill('${k.id}','${k.unit_code}',${!!k.engine_kill_active})">
+                ${k.engine_kill_active ? '🔓 Restore' : '🔒 Kill'}
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Payouts
+      const payouts = await sbFetch('/fleet_payouts?select=*,fleet_owners(full_name,momo_number,momo_network),fleet_tricycles(unit_code)&payout_status=eq.pending&order=created_at.desc');
+      const payList = document.getElementById('payouts-list');
+      if (payouts && payouts.length) {
+        const totalDue = payouts.reduce((s,p)=>s+(parseFloat(p.net_payout)||0),0);
+        document.getElementById('fa-payouts-due').textContent = 'GHS ' + totalDue.toFixed(0);
+        payList.innerHTML = payouts.map(p => `
+          <div class="payout-row">
+            <div class="payout-info">
+              <div class="name">${p.fleet_owners?.full_name||'Owner'} — ${p.fleet_tricycles?.unit_code||'Keke'}</div>
+              <div class="detail">
+                Week: ${p.week_start} → ${p.week_end} ·
+                Gross: GHS ${p.gross_collected} · Fee: GHS ${p.management_fee}
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="payout-amount">GHS ${p.net_payout}</div>
+              <button class="btn-pay-now" onclick="payOwner('${p.id}','${p.fleet_owners?.full_name}','${p.fleet_owners?.momo_number}',${p.net_payout})">
+                Pay Now
+              </button>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        payList.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:13px;padding:16px;">No pending payouts this week.</div>';
+      }
+
+      // Low stock parts
+      const parts = await sbFetch('/fleet_parts?select=*&is_active=eq.true');
+      const lowStock = (parts||[]).filter(p => p.stock_qty <= p.reorder_level);
+      const partsDiv = document.getElementById('parts-alert-list');
+      if (lowStock.length) {
+        partsDiv.innerHTML = lowStock.map(p => `
+          <div style="display:flex;justify-content:space-between;align-items:center;
+            padding:10px 12px;background:rgba(245,158,11,0.06);
+            border:1px solid rgba(245,158,11,0.15);border-radius:10px;margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px;font-weight:700;">${p.name}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.3);">
+                Stock: ${p.stock_qty} · Reorder at: ${p.reorder_level} · GHS ${p.retail_price} retail
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:800;padding:3px 8px;
+              background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:20px;">
+              LOW STOCK
+            </span>
+          </div>
+        `).join('');
+      } else {
+        partsDiv.innerHTML = '<div style="color:rgba(255,255,255,0.2);font-size:13px;text-align:center;padding:12px;">All parts well stocked ✅</div>';
+      }
+
+    } catch(e) { console.error('Fleet admin error:', e); }
+  }
+
+  function openMap(lat, lng, unit) {
+    window.open(`https://maps.google.com?q=${lat},${lng}&label=${unit}`,'_blank');
+  }
+
+  function waRider(phone, name, unit) {
+    const msg = encodeURIComponent(`Hi ${name}, this is Zygo Express dispatch. Your keke ${unit} needs attention. Please call 0202858011 immediately.`);
+    window.open(`https://wa.me/233${phone.replace(/^0/,'')}?text=${msg}`);
+  }
+
+  function confirmKill(id, unit, isKilled) {
+    if (!confirm(`${isKilled ? 'RESTORE engine' : 'KILL ENGINE'} on ${unit}? This action takes effect immediately.`)) return;
+    fetch(SB_URL + '/rest/v1/fleet_trackers?tricycle_id=eq.'+id, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY },
+      body: JSON.stringify({ engine_kill_active: !isKilled })
+    }).then(() => {
+      loadFleet();
+      alert(`Engine ${isKilled ? 'RESTORED' : 'KILLED'} on ${unit}. Rider notified via WhatsApp automatically.`);
+    });
+  }
+
+  function acknowledgeAlert(id) {
+    fetch(SB_URL + '/rest/v1/fleet_zone_alerts?id=eq.'+id, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY },
+      body: JSON.stringify({ acknowledged: true })
+    }).then(() => loadFleet());
+  }
+
+  function payOwner(payoutId, ownerName, momoNum, amount) {
+    const msg = encodeURIComponent(
+      `ZYGO FLEET WEEKLY PAYOUT\n\nOwner: ${ownerName}\nAmount: GHS ${amount}\nMoMo: ${momoNum}\n\nPlease send MoMo now and paste the confirmation reference below.`
+    );
+    const ref = prompt(`Pay GHS ${amount} to ${ownerName} (${momoNum})\n\nAfter sending, paste the MoMo confirmation reference here:`);
+    if (!ref) return;
+    fetch(SB_URL + '/rest/v1/fleet_payouts?id=eq.'+payoutId, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY },
+      body: JSON.stringify({ payout_status:'paid', payment_ref: ref, paid_at: new Date().toISOString() })
+    }).then(() => { loadFleet(); alert('Payout marked as complete!'); });
+  }
+
+  // ── SEARCH FILTER ────────────────────────────────────────────────────────
+  window._fleetData = [];
+
+  function filterFleetTable() {
+    const q = (document.getElementById('fleet-search')?.value || '').toLowerCase();
+    const rows = document.querySelectorAll('#fleet-table-body tr');
+    rows.forEach(row => {
+      row.style.display = q === '' || row.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // ── CSV EXPORT ────────────────────────────────────────────────────────────
+  function exportFleetCSV() {
+    if (!window._fleetData.length) { alert('Load fleet data first'); return; }
+    const headers = ['Unit','Brand','Reg','Rider','Rider Phone','Owner',
+      'Status','Today Payment','Week Collected','Speed','Fuel','Last Ping'];
+    const rows = window._fleetData.map(k => [
+      k.unit_code, k.brand, k.reg_number||'', k.rider_name||'',
+      k.rider_phone||'', k.owner_name||'', k.tricycle_status||'',
+      k.today_payment||'', k.week_collected_ghs||0,
+      k.last_speed_kmh||'', k.fuel_level_pct||'',
+      k.last_ping ? new Date(k.last_ping).toLocaleString('en-GH') : ''
+    ].map(v => `"${v}"`).join(','));
+    const csv  = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `zygo-fleet-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  // ── STORE DATA FOR EXPORT + SEARCH ────────────────────────────────────────
+  const _origLoadFleet = loadFleet;
+
+  // Load on init and refresh every 15 seconds (faster for live monitoring)
+  loadFleet();
+  setInterval(loadFleet, 15000);
+})();
+</script>

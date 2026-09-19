@@ -1964,21 +1964,60 @@ function openPayRateEditor(){
   });
 }
 
-// ── Fuel efficiency comparison ───────────────────────────────────────────────────
+// ── Tricycle fleet: shared helpers ───────────────────────────────────────────────
+let fleetCache = [];
+
+async function loadFleetCache(){
+  const { data, error } = await sb.rpc('get_all_vehicles');
+  if(error){ console.error('Fleet load error:', error); fleetCache = []; return false; }
+  fleetCache = data || [];
+  return true;
+}
+
+function fleetOptions(selectedId){
+  return fleetCache.map(v=>`<option value="${v.vehicle_id}" ${v.vehicle_id===selectedId?'selected':''}>${sanitize(v.vehicle_name)}${v.plate_number?' · '+sanitize(v.plate_number):''}</option>`).join('');
+}
+
+function riderSelectOptions(selectedRiderId){
+  return getLocalRiders().map(r=>`<option value="${r.riderId}|${sanitize(r.name)}" ${r.riderId===selectedRiderId?'selected':''}>${sanitize(r.name)}</option>`).join('');
+}
+
+// ── Fuel log + efficiency ────────────────────────────────────────────────────────
 async function loadFuelEfficiency(){
   const el = document.getElementById('fin-fuel-content');
   el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading fuel data…</div>';
 
-  const { data, error } = await sb.rpc('get_fuel_efficiency_comparison');
-  if(error || !data){
-    el.innerHTML = '<div class="analytics-empty">❌ Could not load fuel data</div>';
+  const ok = await loadFleetCache();
+  const [effRes, logRes] = await Promise.all([
+    sb.rpc('get_fuel_efficiency_comparison'),
+    sb.rpc('get_fuel_logs', { _limit: 25 })
+  ]);
+
+  if(!ok || effRes.error){
+    el.innerHTML = '<div class="analytics-empty">❌ Could not load fuel data. Run the fleet setup SQL (zygo-export/02_fleet.sql) first.</div>';
     return;
   }
 
+  const data = effRes.data || [];
+  const logs = logRes.data || [];
+
   el.innerHTML = `
-    <div class="fin-table-wrap">
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">⛽ Log a fuel top-up</div>
+      <div class="fin-form-row">
+        <select class="fin-input" id="fuel-vehicle"><option value="">Select tricycle…</option>${fleetOptions()}</select>
+        <input class="fin-input" id="fuel-liters" type="number" step="0.1" min="0" placeholder="Liters"/>
+      </div>
+      <div class="fin-form-row">
+        <input class="fin-input" id="fuel-cost" type="number" step="0.01" min="0" placeholder="Cost (GHS)"/>
+        <input class="fin-input" id="fuel-odo" type="number" step="1" min="0" placeholder="Odometer (km)"/>
+      </div>
+      <button class="fin-add-btn" onclick="submitFuelLog()">+ Save fuel log</button>
+    </div>
+
+    <div class="fin-table-wrap" style="margin-bottom:18px">
       <table class="fin-table">
-        <thead><tr><th>Vehicle</th><th>Rider</th><th>km/Liter</th><th>Total Liters</th><th>Total Distance</th><th>Fuel Cost</th></tr></thead>
+        <thead><tr><th>Tricycle</th><th>Rider</th><th>km/Liter</th><th>Total Liters</th><th>Total Distance</th><th>Fuel Cost</th></tr></thead>
         <tbody>
           ${data.map(v=>`<tr>
             <td style="font-weight:600">${sanitize(v.vehicle_name||'—')}</td>
@@ -1991,79 +2030,222 @@ async function loadFuelEfficiency(){
         </tbody>
       </table>
     </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">Recent fuel logs</div>
+    <div class="fin-table-wrap">
+      <table class="fin-table">
+        <thead><tr><th>Date</th><th>Tricycle</th><th>Rider</th><th>Liters</th><th>Cost</th><th>Odometer</th></tr></thead>
+        <tbody>
+          ${logs.map(l=>`<tr>
+            <td>${new Date(l.logged_at).toLocaleDateString()}</td>
+            <td style="font-weight:600">${sanitize(l.vehicle_name||'—')}</td>
+            <td>${sanitize(l.rider_name||'—')}</td>
+            <td>${Number(l.liters||0).toFixed(1)} L</td>
+            <td>GHS ${Number(l.cost||0).toFixed(2)}</td>
+            <td>${l.odometer_km?Number(l.odometer_km).toFixed(0)+' km':'—'}</td>
+          </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No fuel logs yet</td></tr>'}
+        </tbody>
+      </table>
+    </div>
     <div style="font-size:11px;color:var(--muted);margin-top:10px">
-      Higher km/Liter = better fuel efficiency. Riders log fuel from their app each time they refuel, including odometer reading.
+      km/Liter needs at least two odometer readings per tricycle — always enter the odometer when refuelling.
     </div>`;
 }
 
-// ── Maintenance summary ──────────────────────────────────────────────────────────
+async function submitFuelLog(){
+  const vehicle = document.getElementById('fuel-vehicle').value;
+  const liters  = parseFloat(document.getElementById('fuel-liters').value);
+  const cost    = parseFloat(document.getElementById('fuel-cost').value);
+  const odoRaw  = document.getElementById('fuel-odo').value;
+
+  if(!vehicle){ showToast('Select a tricycle','error'); return; }
+  if(!liters || liters <= 0){ showToast('Enter the liters','error'); return; }
+
+  const { error } = await sb.rpc('log_fuel', {
+    _vehicle_id: vehicle, _liters: liters, _cost: isNaN(cost)?0:cost,
+    _odometer: odoRaw ? parseFloat(odoRaw) : null
+  });
+  if(error){ showToast('Could not save fuel log','error'); console.error(error); return; }
+  showToast('Fuel log saved','success');
+  loadFuelEfficiency();
+}
+
+// ── Maintenance log + summary ────────────────────────────────────────────────────
 async function loadMaintenanceSummary(){
   const el = document.getElementById('fin-maintenance-content');
   el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading maintenance data…</div>';
 
-  const { data, error } = await sb.rpc('get_maintenance_summary');
-  if(error || !data){
-    el.innerHTML = '<div class="analytics-empty">❌ Could not load maintenance data</div>';
+  const ok = await loadFleetCache();
+  const [sumRes, logRes] = await Promise.all([
+    sb.rpc('get_maintenance_summary'),
+    sb.rpc('get_maintenance_logs', { _limit: 25 })
+  ]);
+
+  if(!ok || sumRes.error){
+    el.innerHTML = '<div class="analytics-empty">❌ Could not load maintenance data. Run the fleet setup SQL (zygo-export/02_fleet.sql) first.</div>';
     return;
   }
 
+  const data = sumRes.data || [];
+  const logs = logRes.data || [];
+  const today = new Date().toISOString().slice(0,10);
+
   el.innerHTML = `
-    <div class="fin-table-wrap">
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">🔧 Log a repair or service</div>
+      <div class="fin-form-row">
+        <select class="fin-input" id="mt-vehicle"><option value="">Select tricycle…</option>${fleetOptions()}</select>
+        <select class="fin-input" id="mt-type">
+          <option value="service">Routine service</option>
+          <option value="repair">Repair</option>
+          <option value="tyres">Tyres</option>
+          <option value="battery">Battery</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="fin-form-row">
+        <input class="fin-input" id="mt-desc" placeholder="What was done"/>
+        <input class="fin-input" id="mt-cost" type="number" step="0.01" min="0" placeholder="Cost (GHS)"/>
+      </div>
+      <div class="fin-form-row">
+        <input class="fin-input" id="mt-date" type="date" value="${today}"/>
+        <input class="fin-input" id="mt-next" type="date" placeholder="Next service due"/>
+      </div>
+      <button class="fin-add-btn" onclick="submitMaintenanceLog()">+ Save maintenance log</button>
+    </div>
+
+    <div class="fin-table-wrap" style="margin-bottom:18px">
       <table class="fin-table">
-        <thead><tr><th>Vehicle</th><th>Rider</th><th>Logs</th><th>Total Cost</th></tr></thead>
+        <thead><tr><th>Tricycle</th><th>Rider</th><th>Logs</th><th>Total Cost</th><th>Last Service</th><th>Next Due</th></tr></thead>
         <tbody>
           ${data.map(m=>`<tr>
             <td style="font-weight:600">${sanitize(m.vehicle_name||'—')}</td>
             <td>${sanitize(m.rider_name||'Unassigned')}</td>
             <td>${m.log_count||0}</td>
             <td style="font-weight:700">GHS ${Number(m.total_cost||0).toFixed(2)}</td>
-          </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No maintenance logs yet</td></tr>'}
+            <td>${m.last_service||'—'}</td>
+            <td>${m.next_service_due ? (m.next_service_due <= today ? '⚠️ '+m.next_service_due : m.next_service_due) : '—'}</td>
+          </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No maintenance logs yet</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px">Recent maintenance logs</div>
+    <div class="fin-table-wrap">
+      <table class="fin-table">
+        <thead><tr><th>Date</th><th>Tricycle</th><th>Type</th><th>Details</th><th>Cost</th><th>Next Due</th></tr></thead>
+        <tbody>
+          ${logs.map(l=>`<tr>
+            <td>${l.serviced_at||'—'}</td>
+            <td style="font-weight:600">${sanitize(l.vehicle_name||'—')}</td>
+            <td>${sanitize(l.service_type||'—')}</td>
+            <td>${sanitize(l.description||'—')}</td>
+            <td>GHS ${Number(l.cost||0).toFixed(2)}</td>
+            <td>${l.next_service_due||'—'}</td>
+          </tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted)">No maintenance logs yet</td></tr>'}
         </tbody>
       </table>
     </div>`;
 }
 
-// ── Vehicle management ───────────────────────────────────────────────────────────
+async function submitMaintenanceLog(){
+  const vehicle = document.getElementById('mt-vehicle').value;
+  const type    = document.getElementById('mt-type').value;
+  const desc    = document.getElementById('mt-desc').value.trim();
+  const cost    = parseFloat(document.getElementById('mt-cost').value);
+  const date    = document.getElementById('mt-date').value;
+  const next    = document.getElementById('mt-next').value;
+
+  if(!vehicle){ showToast('Select a tricycle','error'); return; }
+
+  const { error } = await sb.rpc('log_maintenance', {
+    _vehicle_id: vehicle, _service_type: type, _description: desc || null,
+    _cost: isNaN(cost)?0:cost, _serviced_at: date || null, _next_due: next || null
+  });
+  if(error){ showToast('Could not save maintenance log','error'); console.error(error); return; }
+  showToast('Maintenance log saved','success');
+  loadMaintenanceSummary();
+}
+
+// ── Tricycle fleet management ────────────────────────────────────────────────────
 async function loadVehiclesManager(){
   const el = document.getElementById('fin-vehicles-content');
-  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading vehicles…</div>';
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Loading tricycles…</div>';
 
-  const { data: vehicles } = await sb.rpc('get_all_vehicles');
-  const localRidersList = getLocalRiders();
+  const ok = await loadFleetCache();
+  if(!ok){
+    el.innerHTML = '<div class="analytics-empty">❌ Could not load the fleet. Run the fleet setup SQL (zygo-export/02_fleet.sql) first.</div>';
+    return;
+  }
 
-  const riderOptions = localRidersList.map(r=>`<option value="${r.riderId}">${sanitize(r.name)}</option>`).join('');
+  const vehicles = fleetCache;
+  const counts = {
+    active: vehicles.filter(v=>v.status==='active').length,
+    maintenance: vehicles.filter(v=>v.status==='maintenance').length,
+    retired: vehicles.filter(v=>v.status==='retired').length,
+    assigned: vehicles.filter(v=>v.rider_id).length
+  };
 
   el.innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:12px">
+      <span style="background:var(--bg);border-radius:8px;padding:6px 10px">🛺 Fleet: <strong>${vehicles.length}</strong></span>
+      <span style="background:var(--bg);border-radius:8px;padding:6px 10px">🟢 Active: <strong>${counts.active}</strong></span>
+      <span style="background:var(--bg);border-radius:8px;padding:6px 10px">🔧 In repair: <strong>${counts.maintenance}</strong></span>
+      <span style="background:var(--bg);border-radius:8px;padding:6px 10px">⚪ Retired: <strong>${counts.retired}</strong></span>
+      <span style="background:var(--bg);border-radius:8px;padding:6px 10px">👤 Assigned: <strong>${counts.assigned}</strong></span>
+    </div>
+
     <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px">
-      <div style="font-size:13px;font-weight:700;margin-bottom:10px">+ Add Vehicle</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">+ Add tricycle</div>
       <div class="fin-form-row">
-        <input class="fin-input" id="veh-name" placeholder="Vehicle name e.g. Honda Wave 1"/>
+        <input class="fin-input" id="veh-name" placeholder="Name e.g. Tricycle 31"/>
         <input class="fin-input" id="veh-plate" placeholder="Plate number"/>
       </div>
       <div class="fin-form-row">
         <select class="fin-input" id="veh-rider">
           <option value="">Unassigned</option>
-          ${riderOptions}
+          ${riderSelectOptions()}
         </select>
         <select class="fin-input" id="veh-status">
           <option value="active">Active</option>
-          <option value="maintenance">In Maintenance</option>
+          <option value="maintenance">In repair</option>
           <option value="retired">Retired</option>
         </select>
       </div>
-      <button class="fin-add-btn" onclick="addVehicle()">+ Add Vehicle</button>
+      <div class="fin-form-row">
+        <select class="fin-input" id="veh-type">
+          <option value="tricycle">Tricycle</option>
+          <option value="motorbike">Motorbike</option>
+          <option value="van">Van</option>
+        </select>
+      </div>
+      <button class="fin-add-btn" onclick="addVehicle()">+ Add tricycle</button>
     </div>
 
     <div class="fin-table-wrap">
       <table class="fin-table">
-        <thead><tr><th>Vehicle</th><th>Plate</th><th>Assigned Rider</th><th>Status</th></tr></thead>
+        <thead><tr><th>Tricycle</th><th>Plate</th><th>Assigned Rider</th><th>Status</th><th>Next Service</th><th>Costs</th><th></th></tr></thead>
         <tbody>
-          ${(vehicles||[]).map(v=>`<tr>
-            <td style="font-weight:600">${sanitize(v.vehicle_name)}</td>
+          ${vehicles.map(v=>`<tr>
+            <td style="font-weight:600">${sanitize(v.vehicle_name)}${v.vehicle_type && v.vehicle_type!=='tricycle'?` <span style="color:var(--muted);font-weight:500">(${sanitize(v.vehicle_type)})</span>`:''}</td>
             <td>${sanitize(v.plate_number||'—')}</td>
-            <td>${sanitize(v.rider_name||'Unassigned')}</td>
-            <td>${v.status==='active'?'🟢 Active':v.status==='maintenance'?'🔧 Maintenance':'⚪ Retired'}</td>
-          </tr>`).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted)">No vehicles added yet</td></tr>'}
+            <td>
+              <select class="fin-input" style="min-width:130px" onchange="changeVehicleRider('${v.vehicle_id}', this.value)">
+                <option value="">Unassigned</option>
+                ${riderSelectOptions(v.rider_id)}
+              </select>
+            </td>
+            <td>
+              <select class="fin-input" style="min-width:120px" onchange="changeVehicleStatus('${v.vehicle_id}', this.value)">
+                <option value="active" ${v.status==='active'?'selected':''}>🟢 Active</option>
+                <option value="maintenance" ${v.status==='maintenance'?'selected':''}>🔧 In repair</option>
+                <option value="retired" ${v.status==='retired'?'selected':''}>⚪ Retired</option>
+              </select>
+            </td>
+            <td>${v.next_service_due||'—'}</td>
+            <td style="white-space:nowrap">Fuel GHS ${Number(v.fuel_cost||0).toFixed(0)}<br>Repairs GHS ${Number(v.maintenance_cost||0).toFixed(0)}</td>
+            <td><button class="fin-tab-btn" onclick="removeVehicle('${v.vehicle_id}','${sanitize(v.vehicle_name)}')">Delete</button></td>
+          </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--muted)">No tricycles added yet</td></tr>'}
         </tbody>
       </table>
     </div>`;
@@ -2072,17 +2254,45 @@ async function loadVehiclesManager(){
 async function addVehicle(){
   const name = document.getElementById('veh-name').value.trim();
   const plate = document.getElementById('veh-plate').value.trim();
-  const rider = document.getElementById('veh-rider').value;
+  const riderVal = document.getElementById('veh-rider').value;
   const status = document.getElementById('veh-status').value;
+  const type = document.getElementById('veh-type').value;
 
-  if(!name){ showToast('Please enter a vehicle name','error'); return; }
+  if(!name){ showToast('Please enter a name','error'); return; }
+  const [riderId, riderName] = riderVal ? riderVal.split('|') : ['',''];
 
   const { error } = await sb.rpc('upsert_vehicle', {
-    _id: null, _name: name, _plate: plate||null, _rider_id: rider||null, _status: status
+    _id: null, _name: name, _plate: plate||null,
+    _rider_id: riderId||null, _status: status, _type: type, _rider_name: riderName||null
   });
 
-  if(error){ showToast('Failed to add vehicle','error'); return; }
-  showToast('Vehicle added','success');
+  if(error){ showToast('Failed to add tricycle','error'); console.error(error); return; }
+  showToast('Tricycle added','success');
+  loadVehiclesManager();
+}
+
+async function changeVehicleRider(id, riderVal){
+  const [riderId, riderName] = riderVal ? riderVal.split('|') : ['',''];
+  const { error } = await sb.rpc('assign_vehicle_rider', {
+    _id: id, _rider_id: riderId||null, _rider_name: riderName||null
+  });
+  if(error){ showToast('Could not assign rider','error'); console.error(error); return; }
+  showToast(riderId?`Assigned to ${riderName}`:'Rider cleared','success');
+  loadVehiclesManager();
+}
+
+async function changeVehicleStatus(id, status){
+  const { error } = await sb.rpc('set_vehicle_status', { _id: id, _status: status });
+  if(error){ showToast('Could not update status','error'); console.error(error); return; }
+  showToast('Status updated','success');
+  loadVehiclesManager();
+}
+
+async function removeVehicle(id, name){
+  if(!confirm(`Delete ${name}? Its fuel and maintenance logs will be removed too.`)) return;
+  const { error } = await sb.rpc('delete_vehicle', { _id: id });
+  if(error){ showToast('Could not delete','error'); console.error(error); return; }
+  showToast('Tricycle deleted','success');
   loadVehiclesManager();
 }
 
